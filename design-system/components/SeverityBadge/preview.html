@@ -1,0 +1,36 @@
+<!-- @dsCard group="Status" height=120 subtitle="Five levels, each with its own icon and word" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h('div', {className:'col'},
+      h('div', {className:'row'},
+        h(A.SeverityBadge, {level:'critical'}),
+        h(A.SeverityBadge, {level:'high'}),
+        h(A.SeverityBadge, {level:'medium'}),
+        h(A.SeverityBadge, {level:'low'}),
+        h(A.SeverityBadge, {level:'secure'})
+      ),
+      h('div', {className:'row'},
+        h(A.SeverityBadge, {level:'critical', subtle:true}, 'CVE-2026-4417'),
+        h(A.SeverityBadge, {level:'secure', subtle:true}, 'Patched'),
+        h(A.SeverityBadge, {level:'low', subtle:true}, 'Informational')
+      )
+    ));
+
+</script>
+</body>
+</html>

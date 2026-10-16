@@ -1,0 +1,35 @@
+<!-- @dsCard group="Data" height=320 subtitle="Detections, newest first" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  var cols = [
+    {key:'severity', header:'Severity'},
+    {key:'threat', header:'Detection'},
+    {key:'asset', header:'Asset'},
+    {key:'source', header:'Source IP', mono:true},
+    {key:'time', header:'Seen', align:'right', mono:true}
+  ];
+  var rows = [
+    {severity:h(A.SeverityBadge,{level:'critical'}), threat:'Credential stuffing', asset:'auth-gateway-01', source:'185.220.101.44', time:'14:02:11'},
+    {severity:h(A.SeverityBadge,{level:'high'}), threat:'Privilege escalation', asset:'k8s-node-7', source:'10.2.44.19', time:'13:47:50'},
+    {severity:h(A.SeverityBadge,{level:'medium'}), threat:'Unencrypted transfer', asset:'backup-store', source:'10.2.9.3', time:'13:31:02'},
+    {severity:h(A.SeverityBadge,{level:'low'}), threat:'Expired certificate', asset:'cdn-edge-eu', source:'172.16.8.120', time:'12:58:44'}
+  ];
+  ReactDOM.createRoot(document.getElementById('root')).render(h(A.ThreatTable, {columns:cols, rows:rows}));
+
+</script>
+</body>
+</html>

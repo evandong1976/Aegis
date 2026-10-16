@@ -1,0 +1,58 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aegis</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--ground); color:var(--ink); font-family:var(--font-sans); overflow:hidden; }
+  .cover { position:relative; height:288px; overflow:hidden; }
+  .art { position:absolute; top:0; left:480px; width:480px; height:288px; overflow:hidden; }
+  .art svg { display:block; width:480px; height:288px; }
+  .brand { fill:var(--brand); }
+  .deep  { fill:var(--ink); }
+  .cyan  { fill:var(--accent); }
+  .steel { fill:var(--blue-700); }
+  .tint  { fill:var(--blue-300); }
+  .blk   { rx:var(--radius-lg); }
+  .tag-blk { rx:var(--radius-md); }
+  .sweep { fill:none; stroke:var(--ground); stroke-width:6; }
+  .words { position:absolute; left:var(--space-8); right:var(--space-8); bottom:var(--space-8); max-width:440px; }
+  .name { margin:0; font-family:var(--font-display); font-size:120px; line-height:.9; font-weight:700; letter-spacing:-.035em; color:var(--ink); }
+  .tag  { margin:var(--space-3) 0 0 3px; font-size:14px; line-height:20px; font-weight:500; color:var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      brand 152×248 bleeding off the top (the electric blue of the source image) · ink 112×208 (the deep navy ground, inverted per theme so it never sinks into either) · accent 184×248 bleeding off the right edge, the largest block because cyan is what this brand is recognised by · blue-700 112×40 and blue-300 72×24, the two sampled mid-blues, as relief — together ≈31% of 960×288
+  arrangement one tall brand slab at the left of the box, a narrow ink column, then the cyan block bled off the right; bottoms on one line space-6 above the edge, space-5 gutters
+  pattern     arcs, from the README's "a scan is the product's basic gesture": four radar rings in the ground colour cut out of the cyan block, centred on its lower-left corner, radii stepping by space-10 — the sweep a monitoring product draws of itself
+  scales      block sides in space-2 multiples; gutters space-5; arc radii 48 + space-10 steps; stroke space-1 + 2; corners radius-lg, the small tag radius-md, the chip radius-sm
+-->
+      <defs>
+        <clipPath id="cyanBlock"><rect x="296" y="16" width="184" height="248" rx="20"/></clipPath>
+      </defs>
+      <rect class="brand blk" x="0" y="-24" width="152" height="248" rx="20"/>
+      <rect class="tint" x="0" y="240" width="72" height="24" rx="10"/>
+      <rect class="steel tag-blk" x="168" y="0" width="112" height="40" rx="14"/>
+      <rect class="deep blk" x="168" y="56" width="112" height="208" rx="20"/>
+      <rect class="cyan blk" x="296" y="16" width="184" height="248" rx="20"/>
+      <g clip-path="url(#cyanBlock)">
+        <circle class="sweep" cx="296" cy="264" r="48"/>
+        <circle class="sweep" cx="296" cy="264" r="88"/>
+        <circle class="sweep" cx="296" cy="264" r="128"/>
+        <circle class="sweep" cx="296" cy="264" r="168"/>
+      </g>
+    </svg>
+  </div>
+  <div class="words">
+    <h1 class="name">Aegis</h1>
+    <p class="tag">Security that shows its work.</p>
+  </div>
+</div>
+</body>
+</html>

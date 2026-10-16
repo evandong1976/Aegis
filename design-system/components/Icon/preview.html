@@ -1,0 +1,32 @@
+<!-- @dsCard group="Foundations" height=220 subtitle="The icon set, drawn in currentColor" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  var names = A.iconNames;
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h('div', {style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(84px,1fr))',gap:'var(--space-4)'}},
+      names.map(function(n){
+        return h('div', {key:n, style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'var(--space-2)',
+          padding:'var(--space-3)',borderRadius:'var(--radius-md)',background:'var(--surface)',
+          border:'1px solid var(--border)',color:'var(--accent)'}},
+          h(A.Icon, {name:n, size:22}),
+          h('span', {style:{fontFamily:'var(--font-mono)',fontSize:'11px',lineHeight:'16px',color:'var(--ink-subtle)',
+            textAlign:'center',wordBreak:'break-word'}}, n));
+      })));
+
+</script>
+</body>
+</html>

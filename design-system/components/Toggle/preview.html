@@ -1,0 +1,30 @@
+<!-- @dsCard group="Forms" height=140 subtitle="On, off, disabled" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  function Demo() {
+    var s = React.useState({auto:true, quar:false}), v = s[0], set = s[1];
+    return h('div', {className:'col'},
+      h(A.Toggle, {checked:v.auto, label:'Auto-block repeat offenders', onChange:function(){set({auto:!v.auto, quar:v.quar});}}),
+      h(A.Toggle, {checked:v.quar, label:'Quarantine suspicious attachments', onChange:function(){set({auto:v.auto, quar:!v.quar});}}),
+      h(A.Toggle, {checked:true, disabled:true, label:'Audit logging (required by policy)'})
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!-- @dsCard group="Data" height=220 subtitle="Raw events in the mono scale" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h(A.LogStream, {lines:[
+      {time:'14:02:11', level:'block', text:'auth-gateway-01 ← 185.220.101.44 rule=brute-force hits=412'},
+      {time:'14:01:58', level:'warn', text:'k8s-node-7 container escaped seccomp profile (pid 2291)'},
+      {time:'13:59:40', level:'allow', text:'vpn-eu-3 ← 10.2.44.19 user=d.okafor mfa=passkey'},
+      {time:'13:58:02', level:'allow', text:'scan complete targets=1284 findings=37 duration=92s'},
+      {time:'13:55:19', level:'warn', text:'cdn-edge-eu certificate expires in 6 days'}
+    ]}));
+
+</script>
+</body>
+</html>

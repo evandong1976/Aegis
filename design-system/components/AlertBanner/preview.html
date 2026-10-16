@@ -1,0 +1,33 @@
+<!-- @dsCard group="Status" height=380 subtitle="Four tones, each with an icon and a word" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Aegis preview</title>
+<style>
+  html,body{margin:0;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-sans);padding:var(--space-6);box-sizing:border-box;}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);}
+  .col{display:flex;flex-direction:column;gap:var(--space-4);}
+  .grid{display:grid;gap:var(--space-5);}
+  
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var A = window.Aegis, h = React.createElement, F = React.Fragment;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h('div', {className:'col'},
+      h(A.AlertBanner, {tone:'critical', title:'Active intrusion on auth-gateway-01',
+        action:h(A.Button,{variant:'danger',size:'sm'},'Isolate')},
+        'Repeated failed logins from 185.220.101.44 followed by one success at 14:02.'),
+      h(A.AlertBanner, {tone:'warning', title:'27 endpoints missing the October patch'},
+        'Rollout stalled on hosts that have not checked in for 6 days.'),
+      h(A.AlertBanner, {tone:'info', title:'Scheduled scan starts at 02:00 UTC'},
+        'Agents will report elevated CPU for roughly twenty minutes.'),
+      h(A.AlertBanner, {tone:'success', title:'All critical findings resolved'},
+        'The last of this cycle closed 40 minutes ago.')
+    ));
+
+</script>
+</body>
+</html>
