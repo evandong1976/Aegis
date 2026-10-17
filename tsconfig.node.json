@@ -5,7 +5,8 @@
     "vitest.config.*",
     "src/main/**/*",
     "src/preload/**/*",
-    "src/shared/**/*"
+    "src/shared/**/*",
+    "scripts/**/*.mts"
   ],
   "compilerOptions": {
     "composite": true,

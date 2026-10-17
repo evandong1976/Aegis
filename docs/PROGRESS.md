@@ -1,9 +1,14 @@
-## Handoff (updated 2026-10-17 00:00 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 00:50 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **`sponsor-check` (this branch, not merged into `main`)**: the Daytona and Droid docs check.
+    Findings with the exact calls are in `docs/PLAN.md` › Sponsor findings. The SDKs are pinned
+    (`@daytona/sdk` 0.220.0, `@factory/droid-sdk` 0.9.1). `pnpm try:daytona` and `pnpm try:droid`
+    typecheck, but **have not run**: no keys are set, and the droid CLI isn't installed. Without
+    keys each exits 1 with a clear message.
   - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
     `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
     commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
@@ -22,13 +27,18 @@
   `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
   start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
   milestone 3 (joint) is underway.
-- **Broken / failing:** nothing failing. Three small UI issues open (see "Open issues"; branch
-  `ui-fixes`).
+- **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
+  fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
+  small UI issues open (see "Open issues"; branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
-- **Blocked on / questions for the user:** deferred by the team: four-track eligibility (and whether
-  to keep the Photon track now that Photon is deferred), demo domain. Before M4/M6: verify Droid
-  can run inside a Daytona sandbox and Chalk can host its own sandbox.
+- **Blocked on / questions for the user:** to finish `sponsor-check`, add `DAYTONA_API_KEY` and
+  `FACTORY_API_KEY` to `.env`, install the droid CLI, then run `pnpm try:daytona` and
+  `pnpm try:droid`. The team needs to choose how Worker A reaches the sandbox: **A**, Droid inside
+  it, which needs network to Factory; or **B**, Droid connected to it through MCP tools, with the
+  network kept off (PLAN.md › Sponsor findings › Factory Droid). Deferred by the team: four-track
+  eligibility (and whether to keep the Photon track now that Photon is deferred), demo domain.
+  Before M6: can Chalk host its own sandbox?
 - **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
   every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
   with the latest `SUMMARY.md` in `logs/`.
@@ -151,7 +161,8 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 
 ## Sponsor findings
 
-None yet; see `docs/PLAN.md` › Sponsor findings.
+Daytona and Factory Droid: from each SDK's types, 2026-10-17, branch `sponsor-check`. The try
+scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
@@ -161,6 +172,11 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 
 ## Decisions log
 
+- 2026-10-17 00:50: `sponsor-check`: Daytona and Droid findings recorded in PLAN.md. The SDKs are
+  pinned. `scripts/try-daytona.mts` and `scripts/try-droid.mts` are written and typechecked, but
+  haven't run yet (no keys). New optional env vars: `AEGIS_DAYTONA_SNAPSHOT`, `DROID_PATH`,
+  `DAYTONA_API_URL` / `DAYTONA_TARGET`. Open choice for Worker A: Droid inside the sandbox (A) or
+  connected to it through MCP tools (B).
 - 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
   `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
   prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and

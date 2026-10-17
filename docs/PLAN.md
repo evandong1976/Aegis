@@ -283,16 +283,84 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
-Not checked yet. Do this before writing each integration, record the exact calls here, and get
-`scripts/try-<sponsor>.ts` passing first. Never invent SDK method names.
+Do this before writing each integration, record the exact calls here, and get
+`scripts/try-<sponsor>` passing first. Never invent SDK method names. Daytona and Droid were
+checked on 2026-10-17 against each SDK's README and installed type definitions (branch
+`sponsor-check`). Their try scripts are written, but they haven't run yet because no keys are set.
 
-| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                     |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | —                                            |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | —                                            |
-| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                            |
-| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                            |
-| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key |
+| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                             |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below: from the SDK's types; `pnpm try:daytona` not run yet (no key) |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)   |
+| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                    |
+| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                                                    |
+| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                         |
+
+### Daytona
+
+- **SDK:** `@daytona/sdk` 0.220.0, pinned exact. That's the name in Daytona's docs;
+  `@daytonaio/sdk` publishes the same versions. `new Daytona()` reads `DAYTONA_API_KEY`, plus
+  `DAYTONA_API_URL` and `DAYTONA_TARGET` if set.
+- **Create:** `daytona.create({ snapshot?, networkBlockAll: true, ephemeral: true, autoStopInterval, labels }, { timeout })`.
+  - `ephemeral` deletes the sandbox when it stops.
+  - `ttlMinutes` is a wall-clock limit that destroys the sandbox whatever its state. Use it as a
+    backstop against leaked sandboxes.
+- **Network, per sandbox (answers "network off"):**
+  - `networkBlockAll` turns it off.
+  - `networkAllowList` takes CIDRs and `domainAllowList` takes domains.
+  - `sandbox.updateNetworkSettings({ networkBlockAll })` changes it while the sandbox runs.
+  - `try-daytona` probes example.com with curl, wget and python3 to confirm the network is really off.
+- **Files:** `sandbox.fs.createFolder(path, mode)`, `sandbox.fs.uploadFile(buffer | localPath, remotePath)`
+  and `sandbox.fs.downloadFile(remotePath)`.
+- **Run:** `sandbox.process.executeCommand(command, cwd?, env?, timeoutSeconds?)` returns
+  `{ exitCode, result }`. The timeout ends the command.
+- **Delete:** `sandbox.delete(timeout?)` or `daytona.delete(sandbox)`. Put it in a `finally`, as
+  `try-daytona` does.
+- **Snapshot (for `pnpm build:sandbox`, M3):**
+  `daytona.snapshot.create({ name, image: Image.fromDockerfile('sandbox/Dockerfile') }, { onLogs })`.
+  Daytona runs `linux/amd64`.
+- **Not answered by the SDK:**
+  - Start-up time: `try-daytona` logs it.
+  - Concurrency limits and hackathon credits: ask Daytona at the event.
+
+### Factory Droid
+
+- **SDK:** `@factory/droid-sdk` 0.9.1, pinned exact. It's TypeScript; there's also a Python SDK.
+  - Import from `@factory/droid-sdk/node`.
+  - It starts the **`droid` CLI as a subprocess**, so the CLI must be installed:
+    `brew install --cask droid`, or `npm install -g droid@<version>` (npm builds don't auto-update),
+    or set `execPath` / `DROID_PATH`.
+  - It reads `FACTORY_API_KEY`.
+- **One call:** `run(prompt, { cwd, execPath, autonomyLevel, outputFormat: { type: OutputFormatType.JsonSchema, schema } })`
+  returns `{ success, subtype, text, structuredOutput, structuredOutputError, error, tokenUsage, messages }`.
+- **Sessions:**
+  - `createSession({ mcpServers, permissionHandler, autonomyLevel, cwd, execPath })` opens one.
+  - `session.stream(prompt)` yields `ToolCall`, `Assistant` and `Result` messages. That stream is
+    the raw material for Droid's log in the report.
+  - Also: `session.listTools()`, `session.updateSettings({ disabledToolIds })`, `session.close()`.
+- **Tools and MCP:**
+  - `createSdkMcpServer({ name, tools: [tool(name, description, inputShape?, handler)] })` defines
+    in-process tools.
+  - External MCP servers also work, so REA over MCP is possible (stretch).
+- **Limiting what Droid can do:**
+  - There's only a deny-list (`disabledToolIds`), no allow-list.
+  - `permissionHandler` sees every tool use, including `details.type` and, for MCP tools,
+    `details.serverName`. It returns `ToolConfirmationOutcome.ProceedOnce` or `Cancel`.
+  - With no handler, every request is cancelled.
+  - `try-droid` turns off every built-in tool from `listTools()` and allows only its own MCP server.
+- **zod:** the SDK bundles zod 3; Aegis uses zod 4.6.7. Tool input shapes must be zod 3 schemas.
+  `try-droid` sidesteps this with a tool that takes no input. Settle it at M4.
+- **Run time:** not documented. `try-droid` logs it.
+- **Can Droid run inside a Daytona sandbox? Two options, and the team needs to choose (decision 17
+  assumes A):**
+  - **A. Droid inside the sandbox.** Install the `droid` CLI in the image, which then needs Node.js;
+    `sandbox/Dockerfile` has none today. The sandbox also has to reach Factory's API, which
+    conflicts with network-off analysis unless `domainAllowList` admits only Factory's API hosts.
+    Those hosts aren't in the docs; ask Factory.
+  - **B. Droid connected to the sandbox** (BUILD_PROMPT §4.7 item 2, "run inside or connect
+    to"). Droid runs in the main process with every built-in tool off. Its only tools are Aegis MCP
+    tools that run read-only commands inside the sandbox through `executeCommand`. The sample never
+    leaves the sandbox and the network stays off. `try-droid` tests this setup with a stub tool.
 
 ## Open questions
 
