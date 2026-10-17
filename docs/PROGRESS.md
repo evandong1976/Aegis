@@ -9,7 +9,7 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished — branch `extension-status` (uncommitted):** the milestone-1 Chrome check
+- **Just finished — branch `extension-status`, merged into `main` (not pushed):** the milestone-1 Chrome check
   found that the app said Connected but the extension's badge and popup stayed on "Not
   connected". Chrome leaves `Origin` off an extension's GET requests, so the bridge answered
   `GET /status` with 403 (only `POST /ping` passed). `/status` and `/scan/:id` are now POST
