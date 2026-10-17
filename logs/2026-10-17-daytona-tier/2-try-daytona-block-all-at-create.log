@@ -1,0 +1,7 @@
+.env not found. Continuing without it.
+ok   create (network off): 45d1f664-664d-4ab7-ad75-f24494a337bc from the default snapshot in 0.8 s (1 attempt); networkBlockAll=true
+ok   upload: sample/file + sample/meta.json in 0.5 s
+ok   run a command: sha256sum exit 0 in 0.1 s; matches
+ok   network is off (ordinary website, https://example.com): BLOCKED in 15.2 s
+ok   network is off (essential service, https://registry.npmjs.org/): BLOCKED in 15.2 s
+ok   delete: at 2026-10-17T14:38:23.004Z in 0.1 s

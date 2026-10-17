@@ -1,0 +1,5 @@
+{
+  "at": "2026-10-17T14:38:23.194Z",
+  "domainAllowList": "app.factory.ai,api.factory.ai",
+  "error": "Network access is restricted and cannot be overridden at the sandbox level. Remove domainAllowList from the request. See https://www.daytona.io/docs/en/network-limits/#tier-based-network-restrictions"
+}

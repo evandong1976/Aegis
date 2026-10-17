@@ -1,13 +1,41 @@
-## Handoff (updated 2026-10-17 00:00 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:00 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
-  - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
-    `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
-    commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
-    Branches. Joint items (0, 3, 10) have no branch and aren't started.
+  - **`pnpm try:droid` passes** (option B, end to end): Droid on the Mac, 31 built-in tools off,
+    three read-only tools into a network-off Daytona sandbox; correct SHA-256, verdict and summary
+    in about 10 s; tool calls logged; 0 sandboxes left. Found and worked around an SDK/CLI protocol
+    mismatch, and `ToolSearch` can't be disabled (harmless). PLAN.md › Sponsor findings › Factory
+    Droid › Live results; evidence `logs/2026-10-17-droid/`. droid CLI 0.238.0 installed via
+    Homebrew (plus its dependency ripgrep).
+  - **Worker A decided: option B** (PLAN.md decision 19). `try-droid` step 2 now uses a real
+    sandbox: network off, one harmless text file, three read-only argument-free tools; Droid must
+    report the file's SHA-256, which only the tools can give it. Typechecks; **not run yet** (needs
+    the droid CLI). Option A (step 3) is opt-in with `AEGIS_TRY_DROID_INSIDE=1`.
+  - `extension-heartbeat` merged into `main` (local, not pushed).
+  - **Daytona checked live (10:40)** with Evan's key: `pnpm try:daytona` passes (create 0.8–3.8 s,
+    upload, run, network off, delete). The org is on Tier 1 or 2: `networkBlockAll` at creation
+    works (even npm, an "essential service", is blocked), but allow-lists and changes after
+    creation are refused, and Factory's hosts are unreachable. So **analysis offline works now;
+    Droid inside the sandbox (option A) and link detonation need Tier 3** or the alternatives in
+    `docs/PLAN.md` › Sponsor findings › Daytona › Live results. Evidence:
+    `logs/2026-10-17-daytona-tier/`. Leak check: 0 sandboxes left.
+  - The try scripts and the app now read `.env.local` as well as `.env` (`.env.local` wins);
+    `try-daytona` also probes an essential service, so "network off" is a real test on Tier 1/2.
+  - **Review against the plan (01:20)**: `try-droid` now also runs Droid inside a Daytona sandbox
+    (option A), as PLAN.md › Branches asks. `try-daytona` now uses the 20 s sandbox-start limit
+    with one retry (architectural.md §4.6). New optional env var: `AEGIS_FACTORY_DOMAINS`.
+  - **`sponsor-check` (this branch, not merged into `main`)**: the Daytona and Droid docs check.
+    Findings with the exact calls are in `docs/PLAN.md` › Sponsor findings. The SDKs are pinned
+    (`@daytona/sdk` 0.220.0, `@factory/droid-sdk` 0.9.1). `pnpm try:daytona` and `pnpm try:droid`
+    typecheck, but **have not run**: no keys are set, and the droid CLI isn't installed. Without
+    keys each exits 1 with a clear message.
+  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
+    branch's work is in its own commits, and this file is that branch's handoff. Order,
+    prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
+    empty, waiting on milestone 3 (joint).
   - **Verified what works** with `pnpm verify` and recorded the evidence in
     [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
     commit `35cba97` (see "What works today" below)
@@ -15,20 +43,16 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows
-  Bridge = Connected within 30 s (closes milestone 1; the verification only simulated the
-  heartbeat with `curl`). Then split: Evan starts milestone 2 (content script → `/page` → wire
-  `showClickGuard`) and the `demo/` phishing page. Zach claims and starts `sponsor-check` and
-  `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
-  start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
-  milestone 3 (joint) is underway.
-- **Broken / failing:** nothing failing. Three small UI issues open (see "Open issues"; branch
-  `ui-fixes`).
+- **Next step:** Merge `sponsor-check` into `main` (its "Done when" is met: both scripts pass, both
+  findings rows filled in, leak check 0). Then `worker-a` can start once M3 and the `WorkerResult`
+  type exist. Still open: where link detonation runs (Tier 3 or Chalk).
+- **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
+  fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
+  small UI issues open (see "Open issues"; branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
-- **Blocked on / questions for the user:** deferred by the team: four-track eligibility (and whether
-  to keep the Photon track now that Photon is deferred), demo domain. Before M4/M6: verify Droid
-  can run inside a Daytona sandbox and Chalk can host its own sandbox.
+- **Blocked on / questions for the user:** OK to merge `sponsor-check` into `main`? Where link
+  detonation runs (Tier 3 or Chalk).
 - **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
   every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
   with the latest `SUMMARY.md` in `logs/`.
@@ -151,16 +175,34 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 
 ## Sponsor findings
 
-None yet; see `docs/PLAN.md` › Sponsor findings.
+Daytona and Factory Droid: from each SDK's types, 2026-10-17, branch `sponsor-check`. The try
+scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
-| After milestone | Sandboxes left running |
-| --------------- | ---------------------- |
-| —               | Daytona not used yet   |
+| After                                       | Sandboxes left running                                    |
+| ------------------------------------------- | --------------------------------------------------------- |
+| `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
+| `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
 
 ## Decisions log
 
+- 2026-10-17: `pnpm try:droid` passes with option B. Workaround for the SDK 0.9.1 / droid 0.238.0
+  protocol mismatch recorded in PLAN.md › Sponsor findings › Factory Droid › Live results.
+
+- 2026-10-17: Worker A is option B — Droid on the Mac, narrow read-only tools into a network-off
+  sandbox (PLAN.md decision 19).
+
+- 2026-10-17: Daytona checked live on `sponsor-check`. This account's tier (1 or 2) allows
+  `networkBlockAll` at creation but refuses allow-lists and later changes; Factory and ordinary
+  websites are unreachable. Option A (Droid inside) and link detonation need Tier 3 or an
+  alternative; the team decides (PLAN.md › Sponsor findings › Daytona › Live results).
+
+- 2026-10-17 00:50: `sponsor-check`: Daytona and Droid findings recorded in PLAN.md. The SDKs are
+  pinned. `scripts/try-daytona.mts` and `scripts/try-droid.mts` are written and typechecked, but
+  haven't run yet (no keys). New optional env vars: `AEGIS_DAYTONA_SNAPSHOT`, `DROID_PATH`,
+  `DAYTONA_API_URL` / `DAYTONA_TARGET`. Open choice for Worker A: Droid inside the sandbox (A) or
+  connected to it through MCP tools (B).
 - 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
   `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
   prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and

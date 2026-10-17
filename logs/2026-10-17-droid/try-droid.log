@@ -1,0 +1,9 @@
+.env not found. Continuing without it.
+ok   droid CLI: droid 0.238.0
+ok   run() with structured output: {"verdict":"unknown","summary":"The check worked."} in 5.2 s
+ok   sandbox (network off) + sample: 2a89b682-d69a-42b5-b3e6-c94895348b0d in 1.0 s
+ok   built-in tools off: 31 switched off; ToolSearch can't be (schema loader only)
+ok   Droid used the sandbox tools: 3 tool call(s) (read_sample, describe_sample, list_sample_files); sha256 matches; verdict clean; "The sample is a short plain-text note with no executable code or apparent malicious content." in 9.7 s
+sandbox log: [{"at":"2026-10-17T14:57:56.695Z","tool":"read_sample","exitCode":0,"bytes":48},{"at":"2026-10-17T14:57:56.697Z","tool":"describe_sample","exitCode":0,"bytes":85},{"at":"2026-10-17T14:57:56.700Z","tool":"list_sample_files","exitCode":0,"bytes":157}]
+ok   delete: 2a89b682-d69a-42b5-b3e6-c94895348b0d at 2026-10-17T14:58:02.037Z
+skip droid inside a Daytona sandbox: option B chosen (set AEGIS_TRY_DROID_INSIDE=1 to try)

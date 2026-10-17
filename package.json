@@ -29,9 +29,13 @@
     "tokens": "node design-system/build-tokens.mjs",
     "capture": "sh scripts/capture.sh",
     "dev:demo": "AEGIS_DEMO=1 electron-vite dev",
-    "verify": "sh scripts/verify.sh"
+    "verify": "sh scripts/verify.sh",
+    "try:daytona": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-daytona.mts",
+    "try:droid": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-droid.mts"
   },
   "dependencies": {
+    "@daytona/sdk": "0.220.0",
+    "@factory/droid-sdk": "0.9.1",
     "zod": "4.6.7"
   },
   "devDependencies": {

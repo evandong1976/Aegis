@@ -9,14 +9,21 @@ import {
   DEFAULT_SANDBOX_DAILY_BUDGET
 } from '@shared/constants'
 
-/** Loads `.env` from the project root in dev, or from userData when packaged. */
-export function loadEnv(): string | null {
-  const path = app.isPackaged
-    ? join(app.getPath('userData'), '.env')
-    : join(app.getAppPath(), '.env')
-  if (!existsSync(path)) return null
-  process.loadEnvFile(path)
-  return path
+/**
+ * Loads `.env.local` then `.env`, from the project root in dev or from userData when packaged.
+ * Node never overwrites a variable that is already set, so `.env.local` wins over `.env`, and the
+ * real environment wins over both. Returns the files that were found.
+ */
+export function loadEnv(): string[] {
+  const dir = app.isPackaged ? app.getPath('userData') : app.getAppPath()
+  const loaded: string[] = []
+  for (const name of ['.env.local', '.env']) {
+    const path = join(dir, name)
+    if (!existsSync(path)) continue
+    process.loadEnvFile(path)
+    loaded.push(path)
+  }
+  return loaded
 }
 
 function int(name: string, fallback: number): number {
