@@ -1,18 +1,21 @@
-## Handoff (updated 2026-10-17 00:50 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 01:20 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Review against the plan (01:20)**: `try-droid` now also runs Droid inside a Daytona sandbox
+    (option A), as PLAN.md › Branches asks. `try-daytona` now uses the 20 s sandbox-start limit
+    with one retry (architectural.md §4.6). New optional env var: `AEGIS_FACTORY_DOMAINS`.
   - **`sponsor-check` (this branch, not merged into `main`)**: the Daytona and Droid docs check.
     Findings with the exact calls are in `docs/PLAN.md` › Sponsor findings. The SDKs are pinned
     (`@daytona/sdk` 0.220.0, `@factory/droid-sdk` 0.9.1). `pnpm try:daytona` and `pnpm try:droid`
     typecheck, but **have not run**: no keys are set, and the droid CLI isn't installed. Without
     keys each exits 1 with a clear message.
-  - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
-    `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
-    commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
-    Branches. Joint items (0, 3, 10) have no branch and aren't started.
+  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
+    branch's work is in its own commits, and this file is that branch's handoff. Order,
+    prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
+    empty, waiting on milestone 3 (joint).
   - **Verified what works** with `pnpm verify` and recorded the evidence in
     [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
     commit `35cba97` (see "What works today" below)
@@ -20,13 +23,12 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows
-  Bridge = Connected within 30 s (closes milestone 1; the verification only simulated the
-  heartbeat with `curl`). Then split: Evan starts milestone 2 (content script → `/page` → wire
-  `showClickGuard`) and the `demo/` phishing page. Zach claims and starts `sponsor-check` and
-  `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
-  start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
-  milestone 3 (joint) is underway.
+- **Next step:** On this branch: add `DAYTONA_API_KEY` and `FACTORY_API_KEY` to `.env`, install
+  the droid CLI (`brew install --cask droid`), then run `pnpm try:daytona` and `pnpm try:droid`.
+  Record the timings and answers in `docs/PLAN.md` › Sponsor findings, check the Daytona
+  dashboard for leaked sandboxes (› Sandbox leak check below), and merge into `main` when both
+  pass. Then the team picks Worker A option A or B. Outside this branch, still open: load
+  `extension/dist` in Chrome to close milestone 1.
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
   small UI issues open (see "Open issues"; branch `ui-fixes`).

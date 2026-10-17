@@ -66,9 +66,9 @@ update PROGRESS.md, and bring the later branches up to date with `main`.
 - **Goal:** answer the Daytona and Factory Droid questions (MEGA_PROMPT §10 and the Sponsor
   findings table below) from their current docs, and get the smallest working call passing for
   each before any integration code (BUILD_PROMPT §4.5).
-- **Holds:** `scripts/try-daytona.ts` (create a sandbox with network off, upload a file, run a
+- **Holds:** `scripts/try-daytona.mts` (create a sandbox with network off, upload a file, run a
   command, read its output, delete it in a `finally`; log the start-up time) and
-  `scripts/try-droid.ts` (one Droid call, then the same call from inside a Daytona sandbox). It also
+  `scripts/try-droid.mts` (one Droid call, then the same call from inside a Daytona sandbox). It also
   fills in the Daytona and Factory Droid rows of Sponsor findings, with the exact calls, and adds
   any new env vars to `.env.example`.
 - **Decides:** whether Worker A is Droid _inside_ the sandbox (decision 17) or Droid in the main
@@ -361,6 +361,9 @@ checked on 2026-10-17 against each SDK's README and installed type definitions (
     to"). Droid runs in the main process with every built-in tool off. Its only tools are Aegis MCP
     tools that run read-only commands inside the sandbox through `executeCommand`. The sample never
     leaves the sandbox and the network stays off. `try-droid` tests this setup with a stub tool.
+  - `try-droid`'s last step tries A: it installs `droid` in a Daytona sandbox (npm `droid@0.232.0`,
+    or Factory's installer if there's no npm) and runs `droid exec --output-format json`. If
+    `AEGIS_FACTORY_DOMAINS` is set, it first cuts the sandbox's network to those hosts.
 
 ## Open questions
 

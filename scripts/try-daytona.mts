@@ -28,21 +28,26 @@ const snapshot = process.env.AEGIS_DAYTONA_SNAPSHOT || undefined
 let sandbox: Sandbox | undefined
 
 try {
+  // Sandbox start: 20 s, then one retry (architectural.md §4.6).
+  const params = {
+    snapshot,
+    networkBlockAll: true,
+    ephemeral: true,
+    autoStopInterval: 5,
+    labels: { app: 'aegis', job: 'try-daytona' }
+  }
   const t0 = performance.now()
-  sandbox = await daytona.create(
-    {
-      snapshot,
-      networkBlockAll: true,
-      ephemeral: true,
-      autoStopInterval: 5,
-      labels: { app: 'aegis', job: 'try-daytona' }
-    },
-    { timeout: 60 }
-  )
+  let attempts = 1
+  try {
+    sandbox = await daytona.create(params, { timeout: 20 })
+  } catch {
+    attempts = 2
+    sandbox = await daytona.create(params, { timeout: 20 })
+  }
   record(
     'create (network off)',
     sandbox.networkBlockAll === true,
-    `${sandbox.id} from ${snapshot ?? 'the default snapshot'} in ${seconds(t0)}; networkBlockAll=${sandbox.networkBlockAll}`
+    `${sandbox.id} from ${snapshot ?? 'the default snapshot'} in ${seconds(t0)} (${attempts} attempt${attempts > 1 ? 's' : ''}); networkBlockAll=${sandbox.networkBlockAll}`
   )
 
   const body = Buffer.from('Aegis try-daytona: harmless text, nothing to run.\n')

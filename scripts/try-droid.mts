@@ -1,15 +1,22 @@
 // Smallest working Factory Droid calls (BUILD_PROMPT §4.5, §4.7):
 //
 // 1. `run()`: one prompt, structured JSON output, nothing allowed to touch this Mac.
-// 2. The Worker A shape to test (docs/PLAN.md › Sponsor findings): Droid runs here with every
+// 2. Worker A option B, "connected" (docs/PLAN.md › Sponsor findings): Droid runs here with every
 //    built-in tool switched off, and its only tool is an in-process MCP tool. In Aegis that tool
 //    would run read-only commands inside the Daytona sandbox. Here it returns a fixed line of
-//    analysis output, so this script needs no sandbox and no sample.
+//    analysis output, so this step needs no sandbox and no sample.
+// 3. Worker A option A, "inside": the same kind of call from inside a Daytona sandbox. It installs
+//    the droid CLI there and runs `droid exec` (read-only by default). No sample is involved, so
+//    the sandbox has the network it needs to install the CLI. If AEGIS_FACTORY_DOMAINS is set
+//    (comma-separated hosts), the network is then cut to those hosts before the call, to test
+//    whether Droid works with only Factory reachable. The FACTORY_API_KEY is passed to the
+//    sandbox for that one command, and the sandbox is deleted in a `finally`.
 //
 //   pnpm try:droid
 //
-// Needs FACTORY_API_KEY in .env and the droid CLI on PATH (`brew install --cask droid`, or
-// `npm install -g droid@<version>`), or DROID_PATH pointing at it. Exits 1 if any check fails.
+// Needs FACTORY_API_KEY and DAYTONA_API_KEY in .env, and the droid CLI on PATH
+// (`brew install --cask droid`, or `npm install -g droid@<version>`) or DROID_PATH pointing at
+// it. Exits 1 if any check fails.
 
 import { execFileSync } from 'node:child_process'
 import { mkdtemp, rm } from 'node:fs/promises'
@@ -26,6 +33,10 @@ import {
   run,
   tool
 } from '@factory/droid-sdk/node'
+import { Daytona, type Sandbox } from '@daytona/sdk'
+
+/** The droid CLI version installed in the sandbox: exact, and at least two weeks old when pinned. */
+const SANDBOX_DROID_VERSION = '0.232.0'
 
 const results: Array<{ step: string; ok: boolean; detail: string }> = []
 const record = (step: string, ok: boolean, detail: string): void => {
@@ -153,6 +164,69 @@ try {
   record('Droid call', false, message(err))
 } finally {
   await rm(cwd, { recursive: true, force: true })
+}
+
+// 3. Inside a Daytona sandbox.
+if (!process.env.DAYTONA_API_KEY) {
+  record('droid inside a Daytona sandbox', false, 'needs DAYTONA_API_KEY in .env')
+} else {
+  let sandbox: Sandbox | undefined
+  try {
+    const t3 = performance.now()
+    const box = await new Daytona().create(
+      {
+        snapshot: process.env.AEGIS_DAYTONA_SNAPSHOT || undefined,
+        ephemeral: true,
+        autoStopInterval: 10,
+        labels: { app: 'aegis', job: 'try-droid' }
+      },
+      { timeout: 20 }
+    )
+    sandbox = box
+    type Run = ReturnType<Sandbox['process']['executeCommand']>
+    const sh = (cmd: string, timeout: number, env?: Record<string, string>): Run =>
+      box.process.executeCommand(`sh -c '${cmd.replace(/'/g, `'"'"'`)}'`, undefined, env, timeout)
+    const hasNpm = (await sh('command -v npm', 15)).exitCode === 0
+    const install = hasNpm
+      ? `npm install -g droid@${SANDBOX_DROID_VERSION}`
+      : 'curl -fsSL https://app.factory.ai/cli | sh'
+    const installed = await sh(
+      `${install} && export PATH="$HOME/.local/bin:$PATH" && droid --version`,
+      300
+    )
+    record(
+      'droid CLI in the sandbox',
+      installed.exitCode === 0,
+      `${box.id}: "${install}" exit ${installed.exitCode}; ${installed.result.trim().split('\n').pop()} (${seconds(t3)} incl. start)`
+    )
+
+    const domains = process.env.AEGIS_FACTORY_DOMAINS
+    if (domains) await box.updateNetworkSettings({ domainAllowList: domains })
+    const t4 = performance.now()
+    const prompt = 'Reply with exactly one sentence saying this check worked. Do not use any tools.'
+    const ran = await sh(
+      `export PATH="$HOME/.local/bin:$PATH" && droid exec --output-format json "${prompt}"`,
+      120,
+      { FACTORY_API_KEY: process.env.FACTORY_API_KEY ?? '' }
+    )
+    const network = domains ? `network limited to ${domains}` : 'network open'
+    record(
+      'droid exec inside the sandbox',
+      ran.exitCode === 0 && ran.result.trim().length > 0,
+      `exit ${ran.exitCode} in ${seconds(t4)}, ${network}; ${ran.result.trim().slice(0, 300)}`
+    )
+  } catch (err) {
+    record('droid inside a Daytona sandbox', false, message(err))
+  } finally {
+    if (sandbox) {
+      try {
+        await sandbox.delete(60)
+        record('delete', true, `${sandbox.id} at ${new Date().toISOString()}`)
+      } catch (err) {
+        record('delete', false, `${sandbox.id}: ${message(err)}`)
+      }
+    }
+  }
 }
 
 process.exit(results.every((r) => r.ok) ? 0 : 1)
