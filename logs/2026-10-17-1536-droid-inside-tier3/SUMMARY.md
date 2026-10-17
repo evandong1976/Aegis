@@ -7,7 +7,10 @@ Evidence for the team's call on PLAN.md decision 19 (option A vs B) now that the
 **Result: the network side of option A works; whether Droid answers inside is still unproven,
 because the Factory key in `.env` is invalid.** Factory returns 401 for it from the Mac (open
 network, steps 1–2) and from inside the sandbox. That's a key problem, not a sandbox or network
-problem. Re-run with a valid key: `AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid`.
+problem. The key was pasted into the team's chat earlier today and PLAN.md › Open questions says
+to rotate it, so it was most likely rotated or revoked. **Blocked on key:** with a new
+`FACTORY_API_KEY` in `.env.local`, re-run steps 1–3: `AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid`.
+The org had 0 sandboxes when checked again afterwards.
 
 ## What ran
 

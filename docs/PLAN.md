@@ -600,8 +600,9 @@ What it means for Aegis (decision 28):
 
 Evidence for the team; decision 19 stands. **The network side works; Droid answering inside is
 not proven yet, because the Factory key in `.env` is invalid** (Factory returns 401 from the Mac
-too, so it's the key, not the sandbox). Re-run `AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid` with a
-valid key.
+too, so it's the key, not the sandbox; likely rotated or revoked after it was pasted in chat, Open
+questions). **Blocked on key:** with a new key in `.env.local`, re-run steps 1–3
+(`AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid`).
 
 - **Allow-list, not open internet:** created with `domainAllowList`
   `app.factory.ai,api.factory.ai,registry.npmjs.org` (accepted, about 1 s), then narrowed with
