@@ -3,6 +3,7 @@ import {
   SAMPLE_PATH,
   createSandbox,
   observeCommand,
+  probeCommand,
   parseObservation,
   runSample,
   sha256Hex,
@@ -124,6 +125,14 @@ describe('SandboxSession.upload', () => {
     await expect(
       s.upload(Buffer.from('x'), { filename: 'x', url: null, referrer: null, contentType: null })
     ).rejects.toThrow(/upload check failed/)
+  })
+})
+
+describe('probeCommand', () => {
+  it('caps every tool with timeout and stops wget retrying', () => {
+    const cmd = probeCommand('https://example.com')
+    expect(cmd.match(/timeout -k 1 8 /g)).toHaveLength(3)
+    expect(cmd).toContain('--tries=1')
   })
 })
 

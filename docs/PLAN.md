@@ -131,6 +131,8 @@ truth. Evan's next branch is `link-checks` (M2).
   `sandbox-image` is merged in.
 - **Done when:** `pnpm try:sandbox` passes live against Daytona (needs `DAYTONA_API_KEY` in
   `.env.local`) and the leak check shows 0 sandboxes.
+- **Result (2026-10-17 12:29):** passes live, 0 sandboxes left
+  (`logs/2026-10-17-1229-sandbox-run/`).
 - **Then:** M3's `scans.ts` and `workerA.ts` use `withSandbox`; `observe.py` in the image can
   replace the shell-based observation when the snapshot exists.
 

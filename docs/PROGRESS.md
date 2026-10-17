@@ -26,8 +26,14 @@ disagree, PLAN.md › Decisions wins.
   - **Verified:** the same run command in the local Docker fallback (`aegis-sandbox:dev`,
     `--network none --read-only --cap-drop ALL`): 14 commands, the LaunchAgent write and both
     download attempts recorded, exit 0. Evidence `logs/2026-10-17-1219-sandbox-docker/`.
-  - **Not verified yet: the live Daytona run.** This Mac has no `DAYTONA_API_KEY` (no `.env.local`;
-    `.env` lacks it). Add it to `.env.local`, then `pnpm try:sandbox`.
+  - **Live on Daytona (12:29): passes, all 7 checks.** Sandbox created with the network off in
+    0.8 s, SHA-256 matched inside, example.com and the npm registry both blocked, the sample ran to
+    the end in 25 s (14 commands, the LaunchAgent write, 2 blocked downloads), deleted; leak check
+    0 sandboxes. Evidence `logs/2026-10-17-1229-sandbox-run/` (`SUMMARY.md`). Two earlier runs are
+    kept: the first failed safely (a slow `wget` probe; now capped), the second showed the 30 s
+    limit stopping the sample's own retrying `wget`.
+  - **Next on this branch:** the probes take about 18 s each (a third of the 120 s budget); shorten
+    them before M3. Then merge into `main`.
 - **Just finished — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
@@ -271,6 +277,7 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
 | `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
 | `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
+| `feature/sandbox` live runs, 12:30          | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)     |
 
 ## Decisions log
 

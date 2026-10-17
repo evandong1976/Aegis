@@ -149,9 +149,12 @@ export class SandboxSession {
   /** True when neither an ordinary website nor a Daytona "essential service" can be reached. */
   async networkIsOff(): Promise<boolean> {
     for (const url of ['https://example.com', 'https://registry.npmjs.org/']) {
+      // Three tools at most PROBE_TOOL_S each, plus headroom. A probe that still runs out of time
+      // throws, so the sample is never run on an unproven network.
       const res = await this.exec(
         `network probe ${url}`,
-        `if ${probeCommand(url)}; then echo REACHED; else echo BLOCKED; fi`
+        `if ${probeCommand(url)}; then echo REACHED; else echo BLOCKED; fi`,
+        3 * PROBE_TOOL_S + 15
       )
       if (res.result.trim() !== 'BLOCKED') return false
     }
@@ -159,14 +162,21 @@ export class SandboxSession {
   }
 }
 
-/** Any of curl, wget or python3 reaching `url` means the network is on. */
+/** Hard limit per probe tool, in seconds. */
+export const PROBE_TOOL_S = 8
+
+/**
+ * Any of curl, wget or python3 reaching `url` means the network is on. Each is capped by
+ * `timeout`, and wget tries once: by default it retries up to 20 times, which made a blocked
+ * network look like a hang (logs/2026-10-17-1226-sandbox-run/).
+ */
 export function probeCommand(url: string): string {
   return [
     `curl -sS -m 5 -o /dev/null ${url}`,
-    `wget -q -T 5 -O /dev/null ${url}`,
+    `wget -q -T 5 --tries=1 -O /dev/null ${url}`,
     `python3 -c "import urllib.request; urllib.request.urlopen('${url}', timeout=5)"`
   ]
-    .map((c) => `(${c}) 2>/dev/null`)
+    .map((c) => `(timeout -k 1 ${PROBE_TOOL_S} ${c}) 2>/dev/null`)
     .join(' || ')
 }
 

