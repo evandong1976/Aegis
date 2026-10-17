@@ -145,6 +145,7 @@ drift apart. Changing it is a joint decision (noted in the Handoff).
 | `verdicts.ts`  | The only verdict → word → badge-level mapping, ranks for "AI can only raise", action labels                                                          |
 | `bridge.ts`    | Every bridge route with request/response schemas (`/status`, `/ping`, `/page`, `/download`, `/inspect`, `/scan/:id`, `/trust`)                       |
 | `ipc.ts`       | Every renderer ↔ main channel and its argument/result types, plus the `AegisApi` the preload exposes                                                 |
+| `live.ts`      | The live view's event stream (stages, sandbox, desktop frames, terminal lines, agent steps, end), `LiveRun`, the built-in test samples (§3.9)        |
 | `constants.ts` | Extension ID, bridge port, score thresholds, timeouts, file-type lists, panel size                                                                   |
 | `icons.ts`     | Icon path data shared by the app and the extension                                                                                                   |
 
@@ -190,6 +191,9 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `queue.ts`                          | Planned (M3)                                                                      | Sandbox job queue: 3 at once, priorities, daily budget                                                                                                                  |
 | `daytona.ts`, `docker.ts`           | `daytona.ts` built (M3 sandbox half, `feature/sandbox`); `docker.ts` planned (M8) | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)                                                                               |
 | `scans.ts`                          | Planned (M3)                                                                      | The download pipeline and its persisted state machine (`received → … → compared → done`)                                                                                |
+| `sandboxScan.ts`                    | Built (`feature/visualization`)                                                   | A caught file through a real network-off sandbox with the live view on screen: `daytona.ts`'s steps, the desktop, the streamed trace, the agent, the Report (§3.9)      |
+| `live.ts`, `liveAgent.ts`           | Built (`feature/visualization`)                                                   | Live event bus (last 5 runs in memory, pushed over IPC); `LiveAgent`, the seam `workerA.ts` fills, and the scripted stand-in for Droid used until M4                    |
+| `testSamples.ts`                    | Built                                                                             | Harmless samples that only look malicious (the fake Zoom installer), shared by `try:sandbox` and the live view's test runs                                              |
 | `workerA.ts` (Daytona + Droid)      | Planned (M4)                                                                      | Creates a network-off Daytona sandbox with the file; runs Droid on the Mac with read-only tools into it (decision 19); collects verdict, evidence and the tool-call log |
 | `workerB.ts` (Chalk)                | Planned (M6)                                                                      | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log                                                                                 |
 | `compare.ts`                        | Planned (M4, M6)                                                                  | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)                                                                              |
@@ -216,6 +220,7 @@ the main window. It only displays and asks; it never decides a verdict or touche
 | `components/ds/`                           | Typed React port of `design-system/components/bundle.js`, styled by `bundle.css`                               |
 | `components/aegis.tsx`, `assets/aegis.css` | Figma-only components: VerdictBadge, StatusDot, ScanSteps, Timeline, CodeBlock, chips                          |
 | `lib/hooks.ts`, `lib/format.ts`            | Live status, IPC data hooks, scan log; formatting for machine output                                           |
+| `views/main/LiveView.tsx`, `lib/live.ts`   | The live view (§3.9): stages, Droid's steps, the sandbox's Terminal and Desktop tabs; folds `live:event`s      |
 | `assets/main.css`                          | Tailwind v4 with the design tokens mapped in `@theme`                                                          |
 
 ### 3.6 Analysis workers — two independent reverse engineers · Planned (M3, M4, M6)
@@ -327,6 +332,46 @@ only source of colour, type and spacing (both the app and the extension import i
 `design-system/components/` is the component bundle the renderer ports. `figma/` records the Figma
 file (mini panel, Report, click guard) and the specs of the four dashboard screens that `screens/`
 renders as static HTML.
+
+### 3.9 Live view — watching a file in the sandbox · Built (`feature/visualization`, PLAN.md decision 30)
+
+While a caught file is in the sandbox, the main window shows it happening, and the Report replaces
+the view when the verdict lands. The sandbox is real; until `workerA.ts` (M4) the agent's words
+come from a scripted stand-in, while its tool calls are Droid's real fixed tools.
+
+```mermaid
+flowchart LR
+  IN["Caught file<br/>(M3: /download · today: Test the sandbox)"] --> SS["sandboxScan.ts<br/>daytona.ts steps + live events"]
+  SS -->|"create (network off) · upload · probe ·<br/>sh -x · delete"| SB["Daytona sandbox<br/>network off"]
+  SS -->|"computerUse.start ·<br/>screenshot every 1 s"| SB
+  AG["LiveAgent<br/>scripted stand-in → workerA.ts (M4)<br/>on this Mac"] -->|"read-only tools only"| SB
+  SS --> AG
+  SS --> BUS["live.ts<br/>last 5 runs in memory"]
+  AG -->|"agent events"| BUS
+  BUS -->|"live:event (IPC)"| UI["LiveView.tsx<br/>stages · Droid · Terminal / Desktop"]
+  SS -->|"scan + Report"| DB[("SQLite")]
+  DB --> REP["ReportView<br/>+ sandbox session card"]
+```
+
+- **Events** (`src/shared/live.ts`): `stage` (caught, sandbox, opened, agent, verdict: active /
+  done / failed), `sandbox` (ID, network off, start time), `desktop` (starting / on / off),
+  `frame` (a JPEG of the desktop; only the latest is kept), `term` (from Aegis, the sample or the
+  agent: command, output, note, blocked, file written), `agent` (thought, tool, result, verdict)
+  and `end`. `live:get` returns a run so far; `live:event` pushes each new event.
+- **Terminal tab:** Aegis's own steps, then the sample's `sh -x` trace, read from its output files
+  every 0.7 s while it runs (network attempts as "✕ blocked"), then the agent's commands as
+  `droid › …`. The recorded observation stays the evidence; the stream is only the picture.
+- **Desktop tab:** Daytona Computer Use (Xvfb + xfce4) inside the sandbox; the file opens in an
+  `xfce4-terminal` window titled with its name, showing the recorded run's output. Pictures arrive
+  as data URLs over IPC, so the renderer still loads no remote content (Daytona's web terminal and
+  VNC URLs are not used).
+- **Droid is drawn on this Mac**, outside the sandbox, with a "read-only tools" line between them
+  that lights up during each call (decision 19).
+- **Trigger:** `sandboxScan()` in `index.ts` opens the main window on the new scan. M3's
+  `/download` route calls it with the intercepted bytes; until then Downloads › **Test the
+  sandbox** sends a built-in harmless sample. The mini panel shows one live line with **Watch**.
+- **If something fails:** no desktop → the run goes on, the tab says why; the network turns out to
+  be on → the file is never opened, Unknown; no sandbox → Unknown, never Clean.
 
 ---
 
@@ -451,7 +496,8 @@ flowchart TB
    separate copies. Worker A: Droid on the Mac, read-only tools into a network-off Daytona
    sandbox. Worker B: a Chalk sandbox. Each examines it under a time limit, and
    returns a verdict, confidence, summary, timeline, evidence and its sandbox log. Worker A's Daytona
-   sandbox is destroyed in a `finally`, whatever happened.
+   sandbox is destroyed in a `finally`, whatever happened. The main window shows Worker A's run live while it
+   happens (§3.9).
 6. **Compare** (`compare.ts`). Agreement → that verdict. Disagreement → the more severe one, both
    shown. A test that errors or shows harmful behaviour → Malicious. One worker missing → the other's
    answer, marked partial. Both missing → pre-check only, at best Unknown.
@@ -550,7 +596,9 @@ Aegis/
 │   │   ├── windows.ts, panel.ts, tray.ts, fnkey.ts
 │   │   ├── demo.ts, devcapture.ts            dev only
 │   │   ├── links.ts, linkLists.ts, linkData.ts, linkService.ts   link checks (M2) + tests
-│   │   └── chalk.ts, text.ts, precheck.ts, queue.ts, daytona.ts, docker.ts,
+│   │   ├── daytona.ts                          network-off sandboxes + daytona.test.ts
+│   │   ├── sandboxScan.ts, live.ts, liveAgent.ts, testSamples.ts   live view (§3.9) + tests
+│   │   └── chalk.ts, text.ts, precheck.ts, queue.ts, docker.ts,
 │   │       scans.ts, workerA.ts, workerB.ts, compare.ts, watcher.ts, quarantine.ts,
 │   │       photon.ts (M5, late)                                                   Planned
 │   │       detonate.ts                                                Parked (decision 20)
@@ -564,8 +612,8 @@ Aegis/
 │           ├── components/ds/                  design-system port
 │           ├── components/aegis.tsx            Figma-only components
 │           ├── components/Shell.tsx            window frame
-│           ├── lib/hooks.ts, format.ts
-│           └── views/Panel.tsx, views/main/    the screens
+│           ├── lib/hooks.ts, format.ts, live.ts
+│           └── views/Panel.tsx, views/main/    the screens (LiveView.tsx: §3.9)
 │
 ├── extension/
 │   ├── build.mjs               Vite builds per entry → dist/
@@ -579,7 +627,8 @@ Aegis/
 ├── sandbox/                    Dockerfile, requirements.txt, fetch_capa_rules.py, selftest.py,
 │                               README.md. Planned: entry.py, analyze.py, observe.py,
 │                               rules/*.yar, tests (detonate.py parked, decision 20)
-├── scripts/try-*.mts           live sponsor checks: try-daytona, try-droid (pass);
+├── scripts/try-*.mts           live sponsor checks: try-daytona, try-droid, try-sandbox,
+│                               try-desktop (pass);
 │                               try-chalk, try-photon still to write
 ├── chalk/                      chalk.yaml, pyproject.toml, uv.lock (chalk init) + README;
 │                               Planned (M6): features, resolvers, Worker B helper, evals
@@ -750,6 +799,7 @@ sequenceDiagram
   SC->>DB: Persist scan
   SC->>SC: Pre-check: magic bytes, SHA-256, size (reads bytes only)
   BR-->>UI: Panel pops up without focus: "Scanning now"
+  SC-->>UI: Main window opens the live view (§3.9): stages, sandbox Terminal + Desktop, Droid's tool calls
   par Worker A [M4]
     SC->>A: Fresh Daytona sandbox, network off, file uploaded
     A->>A: Droid examines the file through read-only tools that run inside the sandbox

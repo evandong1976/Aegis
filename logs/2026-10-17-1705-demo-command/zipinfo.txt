@@ -1,0 +1,4 @@
+Archive:  ZoomUpdate.zip
+Zip file size: 363 bytes, number of entries: 1
+-rwxr-xr-x  2.1 unx      249 bX defN 26-Oct-17 17:04 ZoomUpdate.command
+1 file, 249 bytes uncompressed, 185 bytes compressed:  25.7%

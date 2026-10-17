@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import type { FileTab, OverviewStats } from '@shared/ipc'
+import { LIVE_SAMPLES, type LiveSampleKey } from '@shared/live'
 import {
   Button,
   Card,
@@ -57,6 +58,21 @@ export default function DownloadsView({
   const byType = stats?.byType ?? []
   const caughtMax = Math.max(1, ...caught.map((c) => c.files))
   const typeMax = Math.max(1, ...byType.map((c) => c.files))
+  const [starting, setStarting] = useState<LiveSampleKey | null>(null)
+  const [testError, setTestError] = useState<string | null>(null)
+
+  // Until milestone 3 intercepts downloads: a built-in harmless file through a real sandbox. The
+  // main process opens the live view (the Report route) as soon as the scan exists.
+  const testSandbox = async (sample: LiveSampleKey): Promise<void> => {
+    setStarting(sample)
+    setTestError(null)
+    try {
+      const res = await window.aegis.invoke('live:start', sample)
+      if ('error' in res) setTestError(res.error)
+    } finally {
+      setStarting(null)
+    }
+  }
 
   return (
     <>
@@ -88,6 +104,37 @@ export default function DownloadsView({
           caption="opened in a Daytona sandbox today"
         />
       </div>
+
+      <Card
+        title="Test the sandbox"
+        description="Until Chrome downloads are intercepted (milestone 3), send a harmless built-in file through a real network-off Daytona sandbox and watch it being opened and reviewed. Uses Daytona credits."
+        action={
+          <div className="flex gap-2">
+            {(Object.keys(LIVE_SAMPLES) as LiveSampleKey[]).map((key, i) => (
+              <Button
+                key={key}
+                variant={i === 0 ? 'primary' : 'secondary'}
+                size="sm"
+                icon="play"
+                disabled={starting !== null}
+                title={LIVE_SAMPLES[key].detail}
+                onClick={() => void testSandbox(key)}
+              >
+                {starting === key ? 'Starting…' : LIVE_SAMPLES[key].label}
+              </Button>
+            ))}
+          </div>
+        }
+      >
+        {testError ? (
+          <p className="m-0 text-[13px] leading-[19px] text-danger">{testError}</p>
+        ) : (
+          <p className="m-0 text-[13px] leading-[19px] text-ink-muted">
+            {LIVE_SAMPLES['fake-installer'].label}: {LIVE_SAMPLES['fake-installer'].detail}{' '}
+            {LIVE_SAMPLES['terminal-demo'].label}: {LIVE_SAMPLES['terminal-demo'].detail}
+          </p>
+        )}
+      </Card>
 
       <Card
         title="Downloaded files"

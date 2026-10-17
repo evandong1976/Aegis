@@ -1,0 +1,168 @@
+{
+  "at": "2026-10-17T22:17:50.088Z",
+  "sample": "demo/aegis-terminal-demo.command",
+  "snapshot": "default",
+  "error": null,
+  "deleted": true,
+  "steps": [
+    {
+      "step": "computerUse.start",
+      "ms": 3403,
+      "detail": "{\"message\":\"Computer use processes started successfully\",\"status\":{\"atspi\":{\"Running\":true,\"Priority\":250,\"AutoRestart\":false,\"Pid\":null},\"novnc\":{\"Running\":true,\"Priority\":400,\"AutoRestart\":true,\"Pid\":248},\"pulseaudio\":{\"Running\":true,\"Priority\":150,\"AutoRestart\":true,\"Pid\":157},\"x11vnc\":{\"Running\":true,\"Priority\":300,\"AutoRestart\":true,\"Pid\":176},\"xfce4\":{\"Running\":true,\"Priority\":200,\"AutoRestart\":true,\"Pid\":164},\"xvfb\":{\"Running\":true,\"Priority\":100,\"AutoRestart\":true,\"Pid\":156}}}"
+    },
+    {
+      "step": "computerUse.getStatus",
+      "ms": 69,
+      "detail": "{\"status\":\"active\"}"
+    },
+    {
+      "step": "display.getInfo",
+      "ms": 66,
+      "detail": "{\"displays\":[{\"id\":0,\"x\":0,\"y\":0,\"width\":1024,\"height\":768,\"isActive\":true}]}"
+    },
+    {
+      "step": "display.getWindows",
+      "ms": 144,
+      "detail": "{\"windows\":[{\"id\":273,\"title\":\"xfce4-panel\",\"x\":0,\"y\":0,\"width\":0,\"height\":0,\"isActive\":false},{\"id\":289,\"title\":\"Desktop\",\"x\":0,\"y\":0,\"width\":0,\"height\":0,\"isActive\":false}]}"
+    }
+  ],
+  "sandboxLog": [
+    {
+      "at": "2026-10-17T22:17:15.298Z",
+      "ms": 5631,
+      "step": "create",
+      "ok": true,
+      "detail": "2fd39c34-4206-4404-bff4-13df2ed6129e from the default snapshot, 1 attempt, networkBlockAll=true"
+    },
+    {
+      "at": "2026-10-17T22:17:20.930Z",
+      "ms": 473,
+      "step": "upload",
+      "ok": true,
+      "bytes": 524,
+      "detail": "sample/file + sample/meta.json"
+    },
+    {
+      "at": "2026-10-17T22:17:21.404Z",
+      "ms": 73,
+      "step": "check upload",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 78,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:17:21.477Z",
+      "ms": 8186,
+      "step": "network probe (2 hosts × 3 tools, in parallel)",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 8,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-17T22:17:35.205Z",
+      "ms": 81,
+      "step": "desktop environment",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 101,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:17:35.287Z",
+      "ms": 1088,
+      "step": "open sample in a desktop terminal",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 53,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:17:41.843Z",
+      "ms": 8083,
+      "step": "network probe (2 hosts × 3 tools, in parallel)",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 8,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-17T22:17:49.926Z",
+      "ms": 160,
+      "step": "delete",
+      "ok": true,
+      "detail": "2fd39c34-4206-4404-bff4-13df2ed6129e"
+    }
+  ],
+  "result": {
+    "meta": {
+      "filename": "aegis-terminal-demo.command",
+      "url": null,
+      "referrer": null,
+      "contentType": "text/x-shellscript",
+      "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+      "size": 524
+    },
+    "offBefore": true,
+    "offAfter": true,
+    "status": {
+      "status": "active"
+    },
+    "display": {
+      "displays": [
+        {
+          "id": 0,
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 768,
+          "isActive": true
+        }
+      ]
+    },
+    "windows": {
+      "windows": [
+        {
+          "id": 273,
+          "title": "xfce4-panel",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "isActive": false
+        },
+        {
+          "id": 289,
+          "title": "Desktop",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "isActive": false
+        }
+      ]
+    },
+    "frames": [
+      {
+        "file": "logs/2026-10-17-1817-desktop-probe/frame-1.jpg",
+        "bytes": 14048,
+        "ms": 136
+      },
+      {
+        "file": "logs/2026-10-17-1817-desktop-probe/frame-2.jpg",
+        "bytes": 14048,
+        "ms": 107
+      },
+      {
+        "file": "logs/2026-10-17-1817-desktop-probe/frame-3.jpg",
+        "bytes": 14048,
+        "ms": 171
+      }
+    ],
+    "open": "terminal=/usr/bin/xfce4-terminal display=:0\nlaunched\n"
+  },
+  "failures": [
+    "a terminal window with the sample is open on the desktop"
+  ]
+}

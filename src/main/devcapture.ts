@@ -23,6 +23,11 @@ export function scheduleCapture(opts: {
   main: () => BrowserWindow | null
   panel: () => BrowserWindow | null
   reportId?: string
+  /** With AEGIS_CAPTURE_LIVE: starts a test run through a real sandbox (uses Daytona credits). */
+  live?: {
+    start: () => Promise<{ scanId: string } | { error: string }>
+    finished: (scanId: string) => boolean
+  }
 }): void {
   const dir = process.env.AEGIS_CAPTURE_DIR
   if (!dir) return
@@ -54,8 +59,39 @@ export function scheduleCapture(opts: {
         await save(dir, `${route}-scrolled`, opts.main())
       }
     }
+    if (process.env.AEGIS_CAPTURE_LIVE && opts.live) await captureLive(dir, opts)
     await writeFile(join(dir, 'status.json'), JSON.stringify(status.get(), null, 2))
     await writeFile(join(dir, 'log.json'), JSON.stringify(status.recent(200), null, 2))
     console.log('[capture] wrote status.json, log.json')
   })()
+}
+
+/** Screenshots of a live run every 2 s, the panel once mid-run, and the Report it turns into. */
+async function captureLive(
+  dir: string,
+  opts: Parameters<typeof scheduleCapture>[0]
+): Promise<void> {
+  const live = opts.live!
+  const res = await live.start()
+  if ('error' in res) {
+    console.log(`[capture] live run did not start: ${res.error}`)
+    return
+  }
+  console.log(`[capture] live run ${res.scanId}`)
+  let finishedAt: number | null = null
+  for (let i = 1; i <= 60; i++) {
+    await wait(2000)
+    await save(dir, `live-${String(i).padStart(2, '0')}`, opts.main())
+    if (i === 6) await save(dir, 'live-panel', opts.panel())
+    if (!finishedAt && live.finished(res.scanId)) finishedAt = Date.now()
+    // The live view settles 2.5 s after the verdict; one more shot shows the Report.
+    if (finishedAt && Date.now() - finishedAt > 4000) break
+  }
+  await opts
+    .main()
+    ?.webContents.executeJavaScript(
+      "document.querySelector('.app-shell__content')?.scrollTo({ top: 1e6 })"
+    )
+  await wait(500)
+  await save(dir, 'live-report-scrolled', opts.main())
 }

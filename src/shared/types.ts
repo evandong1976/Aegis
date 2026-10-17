@@ -140,7 +140,9 @@ export const DroidReportSchema = z.object({
   /** One sentence, for the report headline, notifications and texts. */
   summary: z.string(),
   confidence: z.enum(['low', 'medium', 'high']),
-  unknowns: z.array(z.string())
+  unknowns: z.array(z.string()),
+  /** `scripted`: the rules-based stand-in the live view uses until Droid is wired (milestone 4). */
+  reviewer: z.enum(['droid', 'scripted']).optional()
 })
 export type DroidReport = z.infer<typeof DroidReportSchema>
 

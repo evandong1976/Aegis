@@ -315,7 +315,8 @@ export function observeCommand(timeoutS: number): string {
   ].join('; ')
 }
 
-const NETWORK_TOOLS =
+/** Commands that try to reach the network. */
+export const NETWORK_TOOLS =
   /^(curl|wget|nc|ncat|netcat|ssh|scp|sftp|ftp|telnet|socat)\b|urllib|requests\.|\/dev\/tcp\//
 
 /** Parses `observeCommand`'s output. */

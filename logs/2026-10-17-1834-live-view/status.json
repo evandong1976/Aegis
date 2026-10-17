@@ -1,0 +1,115 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "degraded",
+      "detail": "Extension not connected. Run pnpm build:extension and load extension/dist in chrome://extensions."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "ok",
+      "detail": "API reachable and the key works. The live test runs at start and on Check now.",
+      "latencyMs": 185
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); no local Docker image aegis-sandbox."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "ok",
+      "detail": "Docker 29.2.1 is running.",
+      "latencyMs": 116
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "down",
+      "detail": "No droid CLI found. Install it (brew install --cask droid) or set DROID_PATH in .env.local, then restart Aegis. Reports run without Droid until then."
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "pending",
+      "detail": "Key set. The live Photon check arrives with milestone 5."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "pending",
+      "detail": "Key set. The live Chalk check arrives with milestone 6."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "ok",
+      "detail": "Test URL matched as expected.",
+      "latencyMs": 74
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-17T22:35:26.973Z",
+      "state": "unconfigured",
+      "detail": "The fn add-on is not built. Run pnpm build:native, then restart Aegis. ⌃⌥A works meanwhile."
+    }
+  ],
+  "activeScans": 1,
+  "extensionLastSeen": null,
+  "demo": true,
+  "page": {
+    "url": "https://mail.google.com/mail/u/0/#inbox/FMfcgz",
+    "counts": {
+      "clean": 11,
+      "unknown": 0,
+      "suspicious": 0,
+      "malicious": 1
+    },
+    "top": {
+      "domain": "login-northwlnd-io.sbs",
+      "reason": "registered 2 days ago",
+      "verdict": "malicious"
+    }
+  }
+}

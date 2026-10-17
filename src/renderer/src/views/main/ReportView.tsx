@@ -19,6 +19,11 @@ import {
 } from '../../components/aegis'
 import { Button, EmptyState } from '../../components/ds'
 import { dayClock, displayUrl, shortClock, shortHash, size } from '../../lib/format'
+import { liveState, useLiveRun } from '../../lib/live'
+import LiveView, { SandboxPane } from './LiveView'
+
+/** How long the live view stays up with the verdict before the Report replaces it. */
+const LIVE_SETTLE_MS = 2500
 
 function Panel({
   title,
@@ -87,11 +92,25 @@ export default function ReportView({
     }
   }, [scanId])
 
-  const name = report ? (report.filename ?? displayUrl(report.url)) : null
+  // A scan opened in a sandbox while this app runs: the live view until the verdict settles.
+  const run = useLiveRun(scanId)
+  const endedAt = run?.events.find((e) => e.kind === 'end')?.at ?? null
+  const [settled, setSettled] = useState<string | null>(null)
+  useEffect(() => {
+    if (!endedAt) return
+    const left = Date.parse(endedAt) + LIVE_SETTLE_MS - Date.now()
+    const t = setTimeout(() => setSettled(endedAt), Math.max(0, left))
+    return () => clearTimeout(t)
+  }, [endedAt])
+  const showLive = Boolean(run && (!endedAt || settled !== endedAt))
+
+  const name = report ? (report.filename ?? displayUrl(report.url)) : (run?.filename ?? null)
   useEffect(() => {
     onTitle(name)
     return () => onTitle(null)
   }, [name, onTitle])
+
+  if (run && showLive) return <LiveView run={run} />
 
   if (!scanId || report === null) {
     return (
@@ -204,7 +223,16 @@ export default function ReportView({
 
       <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-5">
         <div className="flex min-w-0 flex-col gap-5">
-          <Panel title="What would have happened" meta={r.droid ? 'Reviewed by Droid' : undefined}>
+          <Panel
+            title="What would have happened"
+            meta={
+              r.droid
+                ? r.droid.reviewer === 'scripted'
+                  ? 'Scripted stand-in for Droid'
+                  : 'Reviewed by Droid'
+                : undefined
+            }
+          >
             {timeline.length > 0 ? (
               <Timeline steps={timeline} />
             ) : (
@@ -292,6 +320,15 @@ export default function ReportView({
           ) : null}
         </div>
       </div>
+
+      {run ? (
+        <SandboxPane
+          state={liveState(run)}
+          frame={run.frame}
+          follow={false}
+          className="h-[440px]"
+        />
+      ) : null}
 
       <p className="mono-sm m-0 text-ink-subtle">{footer(r)}</p>
     </>
