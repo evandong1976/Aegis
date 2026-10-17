@@ -66,8 +66,8 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
    on a single Mac.
 5. **Figma-only components live in the app**, not in `design-system/components/` (Zach's
    folder): StatusDot, ScanStep, TimelineStep, CodeLine, finding chips and key/value lists, in
-   `src/renderer/src/components/aegis.tsx` + `assets/aegis.css`, tokens only. Promote them to the
-   design system if Zach wants them there.
+   `src/renderer/src/components/aegis.tsx` + `assets/aegis.css`, tokens only. They stay there
+   (team answer, 2026-10-16): don't move them into `design-system/`.
 6. **Design-system components are a typed React port** (`src/renderer/src/components/ds/`) of
    `design-system/components/bundle.js`, with the same `ae-*` markup so `bundle.css` styles them.
    Loading the bundle as a global script would need React on `window` and a looser CSP. Aegis
@@ -128,7 +128,8 @@ Not checked yet. Do this before writing each integration, record the exact calls
 - Deferred: which public domain hosts the demo phishing page and the Photon email subdomain?
   (needed before hosting 0a and Photon email)
 - Photon and Chalk env var names in `.env.example` are guesses until the docs check.
-- Zach: should the Figma-only components (decision 5) move into `design-system/components/`?
-- Zach: Figma has no frames yet for Messages, Accuracy, first-run setup, the tray menu, link
-  outlines or the scam-text banner (`figma/built.md` › Not built yet). Those screens are built
-  from the existing components for now.
+
+Answered 2026-10-16: the Figma-only components stay in the app (decision 5). Figma frames for the
+rest — Messages, Accuracy, first-run setup, the tray menu, link outlines, the scam-text banner
+(`figma/built.md` › Not built yet) — will be designed later. Until then those screens are built from
+the existing components; restyle them to match when the frames land.

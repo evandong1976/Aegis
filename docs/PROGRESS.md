@@ -1,4 +1,4 @@
-## Handoff (updated 2026-10-16 22:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-16 23:00 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold, v2) — 100%; 1 (shell + bridge) — ~90%; 2 — click-guard UI only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
@@ -9,8 +9,8 @@
 - **In progress:** nothing
 - **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows Bridge = Connected within 30 s (closes milestone 1). Then split: Evan starts milestone 2 (content script → `/page` → wire `showClickGuard` from `extension/src/guard.ts`) and the `demo/` phishing page; Zach starts `sandbox/Dockerfile` + the `demo/` test `.pkg` and the Daytona docs check (PLAN.md › Sponsor findings).
 - **Broken / failing:** none. `pnpm typecheck && pnpm lint && pnpm test` pass (23 tests; lint includes the tokens.css staleness check).
-- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–15 (four verdicts and Unknown semantics, nav = Figma shell + Messages/Accuracy, single-user adaptation, coverage ring, Figma components kept in the app, panel follows Figma, Shadow-DOM guard, demo database).
-- **Blocked on / questions for the user:** deferred by the team: four-track eligibility, demo/email domain. For Zach: move the Figma-only components into `design-system/`? Figma frames for Messages/Accuracy/first run? Nothing blocks the next step.
+- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–15 (four verdicts and Unknown semantics, nav = Figma shell + Messages/Accuracy, single-user adaptation, coverage ring, Figma components kept in the app, panel follows Figma, Shadow-DOM guard, demo database). Team answers: Figma-only components stay in the app, not `design-system/`; Figma frames for Messages, Accuracy, first run, tray, link outlines and the scam-text banner come later — restyle those screens when they land.
+- **Blocked on / questions for the user:** deferred by the team: four-track eligibility, demo/email domain. Nothing blocks the next step.
 - **How to verify current state:**
   - `pnpm install && pnpm typecheck && pnpm lint && pnpm test` → all green
   - `pnpm dev` → menu bar shield, no Dock icon; ⌃⌥A toggles the panel; real (empty) history
@@ -89,4 +89,5 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 
 - 2026-10-16: First skeleton on `milestone-0-skeleton` (Electron shell, bridge, extension).
 - 2026-10-16: Owners: Evan = A, Zach = B. Klair's fn add-on may be used, repurposed for Aegis. Deferred: four-track eligibility, demo/email domain.
+- 2026-10-16: Figma-only components stay in the app (not `design-system/`). Figma frames for the remaining screens will be designed later.
 - 2026-10-16: Zach's `fig` commit added `figma/`, `screens/` and the four-verdict design system. Rebuilt on `aegis-v2` from it (PLAN.md decisions 1–15). The half-finished rebase of `milestone-0-skeleton` onto `fig` was aborted; nothing in it was lost (only a README with conflict markers).
