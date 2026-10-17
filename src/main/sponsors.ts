@@ -1,7 +1,7 @@
 // Live checks for the sponsor services Aegis depends on (BUILD_PROMPT §4.1, docs/PLAN.md › Sponsor
 // findings): Daytona, the sandbox image and Factory Droid. health.ts calls these.
 //
-// Two depths, because live tests use credits (team decision, 2026-10-17):
+// Two depths, because live tests use credits (PLAN.md decision 27):
 // - Lookup, on every check (every 60 s): free calls only. Daytona lists sandboxes and looks up the
 //   snapshot; Droid lists models through its CLI.
 // - Live test, at start and on Check now only: Daytona creates a tiny network-off sandbox, runs one
@@ -58,7 +58,7 @@ export async function checkDaytona(
   if (!process.env.DAYTONA_API_KEY) {
     return {
       state: 'unconfigured',
-      detail: 'DAYTONA_API_KEY not set. Add it to .env, then restart Aegis.'
+      detail: 'DAYTONA_API_KEY not set. Add it to .env.local, then restart Aegis.'
     }
   }
   const { Daytona } = await import('@daytona/sdk')
@@ -129,7 +129,7 @@ export async function checkDroid(
   if (!apiKey) {
     return {
       state: 'unconfigured',
-      detail: 'FACTORY_API_KEY not set. Add it to .env, then restart Aegis.'
+      detail: 'FACTORY_API_KEY not set. Add it to .env.local, then restart Aegis.'
     }
   }
   const execPath = await findDroidCli()
@@ -137,7 +137,7 @@ export async function checkDroid(
     const where = process.env.DROID_PATH ? `at ${process.env.DROID_PATH}` : 'found'
     return {
       state: 'down',
-      detail: `No droid CLI ${where}. Install it (brew install --cask droid) or set DROID_PATH in .env, then restart Aegis. Reports run without Droid until then.`
+      detail: `No droid CLI ${where}. Install it (brew install --cask droid) or set DROID_PATH in .env.local, then restart Aegis. Reports run without Droid until then.`
     }
   }
   const sdk = await import('@factory/droid-sdk/node')

@@ -9,6 +9,10 @@ extension/dist
 .env.*
 !.env.example
 evals/.cache
+# Python (chalk/, sandbox/)
+.venv
+__pycache__/
+*.pyc
 native/fn-key/build
 # Verification evidence is committed (scripts/verify.sh); the throwaway app profiles are not.
 !logs/**/*.log
