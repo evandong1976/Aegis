@@ -31,7 +31,8 @@ function result(state: ServiceState, detail: string, latencyMs?: number): Check 
 function keyed(envNames: string[] | string, milestone: number, what: string): Check {
   const has = typeof envNames === 'string' ? config.hasPrefix(envNames) : config.has(...envNames)
   const label = typeof envNames === 'string' ? `${envNames}*` : envNames.join(', ')
-  if (!has) return result('unconfigured', `${label} not set. Add it to .env, then restart Aegis.`)
+  if (!has)
+    return result('unconfigured', `${label} not set. Add it to .env.local, then restart Aegis.`)
   return result('pending', `Key set. The live ${what} check arrives with milestone ${milestone}.`)
 }
 
@@ -54,7 +55,10 @@ function checkBridge(ctx: HealthContext): Check {
 async function checkSafeBrowsing(): Promise<Check> {
   const key = process.env.SAFE_BROWSING_KEY
   if (!key)
-    return result('unconfigured', 'SAFE_BROWSING_KEY not set. Add it to .env, then restart Aegis.')
+    return result(
+      'unconfigured',
+      'SAFE_BROWSING_KEY not set. Add it to .env.local, then restart Aegis.'
+    )
   const started = Date.now()
   try {
     const res = await fetch(

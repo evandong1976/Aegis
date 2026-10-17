@@ -30,8 +30,8 @@
     "capture": "sh scripts/capture.sh",
     "dev:demo": "AEGIS_DEMO=1 electron-vite dev",
     "verify": "sh scripts/verify.sh",
-    "try:daytona": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env scripts/try-daytona.mts",
-    "try:droid": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env scripts/try-droid.mts"
+    "try:daytona": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-daytona.mts",
+    "try:droid": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-droid.mts"
   },
   "dependencies": {
     "@daytona/sdk": "0.220.0",

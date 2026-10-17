@@ -1,9 +1,18 @@
-## Handoff (updated 2026-10-17 01:20 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 10:45 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Daytona checked live (10:40)** with Evan's key: `pnpm try:daytona` passes (create 0.8–3.8 s,
+    upload, run, network off, delete). The org is on Tier 1 or 2: `networkBlockAll` at creation
+    works (even npm, an "essential service", is blocked), but allow-lists and changes after
+    creation are refused, and Factory's hosts are unreachable. So **analysis offline works now;
+    Droid inside the sandbox (option A) and link detonation need Tier 3** or the alternatives in
+    `docs/PLAN.md` › Sponsor findings › Daytona › Live results. Evidence:
+    `logs/2026-10-17-daytona-tier/`. Leak check: 0 sandboxes left.
+  - The try scripts and the app now read `.env.local` as well as `.env` (`.env.local` wins);
+    `try-daytona` also probes an essential service, so "network off" is a real test on Tier 1/2.
   - **Review against the plan (01:20)**: `try-droid` now also runs Droid inside a Daytona sandbox
     (option A), as PLAN.md › Branches asks. `try-daytona` now uses the 20 s sandbox-start limit
     with one retry (architectural.md §4.6). New optional env var: `AEGIS_FACTORY_DOMAINS`.
@@ -23,24 +32,20 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** On this branch: add `DAYTONA_API_KEY` and `FACTORY_API_KEY` to `.env`, install
-  the droid CLI (`brew install --cask droid`), then run `pnpm try:daytona` and `pnpm try:droid`.
-  Record the timings and answers in `docs/PLAN.md` › Sponsor findings, check the Daytona
-  dashboard for leaked sandboxes (› Sandbox leak check below), and merge into `main` when both
-  pass. Then the team picks Worker A option A or B. Outside this branch, still open: load
-  `extension/dist` in Chrome to close milestone 1.
+- **Next step:** The team chooses how Worker A reaches the sandbox, given the tier result:
+  Tier 3 (Droid inside, option A) or Droid on the Mac through narrow tools (option B), which works
+  now. Then: add `FACTORY_API_KEY` to `.env.local`, install the droid CLI
+  (`brew install --cask droid`), run `pnpm try:droid`, record it, and merge this branch into
+  `main`. Outside this branch: reload the extension in Chrome (the heartbeat fix is on branch
+  `extension-heartbeat`) to close milestone 1.
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
   small UI issues open (see "Open issues"; branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
-- **Blocked on / questions for the user:** to finish `sponsor-check`, add `DAYTONA_API_KEY` and
-  `FACTORY_API_KEY` to `.env`, install the droid CLI, then run `pnpm try:daytona` and
-  `pnpm try:droid`. The team needs to choose how Worker A reaches the sandbox: **A**, Droid inside
-  it, which needs network to Factory; or **B**, Droid connected to it through MCP tools, with the
-  network kept off (PLAN.md › Sponsor findings › Factory Droid). Deferred by the team: four-track
-  eligibility (and whether to keep the Photon track now that Photon is deferred), demo domain.
-  Before M6: can Chalk host its own sandbox?
+- **Blocked on / questions for the user:** (1) Tier 3 or option B for Worker A (and where link
+  detonation runs: Tier 3 or Chalk); asking Daytona at the event for credits or a tier bump is
+  free. (2) `FACTORY_API_KEY` and the droid CLI for `pnpm try:droid`.
 - **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
   every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
   with the latest `SUMMARY.md` in `logs/`.
@@ -168,11 +173,16 @@ scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
-| After milestone | Sandboxes left running |
-| --------------- | ---------------------- |
-| —               | Daytona not used yet   |
+| After                                       | Sandboxes left running                                    |
+| ------------------------------------------- | --------------------------------------------------------- |
+| `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
 
 ## Decisions log
+
+- 2026-10-17: Daytona checked live on `sponsor-check`. This account's tier (1 or 2) allows
+  `networkBlockAll` at creation but refuses allow-lists and later changes; Factory and ordinary
+  websites are unreachable. Option A (Droid inside) and link detonation need Tier 3 or an
+  alternative; the team decides (PLAN.md › Sponsor findings › Daytona › Live results).
 
 - 2026-10-17 00:50: `sponsor-check`: Daytona and Droid findings recorded in PLAN.md. The SDKs are
   pinned. `scripts/try-daytona.mts` and `scripts/try-droid.mts` are written and typechecked, but

@@ -286,15 +286,16 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
 Do this before writing each integration, record the exact calls here, and get
 `scripts/try-<sponsor>` passing first. Never invent SDK method names. Daytona and Droid were
 checked on 2026-10-17 against each SDK's README and installed type definitions (branch
-`sponsor-check`). Their try scripts are written, but they haven't run yet because no keys are set.
+`sponsor-check`). `pnpm try:daytona` has run with a real key (live results below); `pnpm try:droid` still needs
+`FACTORY_API_KEY` and the droid CLI.
 
-| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                             |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below: from the SDK's types; `pnpm try:daytona` not run yet (no key) |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)   |
-| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                    |
-| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                                                    |
-| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                         |
+| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                                                                 |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below. `pnpm try:daytona` **passes** (2026-10-17); this account's tier limits network (see Live results) |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)                                       |
+| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                                                        |
+| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                                                                                        |
+| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                                                             |
 
 ### Daytona
 
@@ -308,7 +309,8 @@ checked on 2026-10-17 against each SDK's README and installed type definitions (
 - **Network, per sandbox (answers "network off"):**
   - `networkBlockAll` turns it off.
   - `networkAllowList` takes CIDRs and `domainAllowList` takes domains.
-  - `sandbox.updateNetworkSettings({ networkBlockAll })` changes it while the sandbox runs.
+  - `sandbox.updateNetworkSettings({ networkBlockAll })` changes it while the sandbox runs (Tier 3+
+    only: refused on this account, see Live results).
   - `try-daytona` probes example.com with curl, wget and python3 to confirm the network is really off.
 - **Files:** `sandbox.fs.createFolder(path, mode)`, `sandbox.fs.uploadFile(buffer | localPath, remotePath)`
   and `sandbox.fs.downloadFile(remotePath)`.
@@ -322,6 +324,44 @@ checked on 2026-10-17 against each SDK's README and installed type definitions (
 - **Not answered by the SDK:**
   - Start-up time: `try-daytona` logs it.
   - Concurrency limits and hackathon credits: ask Daytona at the event.
+
+#### Live results on this account (2026-10-17, evidence: `logs/2026-10-17-daytona-tier/`)
+
+`pnpm try:daytona` passes every step with Evan's key. Sandbox creation took 0.8–3.8 s from this
+Mac (round trip); delete about 0.1 s. Default sandboxes are Debian 13 (x86_64) containers, running
+as an unprivileged user (`daytona`) with no Linux capabilities.
+
+The org is on **Tier 1 or 2**, where Daytona restricts network for the whole organization
+([network limits](https://www.daytona.io/docs/en/network-limits)). What that means in practice:
+
+| Network setting                                 | Result on this tier                                                                                                                                               | Evidence file                           |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Default (no setting)                            | Essential services reachable (npm registry: 200, Google Safe Browsing API: reachable); `example.com` and Factory (`app.factory.ai`, `api.factory.ai`) unreachable | `1-default-network-and-updates.json`    |
+| `updateNetworkSettings(...)` after creation     | **Refused**: "Network access is restricted and cannot be overridden at the sandbox level"                                                                         | `1-default-network-and-updates.json`    |
+| `networkBlockAll: true` **at creation**         | **Accepted, and it holds**: `example.com` and the npm registry (an essential service) both blocked                                                                | `2-try-daytona-block-all-at-create.log` |
+| `domainAllowList` at creation (Factory's hosts) | **Refused**: "Remove domainAllowList from the request"                                                                                                            | `3-allowlist-at-create.json`            |
+
+What each Aegis need gets on this tier:
+
+- **Analysis with the network fully off: works now.** Create every analysis sandbox with
+  `networkBlockAll: true`; essential services are blocked too. (Changing it later is refused, so
+  it must be set at creation.)
+- **Droid inside the sandbox (decision 17, option A): not possible on this tier.** Factory's hosts
+  are unreachable and can't be allow-listed. Two ways forward:
+  1. **Tier 3** (Daytona: a $500 top-up; ask Daytona at the event for credits or a tier bump).
+     Then option A works with `domainAllowList` for Factory's hosts and the key as a Daytona Secret.
+  2. **Droid on the Mac, working on the sandbox through tools** (BUILD_PROMPT §4.7 item 2): the
+     Droid SDK runs in the main process, and narrow custom tools (run a command, read a file, list
+     files, for one sandbox) call Daytona's API. Works on any tier; the file under test never
+     shares a machine with Droid or its key. Daytona's official MCP server (`daytona mcp start`)
+     is an alternative to custom tools, but gives Droid broader powers (create/delete sandboxes).
+- **Link detonation (needs the open web): not possible on this tier.** Tier 3, or move detonation
+  to a Chalk sandbox (Chalk's network policy defaults still to be checked).
+- **Nested isolation inside a sandbox** (`unshare -n`): "Operation not permitted" (no
+  capabilities). A Docker-in-Docker test (`docker-dind` snapshot, inner container with
+  `--network none`) was not run; it isn't needed now that create-time `networkBlockAll` works.
+
+Pending the team's choice between Tier 3 and option 2 (PROGRESS.md › Blocked on).
 
 ### Factory Droid
 

@@ -4,7 +4,7 @@
 //
 //   pnpm try:daytona
 //
-// Needs DAYTONA_API_KEY in .env. Optional: DAYTONA_API_URL, DAYTONA_TARGET (read by the SDK) and
+// Needs DAYTONA_API_KEY in .env.local or .env. Optional: DAYTONA_API_URL, DAYTONA_TARGET (read by the SDK) and
 // AEGIS_DAYTONA_SNAPSHOT (a snapshot name; without it Daytona uses its default snapshot).
 // Exits 1 if any check fails. The file it uploads is a line of text, nothing else.
 
@@ -19,7 +19,7 @@ const record = (step: string, ok: boolean, detail: string): void => {
 const seconds = (since: number): string => `${((performance.now() - since) / 1000).toFixed(1)} s`
 
 if (!process.env.DAYTONA_API_KEY) {
-  console.error('DAYTONA_API_KEY is not set. Add it to .env (Daytona dashboard › API keys).')
+  console.error('DAYTONA_API_KEY is not set. Add it to .env.local (Daytona dashboard › API keys).')
   process.exit(1)
 }
 
@@ -73,26 +73,34 @@ try {
     `sha256sum exit ${hashed.exitCode} in ${seconds(t2)}; ${remote === sha256 ? 'matches' : `got ${remote}`}`
   )
 
-  // Any of curl, wget or python3 reaching the internet means the network is not off.
-  const probe = [
-    'curl -sS -m 5 -o /dev/null https://example.com',
-    'wget -q -T 5 -O /dev/null https://example.com',
-    `python3 -c "import urllib.request; urllib.request.urlopen('https://example.com', timeout=5)"`
-  ]
-    .map((c) => `(${c}) 2>/dev/null`)
-    .join(' || ')
-  const t3 = performance.now()
-  const net = await sandbox.process.executeCommand(
-    `if ${probe}; then echo REACHED; else echo BLOCKED; fi`,
-    undefined,
-    undefined,
-    30
-  )
-  record(
-    'network is off',
-    net.result.trim() === 'BLOCKED',
-    `${net.result.trim()} in ${seconds(t3)}`
-  )
+  // Any of curl, wget or python3 reaching a host means the network is not off. Two hosts: an
+  // ordinary website, and a Daytona "essential service" (npm), which Tier 1/2 keep reachable
+  // whatever a sandbox asks for (docs: network-limits › Tier-based network restrictions).
+  const probeHost = (url: string): string =>
+    [
+      `curl -sS -m 5 -o /dev/null ${url}`,
+      `wget -q -T 5 -O /dev/null ${url}`,
+      `python3 -c "import urllib.request; urllib.request.urlopen('${url}', timeout=5)"`
+    ]
+      .map((c) => `(${c}) 2>/dev/null`)
+      .join(' || ')
+  for (const [label, url] of [
+    ['ordinary website', 'https://example.com'],
+    ['essential service', 'https://registry.npmjs.org/']
+  ]) {
+    const t3 = performance.now()
+    const net = await sandbox.process.executeCommand(
+      `if ${probeHost(url)}; then echo REACHED; else echo BLOCKED; fi`,
+      undefined,
+      undefined,
+      30
+    )
+    record(
+      `network is off (${label}, ${url})`,
+      net.result.trim() === 'BLOCKED',
+      `${net.result.trim()} in ${seconds(t3)}`
+    )
+  }
 } catch (err) {
   record('Daytona call', false, err instanceof Error ? err.message : String(err))
 } finally {

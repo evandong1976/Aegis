@@ -1,0 +1,18 @@
+{
+  "startedAt": "2026-10-17T14:20:09.792Z",
+  "sdk": "@daytona/sdk 0.225.0",
+  "createMs": 1265,
+  "sandboxId": "63db9cae-ca2e-406b-b7d5-863217402ff8",
+  "os": "Linux 6.8.0-124-generic x86_64\nDebian GNU/Linux 13 (trixie)\n64\nMem:          773335      134565      312081         183      338603      638770",
+  "reachDefault": {
+    "app.factory.ai": "unreachable",
+    "api.factory.ai": "unreachable",
+    "safebrowsing.googleapis.com": "HTTP 404",
+    "registry.npmjs.org": "HTTP 200",
+    "example.com": "unreachable"
+  },
+  "blockAll": "refused: Network access is restricted and cannot be overridden at the sandbox level. See https://www.daytona.io/docs/en/network-limits/#tier-based-network-restrictions",
+  "factoryAllowList": "refused: Network access is restricted and cannot be overridden at the sandbox level. See https://www.daytona.io/docs/en/network-limits/#tier-based-network-restrictions",
+  "deleted": "yes, in 57 ms",
+  "finishedAt": "2026-10-17T14:20:13.242Z"
+}
