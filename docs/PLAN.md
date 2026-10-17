@@ -28,11 +28,11 @@ Claim a milestone in PROGRESS.md before starting it.
 | 2   | Links: content script, Tier 1 + Safe Browsing, URL stripping, allow list, outlines, click guard wiring                                                   | Evan        | Click-guard UI built (`extension/src/guard.ts`)    |
 | 3   | Downloads: interception, offscreen fetch, pre-check, queue, Daytona sandbox, `analyze.py`, deliver/hold                                                  | Evan + Zach | Not started (Report + Downloads screens are ready) |
 | 4   | Worker A: Droid inside the Daytona sandbox, tests the file, returns result + sandbox log; `compare.ts`; prompt-injection test                            | Zach        | Not started (Report renders a Droid timeline)      |
-| 5   | Photon: iMessage/SMS, email, alerts, follow-ups, Messages tab                                                                                            | Evan        | Not started                                        |
+| 5   | Later: mobile via Photon — forward a phone screenshot, get a verdict back (architectural.md §8)                                                          | Evan        | Deferred; not in the current build                 |
 | 6   | Chalk: Worker B (standalone analyst + sandbox log), link features + Federated Queries, AI Gateway scam-text, evals per worker and combined, Accuracy tab | Evan        | Not started (Accuracy reads `evals/results.json`)  |
 | 7   | Detonation: `detonate.py` + anti-cloaking, Inspect in sandbox, screenshots                                                                               | Zach        | Not started                                        |
 | 8   | `~/Downloads` watcher + quarantine, Docker fallback, every §5.9 row, fn add-on (from Klair)                                                              | Zach        | fn add-on done; the rest not started               |
-| 9   | Stretch: REA deep dive, Photon voice                                                                                                                     | —           | Not started                                        |
+| 9   | Stretch: REA deep dive                                                                                                                                   | —           | Not started                                        |
 | 10  | Demo run on a clean account, DoD walk, video, README, Devpost                                                                                            | Evan + Zach | Not started                                        |
 
 ## Decisions
@@ -59,8 +59,9 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
    the User column becomes **Seen in** (Gmail, Chrome, ~/Downloads, iMessage); the account chip
    becomes a protection-status chip that opens Settings; Settings is titled "This Mac". The bell
    button is left out because there's nothing behind it yet.
-4. **Overview's coverage ring** is the share of six protection layers that are running (Chrome
-   extension, link reputation, download sandbox, Droid, ~/Downloads watcher, Photon), computed
+4. **Overview's coverage ring** is the share of five protection layers that are running (Chrome
+   extension, link reputation, download sandbox, Droid, ~/Downloads watcher; Photon left out while
+   it's deferred, decision 18), computed
    from the live health checks, with the first missing one named as "the gap". The Figma
    "Where we can see" meters become one status-dot row per layer, since each layer is on or off
    on a single Mac.
@@ -147,6 +148,15 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
       a second isolated sandbox (another Daytona sandbox, or local Docker) with Chalk's AI doing
       the analysis, and the architecture doc says so.
 
+18. **Photon is out of the current build** (team direction, 2026-10-17). It returns later as the
+    mobile feature: forward a screenshot from your phone over iMessage or SMS, and Aegis reads it,
+    runs the same checks and replies with a verdict (`docs/architectural.md` §8). Until then: no
+    `photon.ts`, no message intake in the pipeline, no alert texts, no `fetch.py`. The app still
+    shows Photon in a few places (a service dot in the mini panel, a row in Connections, the
+    Messages tab, the "Text me" setting) as "Not set up"; they stay as placeholders for the mobile
+    feature unless the team wants them hidden. MEGA_PROMPT §5.5 (messaging agent) is deferred, not
+    dropped.
+
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
 Not checked yet. Do this before writing each integration, record the exact calls here, and get
@@ -156,16 +166,18 @@ Not checked yet. Do this before writing each integration, record the exact calls
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | —                                            |
 | Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | —                                            |
-| Photon               | Day-one channels, email attachments, voice setup, exact env var names                                                                                                                                 | —                                            |
+| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                            |
 | Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                            |
 | Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key |
 
 ## Open questions
 
 - Deferred: can one Devpost project enter all four tracks? (revisit before step 10)
-- Deferred: which public domain hosts the demo phishing page and the Photon email subdomain?
-  (needed before hosting 0a and Photon email)
-- Photon and Chalk env var names in `.env.example` are guesses until the docs check.
+- Deferred: which public domain hosts the demo phishing page? (needed before hosting 0a)
+- Chalk env var names in `.env.example` are guesses until the docs check (Photon's too, for later).
+- Photon is deferred to the later mobile feature, so the Photon prize track has no entry in the
+  current build. Decide before submission whether to build a minimal version of §8 or drop that
+  track.
 
 Answered 2026-10-16: the Figma-only components stay in the app (decision 5). Figma frames for the
 rest — Messages, Accuracy, first-run setup, the tray menu, link outlines, the scam-text banner

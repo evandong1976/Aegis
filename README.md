@@ -121,7 +121,6 @@ When the full pipeline lands, this copy (also in Settings) must stay true:
 > Suspicious links are opened in a Daytona sandbox. Link domains
 > (with tokens removed) are checked with Chalk and Google Safe Browsing. Page text is checked for
 > scams by an AI model through Chalk and isn't stored. Your Chrome cookies never leave Chrome.
-> Messages you send to Aegis are processed by Photon and stored only on your Mac.
 
 ## How the two analysis workers fit together
 
@@ -151,11 +150,12 @@ examines and tests the file there, then returns a zod-validated result (verdict,
 evidence, summary) and its sandbox log. All sample content is fenced as untrusted. Its answer is
 compared with Chalk's and can only raise the verdict. Coordinated from `src/main/workerA.ts`.
 
-## How Aegis uses Photon
+## Later: Aegis on your phone (Photon)
 
-Not built yet (milestone 5). Plan: forward a suspicious text or email to Aegis over iMessage, SMS
-or email and get a verdict back; opt-in alerts when Aegis blocks something; threads in the
-Messages tab.
+Not in the current build. Photon will bring Aegis to phones: forward a screenshot of a suspicious
+text, email or page to Aegis over iMessage or SMS, and it replies with a verdict, the real
+destination of each link and one sentence on why. See
+[`docs/architectural.md`](docs/architectural.md) §8.
 
 ## How Aegis uses Chalk
 

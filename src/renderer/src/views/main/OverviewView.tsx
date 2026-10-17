@@ -51,8 +51,7 @@ function layers(status: AppStatus | null, watchDownloads = true): Layer[] {
       value: word(sandbox, s('daytona') === 'ok' ? 'Daytona' : 'Docker')
     },
     { label: 'AI review (Droid)', state: s('droid'), value: word(s('droid'), 'Reviewing') },
-    { label: '~/Downloads watcher', state: watcher, value: word(watcher, 'Watching') },
-    { label: 'Messages (Photon)', state: s('photon'), value: word(s('photon'), 'Answering') }
+    { label: '~/Downloads watcher', state: watcher, value: word(watcher, 'Watching') }
   ]
 }
 

@@ -17,15 +17,16 @@ throwaway cloud sandbox, never on the Mac, reverse engineered, and explained in 
 the suspicious code as evidence. Every URL and file gets one of four verdicts: **Malicious**,
 **Suspicious**, **Unknown** or **Clean**.
 
-It works in three places:
+It works in two places today, with a third planned for later:
 
-| Where        | What the user sees                                                                                | Part                        |
-| ------------ | ------------------------------------------------------------------------------------------------- | --------------------------- |
-| **Chrome**   | Risky links outlined, a click guard on dangerous clicks, downloads held until scanned             | Chrome extension            |
-| **The Mac**  | Menu bar icon, mini panel (fn / ⌃⌥A), main window with history and reports; `~/Downloads` watched | Electron app                |
-| **Messages** | Forward a sketchy text, email or link to Aegis and get a verdict back                             | Photon agent inside the app |
+| Where             | What the user sees                                                                                | Part                             |
+| ----------------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
+| **Chrome**        | Risky links outlined, a click guard on dangerous clicks, downloads held until scanned             | Chrome extension                 |
+| **The Mac**       | Menu bar icon, mini panel (fn / ⌃⌥A), main window with history and reports; `~/Downloads` watched | Electron app                     |
+| **Phone** (later) | Forward a screenshot of something suspicious from your phone and get a verdict back (§8)          | Photon, not in the current build |
 
-Four sponsors each do load-bearing work. Every risky file is reverse engineered by **two
+Three sponsors do load-bearing work in the current build; Photon joins later for mobile (§8).
+Every risky file is reverse engineered by **two
 independent workers at once**, and Aegis compares their answers:
 
 - **Worker A — Daytona + Factory Droid:** a throwaway **Daytona** sandbox with **Droid** living
@@ -34,9 +35,9 @@ independent workers at once**, and Aegis compares their answers:
 - **Worker B — Chalk (standalone):** the same job done independently by **Chalk**'s AI in its own
   isolated environment.
 
-Both return a verdict, their evidence and **a log of what happened in their sandbox**. **Photon**
-carries the messaging channels, and **Chalk** also supplies the link threat-intel features, the LLM
-gateway and the evals that measure how often each worker, and the pair, is right.
+Both return a verdict, their evidence and **a log of what happened in their sandbox**. **Chalk**
+also supplies the link threat-intel features, the LLM gateway and the evals that measure how often
+each worker, and the pair, is right.
 
 ---
 
@@ -56,7 +57,7 @@ flowchart LR
   end
   CMP["compare.ts + verdict.ts<br/>more severe answer wins,<br/>can only raise"]
   OUT["Deliver · hold · quarantine<br/>report with both sandbox logs"]
-  OTHER["Other services<br/>Chalk link features + AI Gateway + evals ·<br/>Safe Browsing · Daytona link detonation · Photon"]
+  OTHER["Other services<br/>Chalk link features + AI Gateway + evals ·<br/>Safe Browsing · Daytona link detonation"]
 
   EXT <-->|"HTTP 127.0.0.1"| APP
   APP -->|"file copy 1"| DROID
@@ -184,7 +185,7 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `compare.ts`                        | Planned (M4, M6) | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)        |
 | `detonate.ts`                       | Planned (M7)     | Decides when to detonate a link, queues it, rescans the final URL                                 |
 | `watcher.ts`, `quarantine.ts`       | Planned (M8)     | `~/Downloads` watcher; quarantine, restore, delete                                                |
-| `photon.ts`                         | Planned (M5)     | Inbound messages → checks → replies; alerts; thread storage                                       |
+| `photon.ts`                         | Later (§8)       | Mobile: screenshots forwarded from a phone → checks → verdict reply. Not in the current build     |
 
 ### 3.4 Preload — `src/preload/` · Built
 
@@ -197,15 +198,15 @@ list.
 One React bundle for two windows, routed on the URL hash: `#/panel` is the mini panel, `#/main` is
 the main window. It only displays and asks; it never decides a verdict or touches a key.
 
-| Part                                       | Role                                                                                           |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| `views/Panel.tsx`                          | Mini panel (Figma frame): status, service dots, this page, scanning now, recent verdicts       |
-| `components/Shell.tsx`                     | Fixed frame: nav rail, top bar with ⌘K search and status chip; only the content column scrolls |
-| `views/main/*View.tsx`                     | Overview, Links, Downloads, Report (Figma frame), Messages, Accuracy, Settings, Search         |
-| `components/ds/`                           | Typed React port of `design-system/components/bundle.js`, styled by `bundle.css`               |
-| `components/aegis.tsx`, `assets/aegis.css` | Figma-only components: VerdictBadge, StatusDot, ScanSteps, Timeline, CodeBlock, chips          |
-| `lib/hooks.ts`, `lib/format.ts`            | Live status, IPC data hooks, scan log; formatting for machine output                           |
-| `assets/main.css`                          | Tailwind v4 with the design tokens mapped in `@theme`                                          |
+| Part                                       | Role                                                                                                           |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `views/Panel.tsx`                          | Mini panel (Figma frame): status, service dots, this page, scanning now, recent verdicts                       |
+| `components/Shell.tsx`                     | Fixed frame: nav rail, top bar with ⌘K search and status chip; only the content column scrolls                 |
+| `views/main/*View.tsx`                     | Overview, Links, Downloads, Report (Figma frame), Accuracy, Settings, Search; Messages is a placeholder for §8 |
+| `components/ds/`                           | Typed React port of `design-system/components/bundle.js`, styled by `bundle.css`                               |
+| `components/aegis.tsx`, `assets/aegis.css` | Figma-only components: VerdictBadge, StatusDot, ScanSteps, Timeline, CodeBlock, chips                          |
+| `lib/hooks.ts`, `lib/format.ts`            | Live status, IPC data hooks, scan log; formatting for machine output                                           |
+| `assets/main.css`                          | Tailwind v4 with the design tokens mapped in `@theme`                                                          |
 
 ### 3.6 Analysis workers — two independent reverse engineers · Planned (M3, M4, M6)
 
@@ -283,7 +284,7 @@ snapshot so jobs start in seconds):
 | `analyze.py`              | Off     | Static tools the workers call: real type, script lines, Office macros, PDF actions, archives and `.pkg` scripts, PE/ELF/Mach-O structure, YARA, capa → JSON |
 | `observe.py`              | Off     | Records what happens while a worker tests the file into the sandbox log, under a time limit                                                                 |
 | `detonate.py`             | On      | Link detonation: opens a link in headless Chromium and records redirects, final URL, screenshot, password forms                                             |
-| `fetch.py`                | On      | Fetches links and files for Photon messages, where there is no browser                                                                                      |
+| `fetch.py`                | On      | Later (§8): fetches links found in a phone screenshot, where there is no browser                                                                            |
 | `entry.py`, `rules/*.yar` | —       | Dispatcher; YARA rules including EICAR                                                                                                                      |
 
 ### 3.7 Native fn-key add-on — `native/fn-key/` · Built
@@ -304,8 +305,9 @@ renders as static HTML.
 ## 4. Pipeline
 
 Everything Aegis checks moves through the same nine stages, whatever it is and wherever it came
-from. A link, a downloaded file, a file another app dropped in `~/Downloads`, and a message
-forwarded through Photon all enter at **Intake** and leave with a verdict, an action and a record.
+from. A link, a downloaded file and a file another app dropped in `~/Downloads` all enter at
+**Intake** and leave with a verdict, an action and a record. (Phone screenshots through Photon join
+later as a fourth intake; §8.)
 Only files that the local pre-check can't clear go to the two cloud workers.
 
 ### 4.1 End to end
@@ -316,7 +318,6 @@ flowchart TB
     I1["Chrome page<br/>links · visible text · sender"]
     I2["Chrome download<br/>bytes held in memory"]
     I3["~/Downloads watcher<br/>files from other apps"]
-    I4["Photon message<br/>text · links · attachments"]
   end
 
   subgraph TRI["2 · Triage, on this Mac"]
@@ -334,17 +335,14 @@ flowchart TB
   CMP["4 · Compare<br/>compare.ts"]
   VER["5 · Verdict<br/>verdict.ts · can only raise"]
   ACT["6 · Act<br/>deliver · hold · quarantine · block · reply"]
-  REC["7 · Record and tell<br/>SQLite · panel · notification · Photon alert"]
+  REC["7 · Record and tell<br/>SQLite · panel · notification"]
   REV["8 · Review<br/>report · user decision"]
   EV["9 · Measure<br/>Chalk evals → Accuracy tab"]
 
   I1 --> T1
   I1 --> T2
-  I4 --> T1
-  I4 --> T2
   I2 --> T3
   I3 --> T3
-  I4 -->|"attachments, fetched files"| T3
   T1 -->|"suspicious, shortener,<br/>new domain, or user asks"| DET
   DET -->|"final URL rescored"| VER
   T1 -->|"clear result"| VER
@@ -363,21 +361,21 @@ flowchart TB
 
 ### 4.2 The stages
 
-| #   | Stage           | Owner                                                           | In                                                            | Out                                                                        | Time limit                                      | If it fails                                                                                                | Status                         |
-| --- | --------------- | --------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| 1   | Intake          | `extension/` → `bridge.ts`; `watcher.ts`; `photon.ts`           | A page, a download, a file in `~/Downloads`, a message        | A scan or link check with an ID, persisted in SQLite                       | —                                               | App not running: Chrome lets the download through with "not scanned"; the watcher catches it on next start | Bridge built; rest M2/M3/M5/M8 |
-| 2a  | Link scoring    | `links.ts`, `chalk.ts`                                          | URLs (secrets stripped), link text, page URL                  | `LinkVerdict` per link: score, reasons, checks that ran                    | 300 ms local, 1.5 s for Chalk                   | Chalk slow or down: local rules + cached data + direct Safe Browsing                                       | M2, M6                         |
-| 2b  | Scam-text check | `text.ts`                                                       | Visible text (≤ 8,000 chars, never stored), message text      | `ScamTextResult`: score, scam type, triggering sentences                   | 8 s                                             | Skipped; link results only                                                                                 | M6                             |
-| 2c  | Pre-check       | `precheck.ts`                                                   | The file's bytes (read only, never opened)                    | Real type, SHA-256, size, document risk flags, "needs the cloud" or not    | ~1 s                                            | Unreadable: held with "Can't scan right now"                                                               | M3                             |
-| 3a  | Worker A        | `queue.ts` → `workerA.ts` → Daytona                             | The file + `meta.json` in a fresh, network-off sandbox        | `WorkerResult` A + sandbox log A                                           | Sandbox start 20 s (one retry); whole job 120 s | Daytona down: same job in local Docker; neither: Worker B alone                                            | M3, M4                         |
-| 3b  | Worker B        | `queue.ts` → `workerB.ts` → Chalk                               | The same file, a separate copy                                | `WorkerResult` B + sandbox log B                                           | Whole job 120 s                                 | Chalk down: Worker A alone                                                                                 | M6                             |
-| 3c  | Link detonation | `detonate.ts` → Daytona (`detonate.py`)                         | A full URL (only when the user inspects, or auto rules match) | Redirects, final URL, screenshot, password forms, hosts                    | 20 s page load, 45 s total                      | Report what was captured; a harmless-looking page never lowers the verdict                                 | M7                             |
-| 4   | Compare         | `compare.ts`                                                    | Result A, result B, both logs                                 | One result, agreement, which workers answered                              | Waits until both finish or 120 s pass           | One missing: the other's answer, partial; both missing: pre-check only, never better than Unknown          | M4, M6                         |
-| 5   | Verdict         | `verdict.ts`                                                    | Rule reasons + compared result (or link/text results)         | Malicious · Suspicious · Unknown · Clean, score, reasons                   | instant                                         | Can't fail open: missing evidence means Unknown, never Clean                                               | Built                          |
-| 6   | Act             | `scans.ts`, `quarantine.ts`, bridge reply to the extension      | Verdict + mode (block or warn)                                | Exact scanned bytes delivered, file held or quarantined, link blocked      | —                                               | Never loses a file: every path ends delivered, held or quarantined with a clear choice                     | M3, M8                         |
-| 7   | Record and tell | `store.ts`, `status.ts`, `panel.ts`, notifications, `photon.ts` | Scan + verdict + report                                       | Row in SQLite, log line, panel pop-up, notification, optional text         | —                                               | Photon down: alerts pause, nothing else changes                                                            | Store, panel built; rest M3/M5 |
-| 8   | Review          | Renderer (Report, Links, Downloads), extension popup            | The stored report                                             | User decision: delete, keep, download / restore anyway, trust site         | —                                               | —                                                                                                          | Screens built; actions M8      |
-| 9   | Measure         | `chalk/`, `evals/`, `pnpm eval`                                 | Labeled links, texts and files                                | Precision, recall, false alarms, time per verdict, per worker and combined | offline                                         | Accuracy tab shows "No eval run yet"                                                                       | M6                             |
+| #   | Stage           | Owner                                                      | In                                                            | Out                                                                        | Time limit                                      | If it fails                                                                                                | Status                      |
+| --- | --------------- | ---------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------- |
+| 1   | Intake          | `extension/` → `bridge.ts`; `watcher.ts`                   | A page, a download, a file in `~/Downloads`                   | A scan or link check with an ID, persisted in SQLite                       | —                                               | App not running: Chrome lets the download through with "not scanned"; the watcher catches it on next start | Bridge built; rest M2/M3/M8 |
+| 2a  | Link scoring    | `links.ts`, `chalk.ts`                                     | URLs (secrets stripped), link text, page URL                  | `LinkVerdict` per link: score, reasons, checks that ran                    | 300 ms local, 1.5 s for Chalk                   | Chalk slow or down: local rules + cached data + direct Safe Browsing                                       | M2, M6                      |
+| 2b  | Scam-text check | `text.ts`                                                  | Visible text (≤ 8,000 chars, never stored)                    | `ScamTextResult`: score, scam type, triggering sentences                   | 8 s                                             | Skipped; link results only                                                                                 | M6                          |
+| 2c  | Pre-check       | `precheck.ts`                                              | The file's bytes (read only, never opened)                    | Real type, SHA-256, size, document risk flags, "needs the cloud" or not    | ~1 s                                            | Unreadable: held with "Can't scan right now"                                                               | M3                          |
+| 3a  | Worker A        | `queue.ts` → `workerA.ts` → Daytona                        | The file + `meta.json` in a fresh, network-off sandbox        | `WorkerResult` A + sandbox log A                                           | Sandbox start 20 s (one retry); whole job 120 s | Daytona down: same job in local Docker; neither: Worker B alone                                            | M3, M4                      |
+| 3b  | Worker B        | `queue.ts` → `workerB.ts` → Chalk                          | The same file, a separate copy                                | `WorkerResult` B + sandbox log B                                           | Whole job 120 s                                 | Chalk down: Worker A alone                                                                                 | M6                          |
+| 3c  | Link detonation | `detonate.ts` → Daytona (`detonate.py`)                    | A full URL (only when the user inspects, or auto rules match) | Redirects, final URL, screenshot, password forms, hosts                    | 20 s page load, 45 s total                      | Report what was captured; a harmless-looking page never lowers the verdict                                 | M7                          |
+| 4   | Compare         | `compare.ts`                                               | Result A, result B, both logs                                 | One result, agreement, which workers answered                              | Waits until both finish or 120 s pass           | One missing: the other's answer, partial; both missing: pre-check only, never better than Unknown          | M4, M6                      |
+| 5   | Verdict         | `verdict.ts`                                               | Rule reasons + compared result (or link/text results)         | Malicious · Suspicious · Unknown · Clean, score, reasons                   | instant                                         | Can't fail open: missing evidence means Unknown, never Clean                                               | Built                       |
+| 6   | Act             | `scans.ts`, `quarantine.ts`, bridge reply to the extension | Verdict + mode (block or warn)                                | Exact scanned bytes delivered, file held or quarantined, link blocked      | —                                               | Never loses a file: every path ends delivered, held or quarantined with a clear choice                     | M3, M8                      |
+| 7   | Record and tell | `store.ts`, `status.ts`, `panel.ts`, notifications         | Scan + verdict + report                                       | Row in SQLite, log line, panel pop-up, notification                        | —                                               | —                                                                                                          | Store, panel built; rest M3 |
+| 8   | Review          | Renderer (Report, Links, Downloads), extension popup       | The stored report                                             | User decision: delete, keep, download / restore anyway, trust site         | —                                               | —                                                                                                          | Screens built; actions M8   |
+| 9   | Measure         | `chalk/`, `evals/`, `pnpm eval`                            | Labeled links, texts and files                                | Precision, recall, false alarms, time per verdict, per worker and combined | offline                                         | Accuracy tab shows "No eval run yet"                                                                       | M6                          |
 
 ### 4.3 Links, step by step
 
@@ -390,7 +388,7 @@ flowchart TB
    real destination, lookalike brands, punycode, raw IPs, risky TLDs, shorteners, executable paths;
    domain age, Safe Browsing and threat-feed matches from Chalk (cached per domain for an hour).
    Trusted sites skip the heuristics but still get Safe Browsing and the feeds.
-4. **Check the text** (`text.ts`, ≤ 8 s). Webmail and Photon messages always; other pages only when
+4. **Check the text** (`text.ts`, ≤ 8 s). Webmail always; other pages only when
    a cheap keyword filter or Tier 1 finds something.
 5. **Verdict** (`verdict.ts`). A Safe Browsing or threat-feed match is Malicious outright.
 6. **Mark the page** (content script). Suspicious links get an amber dotted outline, Malicious a red
@@ -436,9 +434,8 @@ flowchart TB
    - **Unknown / Suspicious:** held, with Show report · Delete · Download anyway.
    - **Malicious:** quarantined, with Show report · Delete · Restore anyway.
    - **Warn mode:** nothing is held; the file is delivered with its verdict and report.
-9. **Tell** (`status.ts`, `panel.ts`, `photon.ts`). The panel pops up without taking focus while a file
-   is held and closes 8 seconds after the verdict; a notification opens the report; an optional text
-   goes out through Photon.
+9. **Tell** (`status.ts`, `panel.ts`). The panel pops up without taking focus while a file is held and
+   closes 8 seconds after the verdict; a notification opens the report.
 10. **Report** (renderer). Verdict and risk score, the headline, finding chips, "What would have
     happened", flagged code, indicators, whether both analysts agreed, both sandbox logs, and the
     footer saying where it was scanned and when the sandbox was destroyed.
@@ -466,20 +463,7 @@ The current `ScanStatus` in `src/shared/types.ts` has `uploaded` and `reviewing`
 `received → prechecked → queued → analyzing → compared → verdict → done | failed` when M3 starts
 (a joint change, noted in the Handoff).
 
-### 4.5 Messages, step by step (Photon, M5)
-
-1. A text, iMessage or forwarded email reaches Aegis's Photon number or address; `photon.ts` stores
-   the thread on the Mac.
-2. Every URL in it is stripped and scored (§4.3 steps 2–5); the message itself always gets the
-   scam-text check. On email, the sender is checked for spoofing (display name vs. address,
-   Reply-To mismatch, lookalike domain).
-3. There's no browser, so suspicious links and attachments are fetched by `fetch.py` in a
-   network-on Daytona sandbox. Fetched files then go through §4.4 steps 3–7 like any download.
-4. Aegis replies in the thread: the verdict, the real destination of each link, the scam type if
-   any, and the one-sentence summary.
-5. Follow-ups ("what does it do?") are answered from the stored report.
-
-### 4.6 When a service is down
+### 4.5 When a service is down
 
 The pipeline degrades rather than stops (MEGA_PROMPT §5.9). Defaults are for **block** mode.
 
@@ -489,10 +473,9 @@ The pipeline degrades rather than stops (MEGA_PROMPT §5.9). Defaults are for **
 | Chalk          | Worker A carries the file alone, marked partial. Link scoring uses local rules + direct Safe Browsing; scam-text is skipped unless a direct model key is set.                              |
 | Both workers   | Executables, installers, scripts and archives are **held** with "Can't scan right now" and Download anyway. Documents pass after the local pre-check, with a warning if it found anything. |
 | Safe Browsing  | Threat feeds through Chalk plus Tier 1 rules.                                                                                                                                              |
-| Photon         | Messages and alerts pause; nothing else changes.                                                                                                                                           |
 | The app itself | The extension lets downloads through with a "not scanned" notice; the `~/Downloads` watcher scans them on next start.                                                                      |
 
-### 4.7 Time limits
+### 4.6 Time limits
 
 | Step                     | Limit                            | On timeout                                                   |
 | ------------------------ | -------------------------------- | ------------------------------------------------------------ |
@@ -538,7 +521,8 @@ Aegis/
 │   │   ├── demo.ts, devcapture.ts            dev only
 │   │   └── links.ts, chalk.ts, text.ts, precheck.ts, queue.ts, daytona.ts, docker.ts,
 │   │       scans.ts, workerA.ts, workerB.ts, compare.ts, detonate.ts, watcher.ts,
-│   │       quarantine.ts, photon.ts                                                Planned
+│   │       quarantine.ts                                                           Planned
+│   │       photon.ts                                                  Later (mobile, §8)
 │   ├── preload/
 │   │   └── index.ts            window.aegis
 │   └── renderer/
@@ -562,7 +546,8 @@ Aegis/
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │
 ├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, observe.py,
-│                               detonate.py, fetch.py, rules/*.yar, requirements.txt, tests
+│                               detonate.py, rules/*.yar, requirements.txt, tests
+│                               (fetch.py later, for mobile)
 ├── chalk/                      Planned (M6): features, resolvers, eval config
 ├── evals/                      Planned (M6): labeled links, texts, files; results.json
 ├── demo/                       Planned (M0a/b): phishing page, scam texts, invoice email,
@@ -621,7 +606,7 @@ flowchart LR
       SQL["node:sqlite"]
       ZM["zod 4"]
       FNK["fn_key.node"]
-      SDKS["Daytona · Droid · Photon · Chalk SDKs<br/>(planned)"]
+      SDKS["Daytona · Droid · Chalk SDKs<br/>(planned)"]
     end
     subgraph Renderer["Renderer (sandboxed)"]
       REACT["React 19"]
@@ -658,7 +643,7 @@ flowchart LR
 | Vitest                        | Tests                    | Verdict rules, bridge origin checks, store; pytest for `sandbox/` later               |
 | ESLint + Prettier, TypeScript | Quality                  | `pnpm typecheck && pnpm lint && pnpm test` before every commit                        |
 | Daytona + Droid, Chalk SDKs   | Main → workers (planned) | The two analysis workers (Daytona sandbox with Droid inside; Chalk standalone)        |
-| Photon SDK                    | Main (planned)           | iMessage / SMS / email channels                                                       |
+| Photon SDK                    | Later (§8)               | Mobile: screenshots in, verdicts out over iMessage / SMS                              |
 
 ### 6.2 How the code depends on itself
 
@@ -788,3 +773,23 @@ sequenceDiagram
   BR-->>U: Report with the screenshot, verdict stays Malicious
   U->>G: Back to safety
 ```
+
+---
+
+## 8. Later: Aegis on your phone (Photon)
+
+**Not in the current build.** Photon is how Aegis will reach phones, so people can use it away
+from the Mac. The idea:
+
+1. Someone gets a suspicious text, email or web page on their phone and takes a **screenshot**.
+2. They forward the screenshot to Aegis's number over iMessage or SMS, through **Photon**.
+3. Aegis reads the screenshot (the text, the links and who it claims to be from) and runs it
+   through the same pipeline as everything else: link scoring and the scam-text check (§4.3), and
+   a sandbox look at any link that needs one.
+4. Aegis replies in the thread with a verdict (Malicious, Suspicious, Unknown or Clean), the real
+   destination of each link, and one plain-English sentence on why.
+
+When it's built, it adds a fourth intake to §4.1, `photon.ts` in the main process, `fetch.py` in
+the sandbox for links that need fetching without a browser, a way to read text from images, and
+the Messages tab as the history of those threads. Photon's channels, image handling and setup are
+to be checked against its current docs first (`docs/PLAN.md` › Sponsor findings).

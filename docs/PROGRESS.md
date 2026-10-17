@@ -1,8 +1,9 @@
-## Handoff (updated 2026-10-17 00:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 01:00 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold, v2) — 100%; 1 (shell + bridge) — ~90%; 2 — click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - Photon taken out of the current architecture, pipeline and plan; it returns later as the mobile feature (forward a phone screenshot → verdict). `docs/architectural.md` §8, PLAN.md decision 18
   - Pipeline drafted in `docs/architectural.md` §4 (nine stages, link / file / message flows, scan state machine, service-down table, time limits), **awaiting the team's review**. It plans one shared-type change for M3: `ScanStatus` becomes `received → prechecked → queued → analyzing → compared → verdict → done | failed`
   - Architecture changed to **two analysis workers, compared**: Worker A = Daytona sandbox with Factory Droid inside, Worker B = Chalk standalone; both examine and test the file in their own sandbox and return a result + sandbox log; `compare.ts` reconciles (PLAN.md decision 17, `docs/architectural.md` §2.1, §3.6, §7.1). Docs only so far; no code changed
   - fn key: `native/fn-key` (from Klair, chords removed) + `src/main/fnkey.ts`; a clean fn tap toggles the panel, ⌃⌥A still works. Built with `pnpm build:native`; health check reports it (OK on Evan's Mac — Electron already had Input Monitoring)
@@ -34,7 +35,7 @@
 | 2   | Links                                                                  | Evan        | Click-guard UI done; content script, scoring, wiring not built |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                    |
 | 4   | Worker A (Daytona + Droid) + compare                                   | Zach        | Not started                                                    |
-| 5   | Photon                                                                 | Evan        | Not started                                                    |
+| 5   | Later: mobile via Photon (screenshots → verdict)                       | Evan        | Deferred, not in the current build                             |
 | 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                    |
 | 7   | Detonation                                                             | Zach        | Not started                                                    |
 | 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on done; watcher, quarantine, Docker fallback not built |
@@ -88,6 +89,8 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 | —               | Daytona not used yet   |
 
 ## Decisions log
+
+- 2026-10-17: Photon deferred to a later mobile feature (forward a phone screenshot, get a verdict). Removed from the current pipeline; app placeholders stay as "Not set up" (PLAN.md decision 18).
 
 - 2026-10-17: Pipeline drafted from the architecture (architectural.md §4) for team review.
 
