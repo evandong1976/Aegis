@@ -51,6 +51,8 @@ export function linkHeadline(v: LinkVerdict): string {
       return 'Aegis can’t see where this link goes.'
     case 'domain_age':
       return 'This site was registered only days ago.'
+    case 'http_sensitive':
+      return 'This page would send what you type without encryption.'
     case 'dns_local':
       return 'This link points to your own computer, not a website.'
     default:

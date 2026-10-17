@@ -372,7 +372,12 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     - **A domain whose addresses are all on this computer or a private network** (e.g. jiameng.com
       → 127.0.0.1, found on whynohttps.com) is Unknown: "points to this computer, not a public
       website". Not Malicious: Workday's own `myworkdayjobs.com` does the same. With other signals
-      it adds 20 points. A site lacking HTTPS is not flagged; Chrome already warns about that.
+      it adds 20 points.
+    - **Plain `http` is flagged only for sign-in and payment pages** (`/login`, `/account`,
+      `login.` subdomains, `/checkout`, `/pay`…): Suspicious, "a sign-in page without encryption".
+      Other http sites aren't (Chrome warns about those itself; on whynohttps.com's 114 links this
+      adds nothing). Known domains, this Mac and the LAN are skipped. _Cost:_ a word list, so an
+      http page about "accounts" can be flagged, and a sign-in page with an unusual path missed.
     - **Domain lookups are skipped** for the page's own site, trusted and known domains, IPs and
       shorteners, to keep a busy page from firing hundreds of requests.
     - **Budget:** a page waits up to 1.5 s for lookups; anything slower is marked `timeout` and keeps

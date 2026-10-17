@@ -334,6 +334,27 @@ function isPrivateIp(host: string): boolean {
   )
 }
 
+const PAYMENT_WORDS =
+  /(^|[^a-z])(checkout|payments?|pay|billing|wallet|banking|bank|card)([^a-z]|$)/
+const SIGN_IN_WORDS =
+  /(^|[^a-z])(log-?in|log-?on|sign-?in|sign-?up|auth|oauth|sso|passwords?|passwd|reset|verify|accounts?)([^a-z]|$)/
+
+/**
+ * A sign-in or payment page over plain http: whatever is typed there travels unencrypted. A site
+ * without HTTPS isn't flagged on its own (Chrome warns about that); only these pages are.
+ * Known domains are skipped (Chrome upgrades them to HTTPS), and so are this Mac and the LAN.
+ */
+export function plainHttpSensitive(link: ParsedLink, known: boolean): 'sign-in' | 'payment' | null {
+  if (link.url.protocol !== 'http:' || known) return null
+  if (link.isIp ? isPrivateIp(link.host) : /(^|\.)(localhost|local)$/.test(link.host)) return null
+  const where = [link.subdomain, decodeSafe(link.url.pathname), link.url.search]
+    .join(' ')
+    .toLowerCase()
+  if (PAYMENT_WORDS.test(where)) return 'payment'
+  if (SIGN_IN_WORDS.test(where)) return 'sign-in'
+  return null
+}
+
 const reason = (code: string, text: string, weight: number, hard = false): Reason => ({
   code,
   text,
@@ -412,6 +433,10 @@ export function tier1(link: ParsedLink, linkText = ''): Tier1Result {
   const ext = link.url.pathname.toLowerCase().match(/\.([a-z0-9]{1,12})$/)?.[1]
   if (ext && EXECUTABLE_EXT.has(ext)) {
     reasons.push(reason('executable', `downloads a .${ext} file`, 15))
+  }
+  const plain = plainHttpSensitive(link, known)
+  if (plain) {
+    reasons.push(reason('http_sensitive', `a ${plain} page without encryption (http)`, 30))
   }
   return { reasons, hiddenDestination, known }
 }

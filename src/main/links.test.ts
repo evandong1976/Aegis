@@ -246,3 +246,25 @@ describe('a public link that points to this computer', () => {
     expect(score('http://paypa1-login.com/', '', local).verdict).toBe('suspicious')
   })
 })
+
+describe('sign-in and payment pages over plain http', () => {
+  it('flags them as Suspicious', () => {
+    const login = score('http://shop-example.com/account/login')
+    expect(login.verdict).toBe('suspicious')
+    expect(login.reasons[0].text).toBe('a sign-in page without encryption (http)')
+    expect(linkHeadline(login)).toBe('This page would send what you type without encryption.')
+    expect(score('http://store-example.com/checkout?step=2').reasons[0].text).toBe(
+      'a payment page without encryption (http)'
+    )
+    expect(codes('http://login.some-portal.net/')).toContain('http_sensitive')
+  })
+
+  it('leaves other http pages, https pages, known sites and local addresses alone', () => {
+    expect(score('http://jiameng.com/').verdict).toBe('clean')
+    expect(codes('https://shop-example.com/account/login')).not.toContain('http_sensitive')
+    expect(codes('http://github.com/login')).not.toContain('http_sensitive')
+    expect(codes('http://192.168.1.1/login')).not.toContain('http_sensitive')
+    expect(codes('http://localhost:3000/login')).not.toContain('http_sensitive')
+    expect(codes('http://blog-example.com/authors/jane')).not.toContain('http_sensitive')
+  })
+})
