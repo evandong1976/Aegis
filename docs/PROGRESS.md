@@ -1,9 +1,14 @@
-## Handoff (updated 2026-10-17 10:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:05 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Worker A decided: option B** (PLAN.md decision 19). `try-droid` step 2 now uses a real
+    sandbox: network off, one harmless text file, three read-only argument-free tools; Droid must
+    report the file's SHA-256, which only the tools can give it. Typechecks; **not run yet** (needs
+    the droid CLI). Option A (step 3) is opt-in with `AEGIS_TRY_DROID_INSIDE=1`.
+  - `extension-heartbeat` merged into `main` (local, not pushed).
   - **Daytona checked live (10:40)** with Evan's key: `pnpm try:daytona` passes (create 0.8–3.8 s,
     upload, run, network off, delete). The org is on Tier 1 or 2: `networkBlockAll` at creation
     works (even npm, an "essential service", is blocked), but allow-lists and changes after
@@ -32,20 +37,17 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** The team chooses how Worker A reaches the sandbox, given the tier result:
-  Tier 3 (Droid inside, option A) or Droid on the Mac through narrow tools (option B), which works
-  now. Then: add `FACTORY_API_KEY` to `.env.local`, install the droid CLI
-  (`brew install --cask droid`), run `pnpm try:droid`, record it, and merge this branch into
-  `main`. Outside this branch: reload the extension in Chrome (the heartbeat fix is on branch
-  `extension-heartbeat`) to close milestone 1.
+- **Next step:** Install the droid CLI (`brew install --cask droid`; Factory's signed binary,
+  0.238.0, about 252 MB), run `pnpm try:droid`, save its output under `logs/`, record the result
+  in PLAN.md › Sponsor findings › Factory Droid, run the leak check, then merge `sponsor-check`
+  into `main`. Link detonation still needs a home (Tier 3 or Chalk).
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
   small UI issues open (see "Open issues"; branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
-- **Blocked on / questions for the user:** (1) Tier 3 or option B for Worker A (and where link
-  detonation runs: Tier 3 or Chalk); asking Daytona at the event for credits or a tier bump is
-  free. (2) `FACTORY_API_KEY` and the droid CLI for `pnpm try:droid`.
+- **Blocked on / questions for the user:** permission to install the droid CLI. Where link
+  detonation runs (Tier 3 or Chalk).
 - **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
   every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
   with the latest `SUMMARY.md` in `logs/`.
@@ -178,6 +180,9 @@ scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 | `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
 
 ## Decisions log
+
+- 2026-10-17: Worker A is option B — Droid on the Mac, narrow read-only tools into a network-off
+  sandbox (PLAN.md decision 19).
 
 - 2026-10-17: Daytona checked live on `sponsor-check`. This account's tier (1 or 2) allows
   `networkBlockAll` at creation but refuses allow-lists and later changes; Factory and ordinary

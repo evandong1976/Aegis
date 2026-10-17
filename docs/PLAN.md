@@ -280,6 +280,14 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     Messages tab, the "Text me" setting) as "Not set up"; they stay as placeholders for the mobile
     feature unless the team wants them hidden. MEGA_PROMPT §5.5 (messaging agent) is deferred, not
     dropped.
+19. **Worker A is option B: Droid on the Mac, working on the sandbox through narrow tools** (team
+    decision, 2026-10-17, after the live Daytona check). This account's Daytona tier can't reach
+    Factory from a sandbox (Sponsor findings › Daytona › Live results), so instead of living in
+    the sandbox, Droid runs in the main process with every built-in tool switched off, and its only
+    tools are read-only, argument-free tools over the one file in a sandbox created with
+    `networkBlockAll`. Each tool call is logged as Worker A's sandbox log. The file under test never
+    shares a machine with Droid or its key. Decision 17 otherwise stands (two workers, compared);
+    option A stays possible if the org reaches Tier 3. `scripts/try-droid.mts` step 2 is the proof.
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
@@ -361,7 +369,7 @@ What each Aegis need gets on this tier:
   capabilities). A Docker-in-Docker test (`docker-dind` snapshot, inner container with
   `--network none`) was not run; it isn't needed now that create-time `networkBlockAll` works.
 
-Pending the team's choice between Tier 3 and option 2 (PROGRESS.md › Blocked on).
+**Decided 2026-10-17: option 2** (decision 19). Link detonation still needs Tier 3 or Chalk.
 
 ### Factory Droid
 
