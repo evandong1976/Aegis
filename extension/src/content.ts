@@ -139,13 +139,17 @@ function reset(): void {
 // ---- Marking links ----
 
 const STYLE_ID = 'aegis-link-marks'
-// One colour per verdict that reads on light and dark pages alike: the page's background doesn't
-// follow the system theme, so the design system's theme pair doesn't fit here.
+// Every link the click guard would hold (Unknown, Suspicious, Malicious) gets a solid red border,
+// always visible, in one red that reads on light and dark pages alike (the page's background
+// doesn't follow the system theme). `clone` keeps the border on each line of a wrapped link.
 const MARK_CSS = `
-a[data-aegis-verdict="suspicious"], area[data-aegis-verdict="suspicious"] {
-  outline: 2px dotted #d98b00 !important; outline-offset: 2px !important; }
-a[data-aegis-verdict="malicious"], area[data-aegis-verdict="malicious"] {
-  outline: 2px dashed #e5243f !important; outline-offset: 2px !important; }
+a[data-aegis-verdict] {
+  border: 2px solid #e5243f !important;
+  border-radius: 3px !important;
+  -webkit-box-decoration-break: clone !important;
+  box-decoration-break: clone !important;
+}
+area[data-aegis-verdict] { outline: 2px solid #e5243f !important; }
 `
 
 function mark(): void {

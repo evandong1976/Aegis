@@ -117,8 +117,8 @@ check('redirect wrapper judged by its destination', m.wrapped === 'suspicious')
 check('clean link not marked', m.clean === null)
 check('javascript:void(0) not marked', m.void === null)
 check('link added later (MutationObserver) gets a verdict', m.late === 'malicious' || m.late === 'suspicious', String(m.late))
-const style = await evaluate(`getComputedStyle(document.getElementById('phish')).outlineStyle + ' / ' + getComputedStyle(document.getElementById('mismatch')).outlineStyle`)
-check('outline styles: malicious dashed, suspicious dotted', style === 'dashed / dotted', style)
+const border = await evaluate(`['phish','mismatch','short','clean'].map(id => { const c = getComputedStyle(document.getElementById(id)); return id + ':' + c.borderTopStyle + ' ' + c.borderTopWidth + ' ' + c.borderTopColor }).join(' | ')`)
+check('flagged links have a solid red border, clean links none', border === 'phish:solid 2px rgb(229, 36, 63) | mismatch:solid 2px rgb(229, 36, 63) | short:solid 2px rgb(229, 36, 63) | clean:none 0px rgb(0, 0, 238)', border)
 await shot('1-outlines')
 
 // 2. Hover note

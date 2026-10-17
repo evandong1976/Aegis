@@ -50,9 +50,9 @@
     "detail": "suspicious"
   },
   {
-    "name": "outline styles: malicious dashed, suspicious dotted",
+    "name": "flagged links have a solid red border, clean links none",
     "ok": true,
-    "detail": "dashed / dotted"
+    "detail": "phish:solid 2px rgb(229, 36, 63) | mismatch:solid 2px rgb(229, 36, 63) | short:solid 2px rgb(229, 36, 63) | clean:none 0px rgb(0, 0, 238)"
   },
   {
     "name": "hover note appears on an outlined link",

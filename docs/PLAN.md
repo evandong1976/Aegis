@@ -373,6 +373,10 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
       → 127.0.0.1, found on whynohttps.com) is Unknown: "points to this computer, not a public
       website". Not Malicious: Workday's own `myworkdayjobs.com` does the same. With other signals
       it adds 20 points.
+    - **Every flagged link gets a solid red border, always visible** (team request, 2026-10-17),
+      for Unknown, Suspicious and Malicious alike, instead of MEGA_PROMPT §5.1's amber dotted /
+      red dashed outlines and Unknown's hover-only note. _Cost:_ the border doesn't say which
+      verdict; the hover note and the guard do. A border takes 2 px of space, so text may shift.
     - **Plain `http` is flagged only for sign-in and payment pages** (`/login`, `/account`,
       `login.` subdomains, `/checkout`, `/pay`…): Suspicious, "a sign-in page without encryption".
       Other http sites aren't (Chrome warns about those itself; on whynohttps.com's 114 links this
