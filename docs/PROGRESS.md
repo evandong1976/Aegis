@@ -9,7 +9,7 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished — branch `sponsor-check-sync` (not merged, not pushed):** Zach's later
+- **Just finished — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
     free lookups every 60 s, a tiny live test at start and on Check now. Zach tested it against
@@ -58,12 +58,17 @@ test` pass on `main`.
     Tier 3 question no longer blocks anything.
   - **Photon is in scope** (decision 21), built near the end; **demo materials at the end**
     (decision 22); **one branch per feature** (23); **keys in `.env.local`** (24).
-- **In progress:** branch `droid-tool-lockdown` (tests that lock Droid's tools down; its own
-  handoff lives on that branch).
+- **In progress:** nothing. **Done on branch `droid-tool-lockdown`, merged into `main`:** Worker A's
+  lockdown rules moved from `scripts/try-droid.mts` into `src/main/droidLockdown.ts` with 15 unit
+  tests (permission handler, disabled tools, read-only commands, untrusted fence, prompt
+  injection); `try-droid` imports the same module and still passes live. Evidence
+  `logs/2026-10-17-droid-lockdown/`. `tsconfig.node.json` now allows `.ts` import extensions so
+  the script can import from `src/main/` under Node.
 - **Next step:**
-  1. Team: approve merging `sponsor-check-sync` and `droid-tool-lockdown` into `main`. Zach:
-     your `sponsor-check` commits are in `sponsor-check-sync`; your decision 19 is now 27, and
-     `chalk.yaml` & co. are in `chalk/` (run Chalk commands from there).
+  1. **Zach:** your `sponsor-check` commits are in `main` (via `sponsor-check-sync`); your
+     decision 19 is now 27, and `chalk.yaml` & co. are in `chalk/` (run Chalk commands from there).
+     An untracked `hello_chalk.py` (Chalk's hello-world sandbox) appeared in the repo root at 11:46;
+     it belongs in `chalk/` if kept.
   2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
      RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
      code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
@@ -245,14 +250,19 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | ------------------------------------------- | --------------------------------------------------------- |
 | `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
+| `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
 | `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
 
 ## Decisions log
 
+- 2026-10-17 11:50: `sponsor-check-sync` and `droid-tool-lockdown` merged into `main`; `main`
+  pushed to `origin`.
 - 2026-10-17 11:45: `sponsor-check-sync`: Zach's live sponsor checks (decision 27, was his 19),
   Chalk credentials and `chalk init` files merged with `main`'s docs as the source of truth; Chalk
   files moved to `chalk/`; Worker B must turn its network off (Chalk sandboxes are open by
   default).
+- 2026-10-17 11:27: `droid-tool-lockdown`: the lockdown rules are shared code with tests
+  (`src/main/droidLockdown.ts`); `workerA.ts` must use them at milestone 4.
 - 2026-10-17 11:35: Short links are held at the click as Unknown and the user double-checks
   (PLAN.md decision 26). Droid lockdown tests go on their own branch, `droid-tool-lockdown`.
   `docs-update` merged into `main`; `main` pushed to `origin`.

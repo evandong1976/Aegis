@@ -1,0 +1,11 @@
+# pnpm try:droid on branch droid-tool-lockdown, 2026-10-17 11:26 EDT, commit base d3ceac1 + working tree
+.env not found. Continuing without it.
+ok   droid CLI: droid 0.238.0
+ok   run() with structured output: {"verdict":"unknown","summary":"The check worked."} in 6.5 s
+ok   sandbox (network off) + sample: 5f080c7f-c4d2-41ff-bcf1-c22dd2b46264 in 1.7 s
+ok   built-in tools off: 31 switched off; ToolSearch can't be (schema loader only)
+ok   Droid used the sandbox tools: 3 tool call(s) (list_sample_files, read_sample, describe_sample); sha256 matches; verdict clean; "The sample is a plain-text note with no executable code or apparent malicious content." in 9.5 s
+sandbox log: [{"at":"2026-10-17T15:26:47.162Z","tool":"list_sample_files","exitCode":0,"bytes":157},{"at":"2026-10-17T15:26:47.164Z","tool":"read_sample","exitCode":0,"bytes":48},{"at":"2026-10-17T15:26:47.169Z","tool":"describe_sample","exitCode":0,"bytes":85}]
+ok   delete: 5f080c7f-c4d2-41ff-bcf1-c22dd2b46264 at 2026-10-17T15:26:52.357Z
+skip droid inside a Daytona sandbox: option B chosen (set AEGIS_TRY_DROID_INSIDE=1 to try)
+exit=0
