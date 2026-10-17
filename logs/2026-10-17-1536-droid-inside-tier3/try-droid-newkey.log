@@ -1,0 +1,15 @@
+# AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid (new Factory key): branch claude/happy-haslett-a1ae53, base dccb08a + working tree, 2026-10-17 15:46 EDT; Mac droid: npm droid@0.238.0 via DROID_PATH; env files: --env-file=/Users/zach/Desktop/Aegis/.env
+ok   droid CLI: /private/tmp/claude-501/-Users-zach-Desktop-Aegis--claude-worktrees-happy-haslett-a1ae53/c242c931-3726-42d1-9d8a-c70f00afba8a/scratchpad/droid-cli/node_modules/.bin/droid 0.238.0
+ok   run() with structured output: {"verdict":"unknown","summary":"The check worked."} in 7.5 s
+ok   sandbox (network off) + sample: 3a8d88a0-6c90-4183-ab85-42696c845945 in 1.1 s
+ok   built-in tools off: 31 switched off; ToolSearch can't be (schema loader only)
+ok   Droid used the sandbox tools: 3 tool call(s) (list_sample_files, read_sample, describe_sample); sha256 matches; verdict clean; "The sample is a short plain-text note with no executable code or malicious content." in 10.6 s
+sandbox log: [{"at":"2026-10-17T19:46:31.975Z","tool":"list_sample_files","exitCode":0,"bytes":157},{"at":"2026-10-17T19:46:31.986Z","tool":"read_sample","exitCode":0,"bytes":48},{"at":"2026-10-17T19:46:31.987Z","tool":"describe_sample","exitCode":0,"bytes":85}]
+ok   delete: 3a8d88a0-6c90-4183-ab85-42696c845945 at 2026-10-17T19:46:37.754Z
+ok   sandbox (allow-list): 4d02fa70-b436-43ee-9a48-06851302df81 in 1.9 s; app.factory.ai,api.factory.ai,registry.npmjs.org
+ok   droid CLI in the sandbox: node v25.9.0, npm 11.12.1; npm install droid@0.232.0 exit 0 in 9.8 s; 0.232.0
+ok   allow-list holds: limited to app.factory.ai,api.factory.ai; app.factory.ai HTTP 200, api.factory.ai HTTP 200, example.com unreachable, registry.npmjs.org unreachable, 1.1.1.1 unreachable
+FAIL droid exec inside the sandbox: exit 1 in 7.8 s, network limited to app.factory.ai,api.factory.ai; {"type":"result","subtype":"failure","is_error":true,"duration_ms":195,"num_turns":0,"result":"403 status code (no body)","session_id":"769d4f91-cc9f-4569-9580-f58cd1fe22a9","usage":{"input_tokens":0,"output_tokens":0,"cache_read_input_tokens":0,"cache_creation_input_tokens":0,"factory_credits":0}}
+ok   delete: 4d02fa70-b436-43ee-9a48-06851302df81 at 2026-10-17T19:46:58.090Z
+ok   no sandboxes left: 0 in the org after 2.1 s 
+exit=1 wall=45 s

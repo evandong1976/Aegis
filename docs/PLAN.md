@@ -421,7 +421,7 @@ below).
 | Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                               | Findings                                                                                                              |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox     | Below. `pnpm try:daytona` **passes** (2026-10-17); **Tier 3 since 15:24** (decision 28; see Tier 3 below)             |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19)                                           |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19); option A also passes on Tier 3           |
 | Photon               | iMessage/SMS channels, receiving images (screenshots), setup, env var names                                                         | Below, from docs only (2026-10-17); no `try-photon` yet                                                               |
 | Chalk                | Features, LLM calls, evals, **can Chalk host Worker B's sandbox**, env var names                                                    | Below, from docs, the dashboard and Chalk's generated guide (2026-10-17): network open by default; no `try-chalk` yet |
 | Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                | Key set in `.env.local`; the health check exercises it on the next app start                                          |
@@ -519,8 +519,8 @@ What it means for Aegis (decision 28):
   for Factory's hosts only. Still open: the `droid` CLI needs Node.js in the image, the Factory key
   would sit in the sandbox (as a Daytona Secret), and the sample would share a machine with Droid
   and its key, which option B avoids. `try-droid`'s option A step creates its sandbox with
-  `domainAllowList` (Factory plus npm for the install, then Factory only), never open, and it
-  holds no sample: Factory Droid › Option A on Tier 3.
+  `domainAllowList` (`api` and `prem.factory.ai`, plus npm for the install, then Factory only),
+  never open, and it holds no sample. It passes: Factory Droid › Option A on Tier 3.
 - **Link detonation: now possible on Daytona** in a separate, network-on sandbox, never the one
   that holds a sample.
 
@@ -563,8 +563,9 @@ What it means for Aegis (decision 28):
     tools that run read-only commands inside the sandbox through `executeCommand`. The sample never
     leaves the sandbox and the network stays off. `try-droid` tests this setup against a real network-off sandbox (live results below).
   - `try-droid`'s last step tries A (`AEGIS_TRY_DROID_INSIDE=1`): a sandbox created with
-    `domainAllowList` for Factory's hosts plus `registry.npmjs.org`, `npm install -g droid@0.232.0`,
-    the list narrowed to Factory's hosts (`AEGIS_FACTORY_DOMAINS` overrides them), a probe from
+    `domainAllowList` for Factory's hosts (`api.factory.ai,prem.factory.ai`) plus
+    `registry.npmjs.org`, `npm install -g droid@0.232.0`, the list narrowed to Factory's hosts
+    (`AEGIS_FACTORY_DOMAINS` overrides them), a probe from
     inside, then `droid exec --output-format json`. Result: Option A on Tier 3 below.
 
 #### Live results (2026-10-17, evidence: `logs/2026-10-17-droid/`)
@@ -594,37 +595,51 @@ What it means for Aegis (decision 28):
   handler; `droidLockdown.test.ts` has 15 tests; `try-droid` imports it and still passes. M4's
   `workerA.ts` uses the same module.
 - Option A (Droid inside the sandbox) wasn't run here: the first account's Daytona tier blocked
-  Factory from sandboxes. Run on Tier 3 since: below.
+  Factory from sandboxes. It has run and passed on Tier 3 since: below.
 
-#### Option A on Tier 3 (2026-10-17 15:36, evidence: `logs/2026-10-17-1536-droid-inside-tier3/`)
+#### Option A on Tier 3 (2026-10-17 15:36–15:53, evidence: `logs/2026-10-17-1536-droid-inside-tier3/`)
 
-Evidence for the team; decision 19 stands. **The network side works; Droid answering inside is
-not proven yet, because the Factory key in `.env` is invalid** (Factory returns 401 from the Mac
-too, so it's the key, not the sandbox; likely rotated or revoked after it was pasted in chat, Open
-questions). **Blocked on key:** with a new key in `.env.local`, re-run steps 1–3
-(`AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid`).
+Evidence for the team; decision 19 stands. **Option A works:**
+`AEGIS_TRY_DROID_INSIDE=1 pnpm try:droid` passes all three steps (exit 0). Inside a sandbox whose
+network allows only `api.factory.ai` and `prem.factory.ai`, `droid exec` answers in 5.5 s.
+0 sandboxes left.
 
 - **Allow-list, not open internet:** created with `domainAllowList`
-  `app.factory.ai,api.factory.ai,registry.npmjs.org` (accepted, about 1 s), then narrowed with
-  `updateNetworkSettings` to Factory's hosts. Probed from inside: Factory HTTP 200; `example.com`,
-  `registry.npmjs.org` and `1.1.1.1` (by IP) unreachable. Deleted; 0 sandboxes left.
+  `api.factory.ai,prem.factory.ai,registry.npmjs.org` (accepted, about 1 s), then narrowed with
+  `updateNetworkSettings` to the two Factory hosts. Probed from inside: Factory reachable;
+  `example.com`, `registry.npmjs.org`, `telemetry.factory.ai` and `1.1.1.1` (by IP) unreachable.
 - **Install:** the default snapshot has Node.js 25.9.0 and npm 11.12.1;
-  `npm install -g droid@0.232.0` works in 9–22 s and needs only `registry.npmjs.org`.
-- **Run:** `droid exec` reached Factory and got its "key appears to be invalid" answer in 7–11 s
-  (mostly CLI start-up). With only `api.factory.ai` allowed the result was the same, so
-  `app.factory.ai` may not be needed; confirm with a valid key. Telemetry, update and relay
-  hosts in the CLI were blocked and didn't stall it.
+  `npm install -g droid@0.232.0` works in 8–22 s and needs only `registry.npmjs.org`.
+- **Hosts droid needs:** `api.factory.ai` (auth, model calls) and `prem.factory.ai` (session sync),
+  seen through a logging proxy.
+  - Not `app.factory.ai`.
+  - `telemetry.factory.ai` is optional.
+  - Without `prem`, `droid exec` fails with "403 status code (no body)". That 403 is Daytona's
+    allow-list proxy refusing the connection, not Factory.
+- **How Daytona enforces it:**
+  - It sets `HTTP(S)_PROXY` to a proxy that refuses unlisted hosts.
+  - Direct connections that ignore the proxy also fail, so a sample can't bypass it by skipping
+    the proxy.
+  - Raw DNS to public resolvers gets an intercepted NXDOMAIN, never a real answer. Whether those
+    queries reach the internet wasn't tested.
 - **Tradeoffs if the team revisits decision 19:**
   - The Factory key sits in the sandbox with the sample (env var, or a Daytona Secret, which
-    wasn't tried), and Factory stays reachable, so a sample could read the key and use it.
+    wasn't tried), and Factory stays reachable, so a sample could read the key, use it, or send
+    data to Factory's hosts.
   - `sandbox/Dockerfile` would need Node.js and a pinned `droid` baked in.
   - The sample shares a container and a network path with Droid: "network off from creation"
     becomes "Factory only".
+  - About 5,500–6,700 Factory credits per one-sentence `droid exec`.
   - In return, Droid gets its own tools on the sample instead of three fixed read-only ones, and
     the SDK protocol workaround goes away.
-- **Found on the way:** `daytona.list()` is an async iterator in SDK 0.220.0. The Tier 3 probe
-  counted `.items` (always 0), so its "0 left" wasn't really checked; walking the iterator found 0.
-  A deleted sandbox can still be listed as "started" for a second or two after `delete()` returns.
+- **Not verified:** Droid's tools on a file inside the sandbox, a real sample, a prebuilt image with
+  `droid` baked in, DNS tunnelling.
+- **Found on the way:**
+  - `daytona.list()` is an async iterator in SDK 0.220.0. The Tier 3 probe counted `.items`
+    (always 0), so its "0 left" wasn't really checked; walking the iterator found 0.
+  - A deleted sandbox can still be listed as "started" for a second or two after `delete()`
+    returns.
+  - The first Factory key was rejected (401) and has been rotated; the new one works.
 
 ### Chalk (from docs and the dashboard, 2026-10-17; not run yet)
 

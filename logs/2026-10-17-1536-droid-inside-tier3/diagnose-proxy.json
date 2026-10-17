@@ -1,0 +1,26 @@
+{
+  "startedAt": "2026-10-17T19:51:08.578Z",
+  "allow": "factory.ai,*.factory.ai",
+  "installed": "0.238.0",
+  "direct": {
+    "curl example.com via proxy": "http=000 connect=403",
+    "curl example.com --noproxy": "http=000",
+    "curl 1.1.1.1 --noproxy": "http=000",
+    "curl http://example.com --noproxy": "http=000",
+    "curl api.factory.ai --noproxy": "http=000",
+    "node fetch example.com (no proxy support)": "error: ENOTFOUND",
+    "DNS example.com": "no-dns",
+    "DNS 8.8.8.8 udp/53 (python)": "answer 29 bytes"
+  },
+  "upstream": "http://172.20.0.1:18080",
+  "exitCode": 0,
+  "result": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":3223,\"num_turns\":1,\"result\":\"This check worked.\",\"session_id\":\"fa03a513-2bba-4b0d-9bde-2ea85ea8e308\",\"usage\":{\"input_tokens\":3,\"output_tokens\":8,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":6628,\"factory_credits\":6663,\"",
+  "proxyLog": [
+    "2 CONNECT api.factory.ai:443 HTTP/1.1 -> HTTP/1.1 200 Connection Established",
+    "      8 CONNECT prem.factory.ai:443 HTTP/1.1 -> HTTP/1.1 200 Connection Established",
+    "      1 CONNECT telemetry.factory.ai:443 HTTP/1.1 -> HTTP/1.1 200 Connection Established"
+  ],
+  "deleted": true,
+  "leftInOrg": [],
+  "finishedAt": "2026-10-17T19:51:49.343Z"
+}

@@ -9,7 +9,8 @@
 //    is logged (the start of Worker A's sandbox log). The sandbox is deleted in a `finally`.
 // 3. Option A, Droid *inside* a sandbox: only with AEGIS_TRY_DROID_INSIDE=1 (option B is chosen).
 //    The sandbox gets a domain allow-list (Factory's hosts, plus npm for the install), never open
-//    internet, and never holds a sample. AEGIS_FACTORY_DOMAINS overrides Factory's hosts.
+//    internet, and never holds a sample. AEGIS_FACTORY_DOMAINS overrides Factory's hosts
+//    (default api.factory.ai,prem.factory.ai).
 //
 //   pnpm try:droid
 //
@@ -260,16 +261,21 @@ if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
 } else if (!process.env.DAYTONA_API_KEY) {
   record('droid inside a Daytona sandbox', false, 'needs DAYTONA_API_KEY in .env.local or .env')
 } else {
-  const factoryHosts = (process.env.AEGIS_FACTORY_DOMAINS || 'app.factory.ai,api.factory.ai')
+  // What `droid exec` connects to (logged through a proxy, logs/2026-10-17-1536-droid-inside-tier3):
+  // api.factory.ai, and prem.factory.ai for session sync (without it Daytona's allow-list proxy
+  // answers 403 and droid fails). telemetry.factory.ai is optional; app.factory.ai isn't used.
+  const factoryHosts = (process.env.AEGIS_FACTORY_DOMAINS || 'api.factory.ai,prem.factory.ai')
     .split(',')
     .map((h) => h.trim())
     .filter(Boolean)
   // `npm install -g droid` fetches droid and its platform binary (@factory/cli-linux-x64), both
   // from the registry; install.js falls back to the same registry. Nothing else is needed.
   const installHosts = ['registry.npmjs.org']
-  // Hosts that must stay unreachable once narrowed: the open web, the install host, and an address
-  // by IP (a domain allow-list must not leave raw IPs open).
-  const outside = ['example.com', 'registry.npmjs.org', '1.1.1.1']
+  // Hosts that must stay unreachable once narrowed: the open web, the install host, a Factory host
+  // that isn't listed, and an address by IP (a domain allow-list must not leave raw IPs open).
+  const outside = ['example.com', 'registry.npmjs.org', 'telemetry.factory.ai', '1.1.1.1'].filter(
+    (h) => !factoryHosts.includes(h)
+  )
   const key = process.env.FACTORY_API_KEY ?? ''
   const scrub = (text: string): string => (key ? text.split(key).join('<FACTORY_API_KEY>') : text)
   const daytona = new Daytona()
