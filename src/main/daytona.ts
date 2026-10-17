@@ -1,6 +1,7 @@
 // Daytona sandboxes for analysis (MEGA_PROMPT §5.3, architectural.md §3.6). One way to make a
-// sandbox: network off **at creation** (this account's tier refuses changing it later, PLAN.md ›
-// Sponsor findings › Daytona), ephemeral, a 20 s start limit with one retry, and always deleted in
+// sandbox: network off **at creation**. On Daytona Tier 3 a sandbox without it has the whole
+// internet, and turning it off later would leave it on while the sample is uploaded (PLAN.md
+// decision 28), ephemeral, a 20 s start limit with one retry, and always deleted in
 // a `finally`. Every step is written to a sandbox log, which becomes Worker A's log in the report.
 //
 // Nothing here runs a sample on this Mac: `runSample` runs it inside the sandbox only.
@@ -166,9 +167,9 @@ export class SandboxSession {
 }
 
 /**
- * Probe targets: an ordinary website, and a Daytona "essential service" (npm), which this
- * account's tier keeps reachable unless the network is blocked at creation (PLAN.md › Sponsor
- * findings › Daytona).
+ * Probe targets: an ordinary website, and a Daytona "essential service" (npm), which Tier 1/2
+ * keep reachable unless the network is blocked at creation; on Tier 3 both are open by default
+ * (PLAN.md › Sponsor findings › Daytona).
  */
 export const PROBE_URLS = ['https://example.com', 'https://registry.npmjs.org/']
 

@@ -1,0 +1,53 @@
+{
+  "startedAt": "2026-10-17T19:24:22.041Z",
+  "sdk": "@daytona/sdk 0.220.0",
+  "1-default-then-update": {
+    "params": {},
+    "createMs": 928,
+    "sandboxNetworkBlockAll": false,
+    "reach": {
+      "example.com": "HTTP 200",
+      "registry.npmjs.org": "HTTP 200",
+      "app.factory.ai": "HTTP 200",
+      "api.factory.ai": "HTTP 200"
+    },
+    "updateBlockAll": "accepted",
+    "reachAfterBlockAll": {
+      "example.com": "unreachable",
+      "registry.npmjs.org": "unreachable",
+      "app.factory.ai": "unreachable",
+      "api.factory.ai": "unreachable"
+    },
+    "deleted": true
+  },
+  "2-factory-allowlist-at-create": {
+    "params": {
+      "domainAllowList": "app.factory.ai,api.factory.ai"
+    },
+    "createMs": 2781,
+    "sandboxNetworkBlockAll": false,
+    "reach": {
+      "example.com": "unreachable",
+      "registry.npmjs.org": "unreachable",
+      "app.factory.ai": "HTTP 200",
+      "api.factory.ai": "HTTP 200"
+    },
+    "deleted": true
+  },
+  "3-block-all-at-create": {
+    "params": {
+      "networkBlockAll": true
+    },
+    "createMs": 1092,
+    "sandboxNetworkBlockAll": true,
+    "reach": {
+      "example.com": "unreachable",
+      "registry.npmjs.org": "unreachable",
+      "app.factory.ai": "unreachable",
+      "api.factory.ai": "unreachable"
+    },
+    "deleted": true
+  },
+  "leftInOrg": 0,
+  "finishedAt": "2026-10-17T19:24:44.568Z"
+}

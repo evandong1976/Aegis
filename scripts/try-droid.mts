@@ -247,7 +247,9 @@ try {
   await rm(cwd, { recursive: true, force: true })
 }
 
-// 3. Option A, inside a Daytona sandbox: opt-in. This account's tier blocks Factory from sandboxes.
+// 3. Option A, inside a Daytona sandbox: opt-in. Tier 1/2 blocked Factory from sandboxes; Tier 3
+// (PLAN.md decision 28) allows it. No network setting here, so on Tier 3 the sandbox has the whole
+// internet unless AEGIS_FACTORY_DOMAINS narrows it. It never holds a sample.
 if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
   console.log(
     'skip droid inside a Daytona sandbox: option B chosen (set AEGIS_TRY_DROID_INSIDE=1 to try)'

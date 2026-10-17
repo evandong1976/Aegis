@@ -75,7 +75,8 @@ try {
 
   // Any of curl, wget or python3 reaching a host means the network is not off. Two hosts: an
   // ordinary website, and a Daytona "essential service" (npm), which Tier 1/2 keep reachable
-  // whatever a sandbox asks for (docs: network-limits › Tier-based network restrictions).
+  // unless the network is blocked at creation; on Tier 3 both are open by default (docs:
+  // network-limits › Tier-based network restrictions; PLAN.md decision 28).
   const probeHost = (url: string): string =>
     [
       `curl -sS -m 5 -o /dev/null ${url}`,

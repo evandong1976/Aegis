@@ -42,8 +42,9 @@ the evals that measure how often each worker, and the pair, is right. **Links ar
 being opened** (decision 20): no link detonation in the current plan.
 
 > **Changed on 2026-10-17** (see PLAN.md decisions 19–21): Droid moved from inside the sandbox to
-> the Mac (the account's Daytona tier blocks Factory from sandboxes), link detonation was dropped,
-> and Photon came back into scope.
+> the Mac (the account's Daytona tier blocked Factory from sandboxes), link detonation was dropped,
+> and Photon came back into scope. **Later that day (15:24) the org reached Daytona Tier 3**
+> (decision 28): both choices stand, and both alternatives are now possible if the team revisits them.
 
 ---
 
@@ -223,8 +224,9 @@ sandbox and returns a structured result plus a log of everything that happened i
 When both finish (or the time limit ends), `compare.ts` reconciles them.
 
 **How Worker A works (decision 19, proven by `pnpm try:droid`):** `workerA.ts` creates a Daytona
-sandbox with `networkBlockAll: true` **at creation** (the only network setting this account's tier
-accepts; it blocks even Daytona's "essential services"), uploads the file, and starts a Droid
+sandbox with `networkBlockAll: true` **at creation** (it blocks even Daytona's "essential services";
+on Tier 3 a sandbox without it has the whole internet, and turning it off later would leave it on
+during the upload, decision 28), uploads the file, and starts a Droid
 session **on the Mac** with every built-in tool switched off. Droid's only tools are read-only,
 fixed commands that run inside the sandbox through Daytona's API (list the sample, describe it,
 read it; later the `analyze.py` steps). A permission handler cancels any other tool use. Every
@@ -294,8 +296,9 @@ verdict but never lower it. A file that says "this is safe" in its own strings c
 - A test that errors is treated as dangerous, as the team specified. Benign software can also fail
   in a sandbox, so false alarms from this rule are measured in the Chalk evals (Accuracy tab) and
   tuned there.
-- Answered 2026-10-17: Droid **can't** reach Factory from inside a Daytona sandbox on this
-  account's tier, hence decision 19. Chalk **can** host Worker B's sandbox (Chalk Compute).
+- Answered 2026-10-17: Droid **couldn't** reach Factory from inside a Daytona sandbox on the first
+  tier, hence decision 19. On Tier 3 (15:24) it can, with `domainAllowList` for Factory's hosts
+  only; decision 19 stands unless the team revisits it. Chalk **can** host Worker B's sandbox (Chalk Compute).
 - Droid can only do what our tools allow. That is the point (it can't wander off), but each new
   kind of evidence needs a new fixed tool.
 

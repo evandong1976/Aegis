@@ -1,4 +1,4 @@
-## Handoff (updated 2026-10-17 12:25 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 15:30 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
 1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
@@ -9,6 +9,15 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **Daytona is on Tier 3** (Zach, 15:24; PLAN.md decision 28), checked live with a key from the
+  Tier 3 org: a sandbox with no network setting now has the **whole internet**; allow-lists and
+  changing the network after creation are accepted; `networkBlockAll` at creation still blocks
+  everything. Evidence `logs/2026-10-17-1524-daytona-tier3-newkey/` (the earlier key, 15:17, was
+  still Tier 1/2: `logs/2026-10-17-1517-daytona-tier3/`). `pnpm try:sandbox` passes on Tier 3,
+  7/7, 0 sandboxes left (`logs/2026-10-17-1526-sandbox-run/`). Every Aegis sandbox that holds a
+  sample or runs a check already sets `networkBlockAll` at creation. **Decisions 19 (Droid on the
+  Mac) and 20 (no detonation) stand**; Tier 3 makes both alternatives possible, for the team to
+  decide (PLAN.md › Open questions). The new key is in `.env`, not `.env.local`.
 - **In progress — branch `feature/sandbox` (Zach), not merged:** a shell file goes into a Daytona
   sandbox and runs there, never on the Mac.
   - Based on `main` with `sandbox-image` merged in (the analysis Dockerfile and its self-test).
@@ -282,9 +291,12 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
 | `feature/sandbox` live runs, 12:30          | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)     |
 | `feature/sandbox` faster check, 12:39       | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)     |
+| Tier 3 probes + `try:sandbox`, 15:17–15:27  | 0 (`logs/2026-10-17-1526-sandbox-run/leak-check.txt`)     |
 
 ## Decisions log
 
+- 2026-10-17 15:30: Daytona Tier 3 checked live and recorded (PLAN.md decision 28): analysis
+  sandboxes stay network-off from creation; decisions 19 and 20 stand, open to revisit.
 - 2026-10-17 11:50: `sponsor-check-sync` and `droid-tool-lockdown` merged into `main`; `main`
   pushed to `origin`.
 - 2026-10-17 11:45: `sponsor-check-sync`: Zach's live sponsor checks (decision 27, was his 19),
