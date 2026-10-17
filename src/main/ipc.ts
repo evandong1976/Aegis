@@ -10,6 +10,7 @@ import type { Store } from './store'
 import { hidePanel } from './panel'
 import { openMainWindow } from './windows'
 import { retryFnKey } from './fnkey'
+import type { LiveTrigger } from './sponsors'
 
 type Handler<C extends InvokeChannel> = (
   ...args: IpcInvoke[C]['args']
@@ -28,10 +29,14 @@ async function readEvalResults(): Promise<EvalResults | null> {
   }
 }
 
-export function registerIpc(store: Store, refreshHealth: () => Promise<void>): void {
+export function registerIpc(
+  store: Store,
+  refreshHealth: (live?: LiveTrigger) => Promise<void>
+): void {
   handle('status:get', () => status.get())
+  // Check now: also runs the Daytona and Droid live tests (sponsors.ts).
   handle('health:refresh', async () => {
-    await refreshHealth()
+    await refreshHealth('manual')
     return status.health
   })
   handle('overview:get', () => store.overview())

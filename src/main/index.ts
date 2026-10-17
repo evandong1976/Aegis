@@ -9,6 +9,7 @@ import { APP_ID, HEALTH_INTERVAL_MS } from '@shared/constants'
 import { startBridge } from './bridge'
 import { config, loadEnv } from './config'
 import { runHealthChecks } from './health'
+import type { LiveTrigger } from './sponsors'
 import { registerIpc } from './ipc'
 import { getPanel, initPanel, showPanel, togglePanel } from './panel'
 import { getSettings } from './settings'
@@ -32,18 +33,24 @@ let bridge: Server | null = null
 
 // Health refreshes run one at a time, so each compares against the previous result. (Startup and
 // the extension's first ping used to overlap and log every service twice.)
+// `live` (app start, Check now) also runs the Daytona and Droid live tests, which use credits.
 let healthChain: Promise<void> = Promise.resolve()
-function refreshHealth(): Promise<void> {
-  healthChain = healthChain.then(runHealthOnce, runHealthOnce)
+function refreshHealth(live?: LiveTrigger): Promise<void> {
+  const once = (): Promise<void> => runHealthOnce(live)
+  healthChain = healthChain.then(once, once)
   return healthChain
 }
 
-async function runHealthOnce(): Promise<void> {
+async function runHealthOnce(live?: LiveTrigger): Promise<void> {
   const before = new Map(status.health.map((h) => [h.key, h.state]))
   status.health = await runHealthChecks({
     bridgeListening: bridge?.listening ?? false,
     extensionLastSeen: status.extensionLastSeen,
-    storeOpen: store !== null
+    storeOpen: store !== null,
+    live,
+    memory: store
+      ? { get: (k) => store?.getSetting(k), set: (k, v) => store?.setSetting(k, v) }
+      : undefined
   })
   for (const h of status.health) {
     if (before.get(h.key) === h.state) continue
@@ -141,7 +148,10 @@ app.whenReady().then(async () => {
   status.record(fn.running ? 'allow' : 'warn', `fnkey running=${fn.running} loaded=${fn.loaded}`)
 
   initPanel()
+  // Lookups first so the window and tray have a status at once; the live tests follow in the
+  // background (a sandbox start and a Droid call can take a while).
   await refreshHealth()
+  void refreshHealth('start')
   setInterval(() => void refreshHealth(), HEALTH_INTERVAL_MS)
 
   // First run: open the main window so setup is visible. Later launches stay in the menu bar.

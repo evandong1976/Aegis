@@ -130,7 +130,7 @@ export default function SettingsView({ status }: { status: AppStatus | null }): 
         <div className="flex flex-col gap-5">
           <Card
             title="Connections"
-            description="Checked at start, every 60 seconds and when you ask."
+            description="Checked every 60 seconds. At start and on Check now, Daytona and Droid also run a live test, which uses credits."
             action={
               <Button
                 size="sm"
