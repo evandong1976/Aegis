@@ -19,21 +19,21 @@ Deadline: Devpost closes **Sunday Oct 18, 8:00 AM**. Time checks: milestone 3 wo
 **Evan** = Person A (browser and data), **Zach** = Person B (app and sandbox), per MEGA_PROMPT §7.
 Claim a milestone in PROGRESS.md before starting it.
 
-| #   | Milestone                                                                                              | Owner       | Status                                             |
-| --- | ------------------------------------------------------------------------------------------------------ | ----------- | -------------------------------------------------- |
-| 0   | Scaffold, shared types + bridge contract, PLAN/PROGRESS, `.env.example`                                | Evan + Zach | Done (v2)                                          |
-| 0a  | `demo/`: phishing page on our public domain, scam texts, fake invoice email                            | Evan        | Not started                                        |
-| 0b  | `demo/`: harmless test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`                                   | Zach        | Not started                                        |
-| 1   | Shell + bridge: tray, no Dock, main window, panel on ⌃⌥A, SQLite, health, bridge; extension skeleton   | Zach / Evan | Built; extension not yet loaded in a real Chrome   |
-| 2   | Links: content script, Tier 1 + Safe Browsing, URL stripping, allow list, outlines, click guard wiring | Evan        | Click-guard UI built (`extension/src/guard.ts`)    |
-| 3   | Downloads: interception, offscreen fetch, pre-check, Daytona, `analyze.py`, verdict, deliver/hold      | Evan + Zach | Not started (Report + Downloads screens are ready) |
-| 4   | Droid Stage 2 timeline + code evidence, prompt-injection test, README section                          | Zach        | Not started (Report renders `DroidReport`)         |
-| 5   | Photon: iMessage/SMS, email, alerts, follow-ups, Messages tab                                          | Evan        | Not started                                        |
-| 6   | Chalk: features + Federated Queries, AI Gateway scam-text, evals, `pnpm eval`, Accuracy tab            | Evan        | Not started (Accuracy reads `evals/results.json`)  |
-| 7   | Detonation: `detonate.py` + anti-cloaking, Inspect in sandbox, screenshots                             | Zach        | Not started                                        |
-| 8   | `~/Downloads` watcher + quarantine, Docker fallback, every §5.9 row, fn add-on (from Klair)            | Zach        | fn add-on done; the rest not started               |
-| 9   | Stretch: REA deep dive, Photon voice                                                                   | —           | Not started                                        |
-| 10  | Demo run on a clean account, DoD walk, video, README, Devpost                                          | Evan + Zach | Not started                                        |
+| #   | Milestone                                                                                                                                                | Owner       | Status                                             |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------- |
+| 0   | Scaffold, shared types + bridge contract, PLAN/PROGRESS, `.env.example`                                                                                  | Evan + Zach | Done (v2)                                          |
+| 0a  | `demo/`: phishing page on our public domain, scam texts, fake invoice email                                                                              | Evan        | Not started                                        |
+| 0b  | `demo/`: harmless test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`                                                                                     | Zach        | Not started                                        |
+| 1   | Shell + bridge: tray, no Dock, main window, panel on ⌃⌥A, SQLite, health, bridge; extension skeleton                                                     | Zach / Evan | Built; extension not yet loaded in a real Chrome   |
+| 2   | Links: content script, Tier 1 + Safe Browsing, URL stripping, allow list, outlines, click guard wiring                                                   | Evan        | Click-guard UI built (`extension/src/guard.ts`)    |
+| 3   | Downloads: interception, offscreen fetch, pre-check, queue, Daytona sandbox, `analyze.py`, deliver/hold                                                  | Evan + Zach | Not started (Report + Downloads screens are ready) |
+| 4   | Worker A: Droid inside the Daytona sandbox, tests the file, returns result + sandbox log; `compare.ts`; prompt-injection test                            | Zach        | Not started (Report renders a Droid timeline)      |
+| 5   | Photon: iMessage/SMS, email, alerts, follow-ups, Messages tab                                                                                            | Evan        | Not started                                        |
+| 6   | Chalk: Worker B (standalone analyst + sandbox log), link features + Federated Queries, AI Gateway scam-text, evals per worker and combined, Accuracy tab | Evan        | Not started (Accuracy reads `evals/results.json`)  |
+| 7   | Detonation: `detonate.py` + anti-cloaking, Inspect in sandbox, screenshots                                                                               | Zach        | Not started                                        |
+| 8   | `~/Downloads` watcher + quarantine, Docker fallback, every §5.9 row, fn add-on (from Klair)                                                              | Zach        | fn add-on done; the rest not started               |
+| 9   | Stretch: REA deep dive, Photon voice                                                                                                                     | —           | Not started                                        |
+| 10  | Demo run on a clean account, DoD walk, video, README, Devpost                                                                                            | Evan + Zach | Not started                                        |
 
 ## Decisions
 
@@ -118,19 +118,47 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
 16. **The main window is a fixed frame**: the title-bar strip and nav rail never move; only the
     right-hand column scrolls (`.app-shell__content`). Window-level scrolling with a sticky rail
     let the rail slide up under the traffic lights.
+17. **Two analysis workers, compared** (team direction, 2026-10-16). Every file that needs the
+    cloud goes to two independent workers at once, each on its own copy, neither seeing the other:
+    **Worker A** is a throwaway Daytona sandbox with Factory Droid living inside it as the analyst;
+    **Worker B** is Chalk's AI doing the same job standalone in its own isolated environment. Each
+    examines the file, **tests it inside its sandbox**, and returns a verdict, confidence, summary,
+    timeline, evidence and **a log of what happened in its sandbox** (`WorkerResult`, to add to
+    `src/shared/types.ts` at M3/M4 as a joint change). `compare.ts` reconciles them: agreement → that
+    verdict; disagreement → the more severe one, both shown in the report; a test that errors or
+    shows harmful behaviour → Malicious; one worker missing → the other's answer, marked partial;
+    both missing → pre-check only, never better than Unknown. The result goes through `verdict.ts`,
+    so it can only raise. Architecture: `docs/architectural.md` §2.1 and §3.6.
+    - **Differs from MEGA_PROMPT:** §5.3 had `analyze.py` as static-only and §5.4 had Droid reading
+      results from the main process. Now the file is tested inside the sandbox, and Chalk is a second
+      analyst as well as the link-data and eval platform. Unchanged: nothing runs on the Mac; each
+      sandbox is fresh, network off, time-limited and destroyed in a `finally`; clean documents are
+      still cleared by the local pre-check and never uploaded; demos use EICAR and our own harmless
+      test files only.
+    - **Privacy copy changes:** risky files now go to both Daytona and Chalk. The README's Privacy
+      section is updated; the in-app copy (`SettingsView.tsx` `PRIVACY_COPY`) must change with it
+      when M4/M6 land.
+    - **Known limits:** Daytona sandboxes are Linux, so macOS apps and Windows programs can't be
+      tested there; workers fall back to static analysis for them and say so in the log. "A test
+      that errors is dangerous" will also flag benign software that fails in a sandbox; the evals
+      measure that false-alarm rate per worker so it can be tuned.
+    - **To verify before building** (Sponsor findings below): that Droid can run inside a Daytona
+      sandbox, and that Chalk can host its own execution sandbox. If Chalk can't, Worker B runs in
+      a second isolated sandbox (another Daytona sandbox, or local Docker) with Chalk's AI doing
+      the analysis, and the architecture doc says so.
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
 Not checked yet. Do this before writing each integration, record the exact calls here, and get
 `scripts/try-<sponsor>.ts` passing first. Never invent SDK method names.
 
-| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                | Findings                                     |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits                                 | —                                            |
-| Factory Droid        | TS vs Python SDK, can it run in/connect to a Daytona sandbox, MCP (REA), run time                                    | —                                            |
-| Photon               | Day-one channels, email attachments, voice setup, exact env var names                                                | —                                            |
-| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, resolver deploy, gateway models, env var names | —                                            |
-| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                 | Health check uses it; untested without a key |
+| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | —                                            |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | —                                            |
+| Photon               | Day-one channels, email attachments, voice setup, exact env var names                                                                                                                                 | —                                            |
+| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                            |
+| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key |
 
 ## Open questions
 

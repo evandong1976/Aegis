@@ -25,13 +25,49 @@ It works in three places:
 | **The Mac**  | Menu bar icon, mini panel (fn / ⌃⌥A), main window with history and reports; `~/Downloads` watched | Electron app                |
 | **Messages** | Forward a sketchy text, email or link to Aegis and get a verdict back                             | Photon agent inside the app |
 
-Four sponsors each do load-bearing work: **Daytona** runs the sandboxes, **Factory Droid** is the
-reverse-engineering analyst, **Photon** carries the messaging channels, **Chalk** supplies
-threat-intel features, the LLM gateway and the evals that measure accuracy.
+Four sponsors each do load-bearing work. Every risky file is reverse engineered by **two
+independent workers at once**, and Aegis compares their answers:
+
+- **Worker A — Daytona + Factory Droid:** a throwaway **Daytona** sandbox with **Droid** living
+  inside it as the analyst. Droid examines the file, tests it inside the sandbox, and reports
+  back; if the test errors or shows harmful behaviour, it reports the file as dangerous.
+- **Worker B — Chalk (standalone):** the same job done independently by **Chalk**'s AI in its own
+  isolated environment.
+
+Both return a verdict, their evidence and **a log of what happened in their sandbox**. **Photon**
+carries the messaging channels, and **Chalk** also supplies the link threat-intel features, the LLM
+gateway and the evals that measure how often each worker, and the pair, is right.
 
 ---
 
 ## 2. System overview
+
+### 2.1 The big picture
+
+```mermaid
+flowchart LR
+  EXT["Chrome extension<br/>page reader · download intercept ·<br/>click guard"]
+  APP["Aegis app (this Mac)<br/>bridge · scorers · pre-check ·<br/>queue · scans · SQLite · UI"]
+  subgraph WA["Worker A · Daytona sandbox (throwaway, network off)"]
+    DROID["Factory Droid, inside the sandbox<br/>examines + tests the file<br/>→ result + sandbox log"]
+  end
+  subgraph WB["Worker B · Chalk standalone (isolated)"]
+    CHAI["Chalk AI<br/>examines + tests the file<br/>→ result + sandbox log"]
+  end
+  CMP["compare.ts + verdict.ts<br/>more severe answer wins,<br/>can only raise"]
+  OUT["Deliver · hold · quarantine<br/>report with both sandbox logs"]
+  OTHER["Other services<br/>Chalk link features + AI Gateway + evals ·<br/>Safe Browsing · Daytona link detonation · Photon"]
+
+  EXT <-->|"HTTP 127.0.0.1"| APP
+  APP -->|"file copy 1"| DROID
+  APP -->|"file copy 2"| CHAI
+  DROID -->|"verdict + evidence + log"| CMP
+  CHAI -->|"verdict + evidence + log"| CMP
+  CMP --> OUT
+  APP <--> OTHER
+```
+
+### 2.2 Inside Chrome and the app
 
 ```mermaid
 flowchart LR
@@ -44,20 +80,14 @@ flowchart LR
 
   subgraph Mac["Electron app (this Mac)"]
     BR["Bridge<br/>127.0.0.1:47321"]
-    CORE["Main process<br/>scorers · pre-check · queue ·<br/>scans · verdict · health"]
+    CORE["Main process<br/>scorers · pre-check · queue ·<br/>scans · compare · verdict · health"]
     DB[("SQLite<br/>aegis.db")]
     UI["Renderer<br/>mini panel + main window"]
     FN["fn-key add-on"]
     WATCH["~/Downloads watcher"]
   end
 
-  subgraph Cloud["Cloud services"]
-    DAY["Daytona sandboxes<br/>analyze.py · detonate.py · fetch.py"]
-    DROID["Factory Droid"]
-    CHALK["Chalk<br/>features · AI Gateway · evals"]
-    SB["Google Safe Browsing"]
-    PHO["Photon<br/>iMessage · SMS · email"]
-  end
+  CLOUD["Cloud analysis<br/>Worker A + Worker B (§3.6)"]
 
   CS -- "runtime messages" --> SW
   SW <--> OFF
@@ -69,18 +99,20 @@ flowchart LR
   CORE <-->|"typed IPC (preload)"| UI
   FN -- "fn tap" --> CORE
   WATCH --> CORE
-  CORE -- "SDK" --> DAY
-  CORE -- "SDK" --> DROID
-  CORE -- "online queries, LLM calls" --> CHALK
-  CORE -- "lookups" --> SB
-  CORE <-->|SDK| PHO
+  CORE <-->|"SDKs"| CLOUD
 ```
 
 **Trust boundaries** (MEGA_PROMPT §6, BUILD_PROMPT §2):
 
 - **No sample ever runs on the Mac.** The main process may read bytes (pre-check) and hold or
-  quarantine files; analysis and link detonation happen only in Daytona (or local Docker as the
-  fallback).
+  quarantine files. A file is tested only inside a worker's sandbox: a fresh environment per job,
+  network off, time-limited, with no access to the Mac, destroyed when the job ends (local Docker
+  with the same limits is the fallback if Daytona is down).
+- **Two opinions, never fewer checks.** The workers run independently on their own copy of the
+  file. The comparator takes the more severe answer when they disagree, and the result can only
+  raise the rule-based verdict, never lower it.
+- **Sandbox logs are evidence, not instructions.** Each worker's log is stored and shown in the
+  report, and fenced as untrusted data whenever a model reads it.
 - **Secrets stay in the main process.** API keys live in `.env` (or Electron `safeStorage`). The
   renderer gets a narrow typed API; the extension never sees a key and only talks to the bridge.
 - **The bridge** listens on `127.0.0.1` only and accepts a request only when its `Origin` is the
@@ -146,8 +178,10 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `precheck.ts`                       | Planned (M3)     | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only               |
 | `queue.ts`                          | Planned (M3)     | Sandbox job queue: 3 at once, priorities, daily budget                                            |
 | `daytona.ts`, `docker.ts`           | Planned (M3, M8) | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)         |
-| `scans.ts`                          | Planned (M3)     | The download pipeline and its persisted state machine (`received → … → done`)                     |
-| `droid.ts`                          | Planned (M4)     | Builds the Droid task, validates its JSON, retries once, falls back                               |
+| `scans.ts`                          | Planned (M3)     | The download pipeline and its persisted state machine (`received → … → compared → done`)          |
+| `workerA.ts` (Daytona + Droid)      | Planned (M4)     | Starts a Daytona sandbox with Droid inside, hands it the file, collects verdict, evidence and log |
+| `workerB.ts` (Chalk)                | Planned (M6)     | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log           |
+| `compare.ts`                        | Planned (M4, M6) | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)        |
 | `detonate.ts`                       | Planned (M7)     | Decides when to detonate a link, queues it, rescans the final URL                                 |
 | `watcher.ts`, `quarantine.ts`       | Planned (M8)     | `~/Downloads` watcher; quarantine, restore, delete                                                |
 | `photon.ts`                         | Planned (M5)     | Inbound messages → checks → replies; alerts; thread storage                                       |
@@ -173,17 +207,84 @@ the main window. It only displays and asks; it never decides a verdict or touche
 | `lib/hooks.ts`, `lib/format.ts`            | Live status, IPC data hooks, scan log; formatting for machine output                           |
 | `assets/main.css`                          | Tailwind v4 with the design tokens mapped in `@theme`                                          |
 
-### 3.6 Sandbox worker — `sandbox/` · Planned (M0b, M3, M7)
+### 3.6 Analysis workers — two independent reverse engineers · Planned (M3, M4, M6)
 
-Python 3.12 scripts uploaded into each Daytona sandbox, built from `sandbox/Dockerfile` into a
-snapshot so jobs start in seconds.
+Once the local pre-check decides a file needs the cloud, `scans.ts` sends **the same file to two
+workers at the same time**. Neither sees the other's answer. Each one examines the file, tests it
+inside its own sandbox, and returns a structured result plus a log of everything that happened in
+its sandbox. When both finish (or the time limit ends), `compare.ts` reconciles them.
 
-| Script                    | Network | Role                                                                                                                                                                       |
-| ------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `analyze.py`              | Off     | Static analysis, never runs the sample: real type, scripts with dangerous lines, Office macros, PDF actions, archives and `.pkg` scripts, PE/ELF/Mach-O, YARA, capa → JSON |
-| `detonate.py`             | On      | Opens a link in headless Chromium (anti-cloaking): redirects, final URL, screenshot, password forms, hosts                                                                 |
-| `fetch.py`                | On      | Fetches links and files for Photon messages, where there is no browser                                                                                                     |
-| `entry.py`, `rules/*.yar` | —       | Dispatcher; YARA rules including EICAR                                                                                                                                     |
+```mermaid
+flowchart LR
+  PC["precheck.ts<br/>needs the cloud"] --> Q["queue.ts"]
+  Q -->|"copy 1"| A
+  Q -->|"copy 2"| B
+  subgraph A["Worker A · Daytona sandbox"]
+    direction TB
+    A1["Factory Droid (inside the sandbox)<br/>examines the file"] --> A2["Tests it in the sandbox<br/>(time-limited, network off)"]
+    A2 --> A3["Result A<br/>verdict · confidence · evidence"]
+    A2 --> A4["Sandbox log A"]
+  end
+  subgraph B["Worker B · Chalk standalone"]
+    direction TB
+    B1["Chalk AI<br/>examines the file"] --> B2["Tests it in its sandbox<br/>(time-limited, isolated)"]
+    B2 --> B3["Result B<br/>verdict · confidence · evidence"]
+    B2 --> B4["Sandbox log B"]
+  end
+  A3 & A4 --> C["compare.ts"]
+  B3 & B4 --> C
+  C --> V["verdict.ts<br/>(can only raise)"]
+  V --> OUT["Deliver · hold · quarantine<br/>+ report with both logs"]
+```
+
+**What each worker returns** (`WorkerResult`, to be added to `src/shared/types.ts` and validated
+with zod in the main process):
+
+| Field        | What it holds                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `worker`     | `daytona-droid` or `chalk`                                                                                               |
+| `verdict`    | One of the four verdicts, plus `confidence` (low / medium / high)                                                        |
+| `summary`    | One plain-English sentence for the report headline and notifications                                                     |
+| `timeline`   | "What would have happened", step by step, each step tied to evidence                                                     |
+| `evidence`   | Code snippets with file and line, findings, indicators                                                                   |
+| `sandboxLog` | Time-stamped events from its own sandbox: what ran, files touched, network attempts (blocked), errors, how the run ended |
+| `ran`        | Which checks ran, how long each took, whether the run fell back to static analysis, and why                              |
+
+**How the answers are compared** (`compare.ts`):
+
+| Situation                                              | Result                                                                              |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Both agree                                             | That verdict, confidence raised; the report says "Both analysts agree"              |
+| They disagree                                          | The **more severe** verdict; the report shows both answers side by side and says so |
+| Either worker's test errors or shows harmful behaviour | **Malicious**, with that worker's log and evidence as the reason                    |
+| One worker fails or times out                          | The other worker's answer, marked partial; the report names the missing worker      |
+| Both fail                                              | The local pre-check result only, never better than **Unknown**                      |
+
+The comparator's result then goes through `verdict.ts`, so the workers can raise the rule-based
+verdict but never lower it. A file that says "this is safe" in its own strings changes nothing.
+
+**Limits, stated honestly:**
+
+- Daytona sandboxes are Linux. Scripts, installer scripts and Linux binaries can be tested there;
+  macOS apps and Windows programs can't run, so for those a worker examines the file statically and
+  says in its log that it did.
+- A test that errors is treated as dangerous, as the team specified. Benign software can also fail
+  in a sandbox, so false alarms from this rule are measured in the Chalk evals (Accuracy tab) and
+  tuned there.
+- Whether Droid can run inside a Daytona sandbox, and whether Chalk can host its own execution
+  sandbox, are to be verified against their current docs (`docs/PLAN.md` › Sponsor findings). If
+  Chalk can't, Worker B runs in a second isolated sandbox with Chalk's AI doing the analysis.
+
+**The sandbox images and scripts** (`sandbox/`, Python 3.12, built from `sandbox/Dockerfile` into a
+snapshot so jobs start in seconds):
+
+| Script                    | Network | Role                                                                                                                                                        |
+| ------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analyze.py`              | Off     | Static tools the workers call: real type, script lines, Office macros, PDF actions, archives and `.pkg` scripts, PE/ELF/Mach-O structure, YARA, capa → JSON |
+| `observe.py`              | Off     | Records what happens while a worker tests the file into the sandbox log, under a time limit                                                                 |
+| `detonate.py`             | On      | Link detonation: opens a link in headless Chromium and records redirects, final URL, screenshot, password forms                                             |
+| `fetch.py`                | On      | Fetches links and files for Photon messages, where there is no browser                                                                                      |
+| `entry.py`, `rules/*.yar` | —       | Dispatcher; YARA rules including EICAR                                                                                                                      |
 
 ### 3.7 Native fn-key add-on — `native/fn-key/` · Built
 
@@ -239,7 +340,8 @@ Aegis/
 │   │   ├── windows.ts, panel.ts, tray.ts, fnkey.ts
 │   │   ├── demo.ts, devcapture.ts            dev only
 │   │   └── links.ts, chalk.ts, text.ts, precheck.ts, queue.ts, daytona.ts, docker.ts,
-│   │       scans.ts, droid.ts, detonate.ts, watcher.ts, quarantine.ts, photon.ts   Planned
+│   │       scans.ts, workerA.ts, workerB.ts, compare.ts, detonate.ts, watcher.ts,
+│   │       quarantine.ts, photon.ts                                                Planned
 │   ├── preload/
 │   │   └── index.ts            window.aegis
 │   └── renderer/
@@ -262,8 +364,8 @@ Aegis/
 │
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │
-├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, detonate.py,
-│                               fetch.py, rules/*.yar, requirements.txt, tests
+├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, observe.py,
+│                               detonate.py, fetch.py, rules/*.yar, requirements.txt, tests
 ├── chalk/                      Planned (M6): features, resolvers, eval config
 ├── evals/                      Planned (M6): labeled links, texts, files; results.json
 ├── demo/                       Planned (M0a/b): phishing page, scam texts, invoice email,
@@ -330,27 +432,36 @@ flowchart LR
       DSR["design-system CSS + fonts"]
     end
   end
-  subgraph Sandbox["Daytona sandbox (planned)"]
+  subgraph WA["Worker A · Daytona sandbox (planned)"]
+    DR["Factory Droid SDK<br/>(inside the sandbox)"]
     PY["Python 3.12: python-magic · pefile · lief ·<br/>capstone · oletools · yara-python ·<br/>flare-capa · Playwright"]
+  end
+  subgraph WB["Worker B · Chalk standalone (planned)"]
+    CH["Chalk AI analyst"]
+    PYB["Same analysis tools<br/>(its own sandbox)"]
   end
   Chrome -->|"HTTP 127.0.0.1 (zod-validated)"| Main
   Renderer -->|"typed IPC via preload"| Main
-  SDKS -->|"upload sample, run scripts"| PY
+  SDKS -->|"same file to both"| DR
+  SDKS -->|"same file to both"| CH
+  DR --> PY
+  CH --> PYB
 ```
 
-| Library                            | Where it runs           | Why it is here                                                                        |
-| ---------------------------------- | ----------------------- | ------------------------------------------------------------------------------------- |
-| Electron 44                        | The app                 | Menu bar app, windows, IPC, `safeStorage`, global shortcuts                           |
-| electron-vite + Vite 8             | Build                   | One config builds main, preload and renderer with HMR; Vite also builds the extension |
-| React 19                           | Renderer                | UI; the design-system bundle is ported to typed React components                      |
-| Tailwind CSS 4                     | Renderer                | Layout utilities; design tokens mapped in `@theme`, no hex values restated            |
-| zod 4                              | Shared, main, extension | Validates every bridge payload, IPC shape and (later) Droid's JSON                    |
-| `node:sqlite`                      | Main                    | The local store; built into Electron's Node, so no native rebuild                     |
-| node-gyp → `fn_key.node`           | Build → main            | fn key capture (Node-API, so not tied to one Electron version)                        |
-| electron-builder                   | Packaging               | `Aegis.app` with `LSUIElement`, the Downloads usage string, the fn add-on             |
-| Vitest                             | Tests                   | Verdict rules, bridge origin checks, store; pytest for `sandbox/` later               |
-| ESLint + Prettier, TypeScript      | Quality                 | `pnpm typecheck && pnpm lint && pnpm test` before every commit                        |
-| Daytona, Droid, Photon, Chalk SDKs | Main (planned)          | Sponsor integrations; each behind its own module and health check                     |
+| Library                       | Where it runs            | Why it is here                                                                        |
+| ----------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| Electron 44                   | The app                  | Menu bar app, windows, IPC, `safeStorage`, global shortcuts                           |
+| electron-vite + Vite 8        | Build                    | One config builds main, preload and renderer with HMR; Vite also builds the extension |
+| React 19                      | Renderer                 | UI; the design-system bundle is ported to typed React components                      |
+| Tailwind CSS 4                | Renderer                 | Layout utilities; design tokens mapped in `@theme`, no hex values restated            |
+| zod 4                         | Shared, main, extension  | Validates every bridge payload, IPC shape and (later) each worker's result            |
+| `node:sqlite`                 | Main                     | The local store; built into Electron's Node, so no native rebuild                     |
+| node-gyp → `fn_key.node`      | Build → main             | fn key capture (Node-API, so not tied to one Electron version)                        |
+| electron-builder              | Packaging                | `Aegis.app` with `LSUIElement`, the Downloads usage string, the fn add-on             |
+| Vitest                        | Tests                    | Verdict rules, bridge origin checks, store; pytest for `sandbox/` later               |
+| ESLint + Prettier, TypeScript | Quality                  | `pnpm typecheck && pnpm lint && pnpm test` before every commit                        |
+| Daytona + Droid, Chalk SDKs   | Main → workers (planned) | The two analysis workers (Daytona sandbox with Droid inside; Chalk standalone)        |
+| Photon SDK                    | Main (planned)           | iMessage / SMS / email channels                                                       |
 
 ### 6.2 How the code depends on itself
 
@@ -410,43 +521,43 @@ sequenceDiagram
   participant OF as Offscreen document
   participant BR as Bridge (main)
   participant SC as scans.ts + precheck.ts
-  participant Q as queue.ts
-  participant D as Daytona sandbox (network off)
-  participant V as verdict.ts
-  participant DR as Droid
+  participant A as Worker A (Daytona + Droid)
+  participant B as Worker B (Chalk)
+  participant CMP as compare.ts + verdict.ts
   participant DB as SQLite
   participant UI as Mini panel / Report
 
   U->>P: Clicks "Download Zoom update" (.pkg)
   P->>SW: chrome.downloads.onCreated [M3]
-  SW->>SW: Cancel + erase the download
+  SW->>SW: Cancel and erase the download
   SW->>OF: Fetch this URL with the user's cookies
   OF->>BR: POST /download (streamed bytes + metadata)
-  BR->>SC: New scan (status: received)
+  BR->>SC: New scan (status received)
   SC->>DB: Persist scan
   SC->>SC: Pre-check: magic bytes, SHA-256, size (reads bytes only)
-  SC->>Q: Risky type → sandbox job (downloads go first)
   BR-->>UI: Panel pops up without focus: "Scanning now"
-  Q->>D: Create sandbox from the Aegis snapshot, upload /sample/file + meta.json
-  D->>D: analyze.py (never runs the sample) → findings JSON
-  D-->>Q: Stage 1 result
-  Q->>V: combine(reasons) → score + verdict
-  V-->>SC: Suspicious (score 61): hold
-  SC->>DB: status verdict, action held
-  SC-->>OF: Verdict: held
+  par Worker A [M4]
+    SC->>A: Fresh Daytona sandbox, network off, file uploaded
+    A->>A: Droid examines the file and tests it inside the sandbox
+    A-->>SC: Result A (verdict, evidence, timeline) + sandbox log A
+  and Worker B [M6]
+    SC->>B: Same file to Chalk's standalone worker
+    B->>B: Chalk AI examines the file and tests it in its own sandbox
+    B-->>SC: Result B (verdict, evidence, timeline) + sandbox log B
+  end
+  SC->>A: Destroy sandbox (finally)
+  SC->>CMP: Compare A and B
+  CMP-->>SC: Both say Malicious (test showed harmful behaviour), can only raise
+  SC->>DB: Report saved: both results, both sandbox logs, agreement
+  SC-->>OF: Verdict: quarantined
   OF-->>U: Notification: Show report · Delete · Download anyway
-  SC->>DR: Stage 2: findings + extracted postinstall script (fenced as untrusted)
-  DR-->>SC: Timeline + code evidence + suggested verdict (zod-validated)
-  SC->>V: applyAiSuggestion (can only raise) → Malicious
-  SC->>D: Destroy sandbox (finally)
-  SC->>DB: Report saved (Droid timeline, sandbox record)
   U->>UI: Opens the report
-  UI-->>U: "This installer would add itself to your login items" + flagged lines
+  UI-->>U: Headline, timeline, flagged code, "Both analysts agree", both sandbox logs
 ```
 
-If the verdict is **Clean**, steps 15–24 become: the main process writes **the exact bytes it
-scanned** (checked by SHA-256) to `~/Downloads` under the original name, and Droid reviews
-executables in the background afterwards.
+If both workers return **Clean**, steps 18–21 become: the main process writes **the exact bytes it
+scanned** (checked by SHA-256) to `~/Downloads` under the original name. If they disagree, the
+more severe answer wins and the report shows both side by side.
 
 ### 7.2 A phishing link is stopped at the click
 

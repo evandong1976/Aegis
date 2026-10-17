@@ -1,16 +1,17 @@
-## Handoff (updated 2026-10-16 23:30 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 00:15 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold, v2) — 100%; 1 (shell + bridge) — ~90%; 2 — click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - Architecture changed to **two analysis workers, compared**: Worker A = Daytona sandbox with Factory Droid inside, Worker B = Chalk standalone; both examine and test the file in their own sandbox and return a result + sandbox log; `compare.ts` reconciles (PLAN.md decision 17, `docs/architectural.md` §2.1, §3.6, §7.1). Docs only so far; no code changed
   - fn key: `native/fn-key` (from Klair, chords removed) + `src/main/fnkey.ts`; a clean fn tap toggles the panel, ⌃⌥A still works. Built with `pnpm build:native`; health check reports it (OK on Evan's Mac — Electron already had Input Monitoring)
   - Main window is now a fixed frame: the nav rail and title bar stay put, only the content column scrolls
   - Before that: v2 rebuild on Zach's `fig` commit (four verdicts, Figma shell and frames, demo database, click guard) — see the decisions log
 - **In progress:** nothing
 - **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows Bridge = Connected within 30 s (closes milestone 1). Then split: Evan starts milestone 2 (content script → `/page` → wire `showClickGuard` from `extension/src/guard.ts`) and the `demo/` phishing page; Zach starts `sandbox/Dockerfile` + the `demo/` test `.pkg` and the Daytona docs check (PLAN.md › Sponsor findings).
 - **Broken / failing:** none. `pnpm typecheck && pnpm lint && pnpm test` pass (23 tests; lint includes the tokens.css staleness check).
-- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–15 (four verdicts and Unknown semantics, nav = Figma shell + Messages/Accuracy, single-user adaptation, coverage ring, Figma components kept in the app, panel follows Figma, Shadow-DOM guard, demo database). Team answers: Figma-only components stay in the app, not `design-system/`; Figma frames for Messages, Accuracy, first run, tray, link outlines and the scam-text banner come later — restyle those screens when they land.
-- **Blocked on / questions for the user:** deferred by the team: four-track eligibility, demo/email domain. Nothing blocks the next step.
+- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–15 (four verdicts and Unknown semantics, nav = Figma shell + Messages/Accuracy, single-user adaptation, coverage ring, Figma components kept in the app, panel follows Figma, Shadow-DOM guard, demo database). Team answers: Figma-only components stay in the app, not `design-system/`; Figma frames for Messages, Accuracy, first run, tray, link outlines and the scam-text banner come later — restyle those screens when they land. Also decision 17: dual workers (Daytona + Droid, Chalk standalone), more severe answer wins, a test that errors means Malicious, both sandbox logs in the report.
+- **Blocked on / questions for the user:** deferred by the team: four-track eligibility, demo/email domain. Nothing blocks the next step. Before M4/M6: verify Droid can run inside a Daytona sandbox and Chalk can host its own sandbox (PLAN.md › Sponsor findings).
 - **How to verify current state:**
   - `pnpm install && pnpm typecheck && pnpm lint && pnpm test` → all green
   - `pnpm build:native` once, then `pnpm dev` → menu bar shield, no Dock icon; tap fn (or ⌃⌥A) to toggle the panel; real (empty) history. If fn does nothing, Settings › Permissions shows why (add-on not built / Input Monitoring not granted to Electron), and System Settings › Keyboard › "Press fn (Globe) key to" should be Do Nothing
@@ -31,9 +32,9 @@
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | In progress: built; extension not loaded in a real Chrome yet  |
 | 2   | Links                                                                  | Evan        | Click-guard UI done; content script, scoring, wiring not built |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                    |
-| 4   | Droid                                                                  | Zach        | Not started                                                    |
+| 4   | Worker A (Daytona + Droid) + compare                                   | Zach        | Not started                                                    |
 | 5   | Photon                                                                 | Evan        | Not started                                                    |
-| 6   | Chalk                                                                  | Evan        | Not started                                                    |
+| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                    |
 | 7   | Detonation                                                             | Zach        | Not started                                                    |
 | 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on done; watcher, quarantine, Docker fallback not built |
 | 9   | Stretch                                                                | —           | Not started                                                    |
@@ -86,6 +87,8 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 | —               | Daytona not used yet   |
 
 ## Decisions log
+
+- 2026-10-17: Two analysis workers (Daytona + Droid inside the sandbox; Chalk standalone) test the file in their own sandboxes and return results + sandbox logs; compared in `compare.ts`. Differs from MEGA_PROMPT §5.3–5.4 (static-only analyze.py, Droid outside the sandbox); see PLAN.md decision 17. In-app privacy copy must be updated when M4/M6 land.
 
 - 2026-10-16: First skeleton on `milestone-0-skeleton` (Electron shell, bridge, extension).
 - 2026-10-16: Owners: Evan = A, Zach = B. Klair's fn add-on may be used, repurposed for Aegis. Deferred: four-track eligibility, demo/email domain.

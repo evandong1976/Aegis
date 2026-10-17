@@ -2,8 +2,10 @@
 
 Aegis scans links and downloads. Every URL you click and every file you download gets a verdict —
 Malicious, Suspicious, Unknown or Clean — and anything dangerous is held, quarantined or blocked
-before it reaches your Mac. Risky files and links are opened in throwaway cloud sandboxes, reverse
-engineered, and explained in plain English with the suspicious code as evidence. Built for
+before it reaches your Mac. Risky files are reverse engineered by two independent workers at once,
+each in its own throwaway cloud sandbox (Daytona with Factory Droid inside, and Chalk), and their
+answers are compared and explained in plain English with the suspicious code and both sandbox logs
+as evidence. Built for
 HackHarvard 2026.
 
 It's a macOS menu bar app (Electron) plus a Chrome extension. The app has a mini panel (fn or ⌃⌥A)
@@ -114,23 +116,40 @@ URL**, and only when `SAFE_BROWSING_KEY` is set.
 
 When the full pipeline lands, this copy (also in Settings) must stay true:
 
-> Documents that look clean are checked on this Mac and never uploaded. Risky files and suspicious
-> links are opened in a Daytona sandbox in the cloud, which is deleted after each scan. Link domains
+> Documents that look clean are checked on this Mac and never uploaded. Risky files are analysed in
+> two isolated cloud sandboxes, one at Daytona and one at Chalk, each deleted after the scan.
+> Suspicious links are opened in a Daytona sandbox. Link domains
 > (with tokens removed) are checked with Chalk and Google Safe Browsing. Page text is checked for
 > scams by an AI model through Chalk and isn't stored. Your Chrome cookies never leave Chrome.
 > Messages you send to Aegis are processed by Photon and stored only on your Mac.
 
+## How the two analysis workers fit together
+
+Every risky file goes to two workers at once, each on its own copy (details and diagrams:
+[`docs/architectural.md`](docs/architectural.md) §3.6):
+
+- **Worker A — Daytona + Factory Droid:** a fresh Daytona sandbox, network off, with Droid living
+  inside it as the analyst. Droid examines the file, tests it inside the sandbox and reports back;
+  if the test errors or shows harmful behaviour, it reports the file as dangerous.
+- **Worker B — Chalk:** the same job done independently by Chalk's AI in its own isolated sandbox.
+
+Each returns a verdict, evidence, a "what would have happened" timeline and a log of what happened
+in its sandbox. `compare.ts` reconciles them (the more severe answer wins when they disagree) and
+the result can only raise Aegis's rule-based verdict, never lower it. The report shows both logs.
+Not built yet (milestones 3, 4 and 6).
+
 ## How Aegis uses Daytona
 
-Not built yet (milestone 3). Plan: one fresh, network-off Daytona sandbox per risky download
-running `analyze.py`, network-on sandboxes for link detonation, up to 3 at once, destroyed after
-every job. Each report's footer and "Checks that ran" show the sandbox.
+Not built yet (milestones 3, 4, 7). Daytona hosts Worker A: one fresh, network-off sandbox per
+risky file, with Factory Droid inside, destroyed after every job; up to 3 at once. It also opens
+suspicious links in network-on sandboxes for detonation. Each report shows the sandbox and its log.
 
 ## How Aegis uses Droid
 
-Not built yet (milestone 4). Plan: Droid is the reverse engineer for Stage 2 reports, running from
-`src/main/droid.ts`, with all sample content fenced as untrusted. Its output fills the Report's
-"What would have happened" timeline, labelled "Reviewed by Droid". Its verdict can only raise ours.
+Not built yet (milestone 4). Droid is Worker A's analyst, living inside the Daytona sandbox: it
+examines and tests the file there, then returns a zod-validated result (verdict, timeline with code
+evidence, summary) and its sandbox log. All sample content is fenced as untrusted. Its answer is
+compared with Chalk's and can only raise the verdict. Coordinated from `src/main/workerA.ts`.
 
 ## How Aegis uses Photon
 
@@ -140,6 +159,8 @@ Messages tab.
 
 ## How Aegis uses Chalk
 
-Not built yet (milestone 6). Plan: threat-intel features and Federated Queries for link scoring,
-the AI Gateway for scam-text checks, and Agent Evals behind the Accuracy tab. Details will be in
-`docs/CHALK.md`.
+Not built yet (milestone 6). Chalk is Worker B, a standalone second analyst that reverse engineers
+each risky file in its own sandbox and returns a result and sandbox log to compare with Droid's. It
+also supplies threat-intel features and Federated Queries for link scoring, the AI Gateway for
+scam-text checks, and the Agent Evals behind the Accuracy tab, measuring each worker alone and the
+pair together. Details will be in `docs/CHALK.md`.
