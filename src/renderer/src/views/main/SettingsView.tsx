@@ -265,6 +265,18 @@ export default function SettingsView({ status }: { status: AppStatus | null }): 
                     <StatusDot state={h.state} label={STATE_WORD[h.state]} />
                   </div>
                   <span className="text-[12px] leading-4 text-ink-subtle">{h.detail}</span>
+                  {k === 'fnKey' && h.state === 'degraded' ? (
+                    <div className="mt-1">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        icon="key"
+                        onClick={() => void window.aegis.invoke('fnkey:retry')}
+                      >
+                        Allow Input Monitoring
+                      </Button>
+                    </div>
+                  ) : null}
                 </li>
               ) : null
             })}

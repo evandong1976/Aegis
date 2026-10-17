@@ -9,6 +9,7 @@ files:
   - '!design-system/*'
   - '!docs/*'
   - '!scripts/*'
+  - '!native/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!vitest.config.{js,ts,mjs,mts,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,BRAINSTORM.md,BUILD_PROMPT.md,MEGA_PROMPT.md}'
@@ -16,6 +17,11 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+# The fn add-on is loaded from Resources/native/fn-key/... (src/main/fnkey.ts). Build it first
+# with pnpm build:native.
+extraResources:
+  - from: native/fn-key/build/Release/fn_key.node
+    to: native/fn-key/build/Release/fn_key.node
 mac:
   target: dir
   category: public.app-category.utilities

@@ -102,9 +102,25 @@ html.is-panel body {
 .app-shell {
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr);
+  /* One row, exactly the window's remaining height, so the content column scrolls inside it. */
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-5);
-  padding: 0 var(--space-5) var(--space-5);
-  align-items: start;
+  padding-left: var(--space-5);
+}
+/* The only scrolling region in the main window. Bottom and right padding live here so content
+   scrolls fully clear of the window edge. */
+.app-shell__content {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: 0 var(--space-5) var(--space-5) 0;
+}
+/* Cards clip their overflow, which would otherwise let the flex column squash them. */
+.app-shell__content > * {
+  flex-shrink: 0;
 }
 .titlebar {
   height: 40px;

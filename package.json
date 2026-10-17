@@ -21,7 +21,7 @@
     "test:watch": "vitest",
     "build:extension": "node extension/build.mjs",
     "build:sandbox": "node scripts/not-yet.mjs build:sandbox 3",
-    "build:native": "node scripts/not-yet.mjs build:native 8",
+    "build:native": "cd native/fn-key && npx --yes node-gyp@10.2.0 rebuild --target=$(node -p \"require('electron/package.json').version\") --dist-url=https://electronjs.org/headers",
     "eval": "node scripts/not-yet.mjs eval 6",
     "icons": "node scripts/make-icons.mjs",
     "app": "electron-vite build && electron-builder --mac --dir",

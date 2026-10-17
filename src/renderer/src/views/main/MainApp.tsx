@@ -52,10 +52,6 @@ export default function MainApp({
   const { data: stats, reload: reloadStats } = useInvoke('overview:get')
 
   useEffect(reloadStats, [status, reloadStats])
-  // Each screen starts at the top, not where the last one was scrolled to.
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [route, scanId, search])
   useEffect(
     () =>
       window.aegis.on('navigate', ({ route: r, scanId: id }) => {
@@ -98,6 +94,7 @@ export default function MainApp({
       title={title}
       search={search}
       onSearch={setSearch}
+      scrollKey={`${route}|${scanId ?? ''}|${search}`}
     >
       {search ? (
         <SearchView query={search} onOpen={openReport} />

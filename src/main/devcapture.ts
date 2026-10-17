@@ -40,6 +40,16 @@ export function scheduleCapture(opts: {
       })
       await wait(1200)
       await save(dir, route, opts.main())
+      if (process.env.AEGIS_CAPTURE_SCROLL) {
+        // Scroll the content column to the bottom: the rail and title bar must not move.
+        await opts
+          .main()
+          ?.webContents.executeJavaScript(
+            "document.querySelector('.app-shell__content')?.scrollTo({ top: 1e6 })"
+          )
+        await wait(400)
+        await save(dir, `${route}-scrolled`, opts.main())
+      }
     }
   })()
 }

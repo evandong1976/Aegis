@@ -1,6 +1,6 @@
 // IPC handlers for the preload API. Channel names and types live in src/shared/ipc.ts.
 
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, shell } from 'electron'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import type { EvalResults, IpcInvoke, InvokeChannel, MainRoute } from '@shared/ipc'
@@ -9,6 +9,7 @@ import { getSettings, setSettings } from './settings'
 import type { Store } from './store'
 import { hidePanel } from './panel'
 import { openMainWindow } from './windows'
+import { retryFnKey } from './fnkey'
 
 type Handler<C extends InvokeChannel> = (
   ...args: IpcInvoke[C]['args']
@@ -57,6 +58,16 @@ export function registerIpc(store: Store, refreshHealth: () => Promise<void>): v
   handle('protection:resume', () => {
     status.resume()
     return status.get()
+  })
+  handle('fnkey:retry', async () => {
+    const fn = retryFnKey()
+    if (fn.loaded && !fn.running) {
+      await shell.openExternal(
+        'x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent'
+      )
+    }
+    await refreshHealth()
+    return status.health
   })
 
   ipcMain.on('panel:hide', () => hidePanel())

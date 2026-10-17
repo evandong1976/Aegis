@@ -85,6 +85,8 @@ export interface IpcInvoke {
   'evals:get': { args: []; result: EvalResults | null }
   'protection:pause': { args: []; result: AppStatus }
   'protection:resume': { args: []; result: AppStatus }
+  /** Retries the fn key after Input Monitoring is granted; opens the System Settings pane if not. */
+  'fnkey:retry': { args: []; result: ServiceHealth[] }
 }
 
 /** Fire-and-forget calls: `ipcRenderer.send(channel, ...args)`. */
@@ -118,7 +120,8 @@ export const INVOKE_CHANNELS: InvokeChannel[] = [
   'trusted:remove',
   'evals:get',
   'protection:pause',
-  'protection:resume'
+  'protection:resume',
+  'fnkey:retry'
 ]
 export const SEND_CHANNELS: SendChannel[] = ['panel:hide', 'main:open']
 export const EVENT_CHANNELS: EventChannel[] = [

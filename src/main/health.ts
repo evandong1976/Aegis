@@ -9,6 +9,7 @@ import { join } from 'path'
 import { EXTENSION_PING_TTL_MS, SERVICE_NAMES } from '@shared/constants'
 import type { ServiceHealth, ServiceKey, ServiceState } from '@shared/types'
 import { config } from './config'
+import { fnKeyStatus } from './fnkey'
 
 const REQUIRED: ServiceKey[] = ['bridge', 'sqlite', 'daytona', 'droid', 'chalk', 'safeBrowsing']
 
@@ -114,6 +115,12 @@ async function checkDownloads(): Promise<Check> {
   }
 }
 
+function checkFnKey(): Check {
+  const s = fnKeyStatus()
+  if (s.running) return result('ok', s.detail)
+  return result(s.loaded ? 'degraded' : 'unconfigured', s.detail)
+}
+
 export async function runHealthChecks(ctx: HealthContext): Promise<ServiceHealth[]> {
   const checks: Record<ServiceKey, Promise<Check> | Check> = {
     bridge: checkBridge(ctx),
@@ -131,7 +138,7 @@ export async function runHealthChecks(ctx: HealthContext): Promise<ServiceHealth
     chalk: keyed('CHALK_', 6, 'Chalk'),
     safeBrowsing: checkSafeBrowsing(),
     downloads: checkDownloads(),
-    fnKey: result('unconfigured', 'The fn add-on is not built yet. Use ⌃⌥A to open the panel.')
+    fnKey: checkFnKey()
   }
   const keys = Object.keys(checks) as ServiceKey[]
   const values = await Promise.all(keys.map((k) => checks[k]))

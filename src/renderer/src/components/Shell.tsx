@@ -65,6 +65,7 @@ export function Shell({
   title,
   search,
   onSearch,
+  scrollKey,
   children
 }: {
   route: MainRoute
@@ -75,9 +76,16 @@ export function Shell({
   title: string
   search: string
   onSearch: (q: string) => void
+  /** When this changes (new screen, report or search), the content scrolls back to the top. */
+  scrollKey: string
   children: ReactNode
 }): React.JSX.Element {
   const searchRef = useRef<HTMLInputElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 })
+  }, [scrollKey])
 
   // ⌘K focuses search (the shortcut chip is bound for real, per the SearchField README).
   useEffect(() => {
@@ -108,13 +116,14 @@ export function Shell({
   const active: NavRoute = route === 'report' ? 'overview' : route
 
   return (
-    <div className="flex min-h-full flex-col">
+    // A fixed frame: the title-bar strip and the nav rail never move; only the right column scrolls.
+    <div className="flex h-screen flex-col overflow-hidden">
       <div className="titlebar drag flex-none" />
-      <div className="app-shell flex-1">
-        <div className="sticky top-0">
+      <div className="app-shell min-h-0 flex-1">
+        <div className="self-start">
           <NavRail brand="Aegis" items={items} value={active} onSelect={onNavigate} />
         </div>
-        <div className="flex min-w-0 flex-col gap-5">
+        <div ref={scrollRef} className="scroll-quiet app-shell__content">
           <header className="flex items-center gap-5">
             <div className="min-w-0">
               <p className="ae-label m-0 mb-1">{eyebrow}</p>

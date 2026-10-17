@@ -31,7 +31,7 @@ Claim a milestone in PROGRESS.md before starting it.
 | 5   | Photon: iMessage/SMS, email, alerts, follow-ups, Messages tab                                          | Evan        | Not started                                        |
 | 6   | Chalk: features + Federated Queries, AI Gateway scam-text, evals, `pnpm eval`, Accuracy tab            | Evan        | Not started (Accuracy reads `evals/results.json`)  |
 | 7   | Detonation: `detonate.py` + anti-cloaking, Inspect in sandbox, screenshots                             | Zach        | Not started                                        |
-| 8   | `~/Downloads` watcher + quarantine, Docker fallback, every §5.9 row, fn add-on (from Klair)            | Zach        | Not started                                        |
+| 8   | `~/Downloads` watcher + quarantine, Docker fallback, every §5.9 row, fn add-on (from Klair)            | Zach        | fn add-on done; the rest not started               |
 | 9   | Stretch: REA deep dive, Photon voice                                                                   | —           | Not started                                        |
 | 10  | Demo run on a clean account, DoD walk, video, README, Devpost                                          | Evan + Zach | Not started                                        |
 
@@ -101,13 +101,23 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     built yet), health checks, tray, panel window, fixed extension ID
     `onljkbhkoinihmjibfofcalimkolemam`, offscreen heartbeat, placeholder scripts that fail loudly,
     `@electron-toolkit/utils` removed so it can't swallow shortcuts.
-14. **fn key**: reuse Klair's add-on, repurposed for Aegis (team answer, 2026-10-16). Copy
-    `~/Downloads/Klair/native/fn-key` → `native/fn-key` and `~/Downloads/Klair/src/main/fnkey.ts`
-    → `src/main/fnkey.ts` in milestone 8, rename to Aegis, drop unused events, wire a clean fn tap
-    to `togglePanel()`, keep ⌃⌥A as the fallback, and declare it as pre-event code on Devpost.
+14. **fn key** (built 2026-10-16, ahead of milestone 8 at the team's request): Klair's add-on,
+    repurposed. `native/fn-key/src/fn_key.c` is a listen-only CGEventTap that reports one event,
+    a clean fn tap; Klair's fn+P/Q/H/digit chords and down/up events are removed.
+    `src/main/fnkey.ts` loads it (a Node-API module, so not tied to an Electron version), toggles
+    the panel on a tap and reports status to the health check; ⌃⌥A stays registered as the
+    fallback. Build with `pnpm build:native` (node-gyp 10.2.0 against Electron's headers; output
+    gitignored, shipped through `extraResources`). It needs Input Monitoring: under `pnpm dev` that
+    is granted to Electron, in a packaged build to Aegis. Settings › Permissions has "Allow Input
+    Monitoring" (re-requests and opens the System Settings pane). Declare it as pre-event code on
+    Devpost.
 15. **Headless UI checks**: `pnpm capture [dir] [routes]` (`scripts/capture.sh`) runs Aegis on
     the demo database in its own profile and bridge port (47399), screenshots the panel and each
     route, and stops only the process it started. It can't collide with a running Aegis.
+    `AEGIS_CAPTURE_SCROLL=1` adds a shot of each route scrolled to the bottom.
+16. **The main window is a fixed frame**: the title-bar strip and nav rail never move; only the
+    right-hand column scrolls (`.app-shell__content`). Window-level scrolling with a sticky rail
+    let the rail slide up under the traffic lights.
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 

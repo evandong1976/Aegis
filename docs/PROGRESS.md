@@ -1,11 +1,11 @@
-## Handoff (updated 2026-10-16 23:00 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-16 23:30 EDT, by Claude Code session, Opus 5.5)
 
-- **Milestone:** 0 (scaffold, v2) — 100%; 1 (shell + bridge) — ~90%; 2 — click-guard UI only
+- **Milestone:** 0 (scaffold, v2) — 100%; 1 (shell + bridge) — ~90%; 2 — click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
-  - Rebuilt on Zach's `fig` commit (branch `aegis-v2` from `origin/main`): four verdicts (Malicious / Suspicious / Unknown / Clean), the Figma screen shell (Overview, Links, Downloads, Messages, Accuracy, Settings) and Figma Report, mini panel and click-guard frames, all from `design-system/` tokens and components
-  - Store schema and queries behind the screens; `AEGIS_DEMO=1` demo database from the Figma demo path; `pnpm capture` for headless screenshots
-  - Plumbing carried over from `milestone-0-skeleton` (bridge, health, tray, panel window, extension with fixed ID)
+  - fn key: `native/fn-key` (from Klair, chords removed) + `src/main/fnkey.ts`; a clean fn tap toggles the panel, ⌃⌥A still works. Built with `pnpm build:native`; health check reports it (OK on Evan's Mac — Electron already had Input Monitoring)
+  - Main window is now a fixed frame: the nav rail and title bar stay put, only the content column scrolls
+  - Before that: v2 rebuild on Zach's `fig` commit (four verdicts, Figma shell and frames, demo database, click guard) — see the decisions log
 - **In progress:** nothing
 - **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows Bridge = Connected within 30 s (closes milestone 1). Then split: Evan starts milestone 2 (content script → `/page` → wire `showClickGuard` from `extension/src/guard.ts`) and the `demo/` phishing page; Zach starts `sandbox/Dockerfile` + the `demo/` test `.pkg` and the Daytona docs check (PLAN.md › Sponsor findings).
 - **Broken / failing:** none. `pnpm typecheck && pnpm lint && pnpm test` pass (23 tests; lint includes the tokens.css staleness check).
@@ -13,7 +13,7 @@
 - **Blocked on / questions for the user:** deferred by the team: four-track eligibility, demo/email domain. Nothing blocks the next step.
 - **How to verify current state:**
   - `pnpm install && pnpm typecheck && pnpm lint && pnpm test` → all green
-  - `pnpm dev` → menu bar shield, no Dock icon; ⌃⌥A toggles the panel; real (empty) history
+  - `pnpm build:native` once, then `pnpm dev` → menu bar shield, no Dock icon; tap fn (or ⌃⌥A) to toggle the panel; real (empty) history. If fn does nothing, Settings › Permissions shows why (add-on not built / Input Monitoring not granted to Electron), and System Settings › Keyboard › "Press fn (Globe) key to" should be Do Nothing
   - `pnpm dev:demo` → same app on the demo database: populated Overview / Links / Downloads, open `invoice_oct.iso` for the Figma Report
   - `pnpm capture /tmp/aegis-capture` → PNGs of the panel and every screen, compare with `figma/reference/*.png` and the Figma frames
   - `pnpm build:extension`, then serve `extension/dist` and open `guard-preview.html` → the click guard
@@ -35,7 +35,7 @@
 | 5   | Photon                                                                 | Evan        | Not started                                                    |
 | 6   | Chalk                                                                  | Evan        | Not started                                                    |
 | 7   | Detonation                                                             | Zach        | Not started                                                    |
-| 8   | Watcher + resilience + fn add-on                                       | Zach        | Not started                                                    |
+| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on done; watcher, quarantine, Docker fallback not built |
 | 9   | Stretch                                                                | —           | Not started                                                    |
 | 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                    |
 
@@ -89,5 +89,6 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 
 - 2026-10-16: First skeleton on `milestone-0-skeleton` (Electron shell, bridge, extension).
 - 2026-10-16: Owners: Evan = A, Zach = B. Klair's fn add-on may be used, repurposed for Aegis. Deferred: four-track eligibility, demo/email domain.
+- 2026-10-16: fn add-on built early (PLAN.md decision 14); main window became a fixed frame with a pinned rail (decision 16).
 - 2026-10-16: Figma-only components stay in the app (not `design-system/`). Figma frames for the remaining screens will be designed later.
 - 2026-10-16: Zach's `fig` commit added `figma/`, `screens/` and the four-verdict design system. Rebuilt on `aegis-v2` from it (PLAN.md decisions 1–15). The half-finished rebase of `milestone-0-skeleton` onto `fig` was aborted; nothing in it was lost (only a README with conflict markers).

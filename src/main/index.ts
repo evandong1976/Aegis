@@ -18,6 +18,7 @@ import { DEMO_PAGE, demoLog, seedDemo } from './demo'
 import { initTray, updateTray, type TrayActions } from './tray'
 import { getMainWindow, openMainWindow, setQuitting } from './windows'
 import { scheduleCapture } from './devcapture'
+import { startFnKey, stopFnKey } from './fnkey'
 
 app.setName('Aegis')
 app.setAppUserModelId(APP_ID)
@@ -124,10 +125,12 @@ app.whenReady().then(async () => {
   status.on('log', (entry) => send('log:appended', entry))
   updateTray(status.get(), trayActions)
 
-  // ⌃⌥A toggles the panel; the fn add-on (milestone 8) will call togglePanel too.
+  // fn (native add-on) and ⌃⌥A both toggle the panel; ⌃⌥A is the fallback and always on.
   if (!globalShortcut.register('Control+Alt+A', togglePanel)) {
     console.warn('[shortcut] ⌃⌥A is taken by another app')
   }
+  const fn = startFnKey(togglePanel)
+  status.record(fn.running ? 'allow' : 'warn', `fnkey running=${fn.running} loaded=${fn.loaded}`)
 
   initPanel()
   await refreshHealth()
@@ -159,6 +162,7 @@ app.on('window-all-closed', () => {})
 app.on('before-quit', () => {
   setQuitting()
   globalShortcut.unregisterAll()
+  stopFnKey()
   bridge?.close()
   store?.close()
 })
