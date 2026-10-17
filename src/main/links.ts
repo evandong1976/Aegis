@@ -443,7 +443,7 @@ export interface LinkFacts {
   feedHost?: string | null
   /** Days since the domain was registered (RDAP). */
   domainAgeDays?: number | null
-  dns?: { exists: boolean; fastFlux: boolean }
+  dns?: { exists: boolean; fastFlux: boolean; local?: 'loopback' | 'private' | null }
   /** Days since the first certificate for the domain was logged. */
   certAgeDays?: number | null
 }
@@ -468,6 +468,11 @@ export function factReasons(facts: LinkFacts, known: boolean): Reason[] {
   }
   if (facts.dns && !facts.dns.exists) {
     out.push(reason('dns_missing', 'the domain doesn’t resolve', 10))
+  }
+  if (facts.dns?.local === 'loopback') {
+    out.push(reason('dns_local', 'points to this computer, not a public website', 20))
+  } else if (facts.dns?.local === 'private') {
+    out.push(reason('dns_local', 'points to a private network, not a public website', 20))
   }
   if (facts.dns?.fastFlux) {
     out.push(reason('fast_flux', 'its addresses change like a fast-flux network', 20))
@@ -499,7 +504,8 @@ export interface ScoreInput {
 
 /**
  * The verdict for one link (destination already unwrapped by the caller when needed). A short
- * link with nothing else against it, or a brand-new domain alone, is Unknown (decisions 1, 26).
+ * link with nothing else against it, a brand-new domain alone, or a domain that points to this
+ * computer is Unknown (decisions 1, 26).
  */
 export function scoreLink({
   href,
@@ -526,10 +532,12 @@ export function scoreLink({
   }
   const t1 = tier1(link, linkText)
   const reasons = [...(trusted ? [] : t1.reasons), ...factReasons(facts, t1.known || trusted)]
-  const youngOnly =
-    reasons.length > 0 && reasons.every((r) => r.code === 'domain_age' || r.code === 'cert_new')
+  // Signals that say "this isn't a normal site" without saying it's hostile: alone, they make the
+  // link Unknown (held at the click), not Suspicious.
+  const UNSURE = ['domain_age', 'cert_new', 'dns_local']
+  const unsureOnly = reasons.length > 0 && reasons.every((r) => UNSURE.includes(r.code))
   const hidden = t1.hiddenDestination && !trusted
-  const v = combine(reasons, { confident: !(hidden || youngOnly) })
+  const v = combine(reasons, { confident: !(hidden || unsureOnly) })
   return {
     url: href,
     urlStripped: stripSecrets(href),

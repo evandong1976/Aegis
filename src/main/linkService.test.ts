@@ -3,6 +3,7 @@ import type { PageRequest } from '@shared/bridge'
 import type { PageSnapshot, ScanReport } from '@shared/types'
 import { checkRuns, LinkService, seenIn, type Lookups } from './linkService'
 import {
+  localOnly,
   looksFastFlux,
   normalizeFeedUrl,
   oldestCertAgeDays,
@@ -312,6 +313,15 @@ describe('lookup parsers', () => {
     })
     expect(d?.toISOString()).toBe('2007-10-09T18:20:50.000Z')
     expect(registrationDate({})).toBeNull()
+  })
+
+  it('tells loopback and private addresses from public ones', () => {
+    expect(localOnly(['127.0.0.1'])).toBe('loopback')
+    expect(localOnly(['0.0.0.0', '::1'])).toBe('loopback')
+    expect(localOnly(['10.1.2.3', '127.0.0.1'])).toBe('private')
+    expect(localOnly(['192.168.1.5', '93.184.215.14'])).toBeNull()
+    expect(localOnly(['172.32.0.1'])).toBeNull()
+    expect(localOnly([])).toBeNull()
   })
 
   it('spots fast flux but not ordinary CDNs', () => {

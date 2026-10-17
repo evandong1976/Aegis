@@ -21,6 +21,7 @@ import {
   domainAgeDays,
   safeBrowsing,
   threatFeeds,
+  type DnsFacts,
   type SafeBrowsingResult
 } from './linkData'
 import {
@@ -53,7 +54,7 @@ export interface Lookups {
   safeBrowsing(urls: string[]): Map<string, Promise<SafeBrowsingResult>> | null
   feeds(href: string): { url: string | null; host: string | null } | null
   domainAgeDays(domain: string): Promise<number | null>
-  dnsFacts(host: string): Promise<{ exists: boolean; fastFlux: boolean }>
+  dnsFacts(host: string): Promise<DnsFacts>
   certAgeDays(domain: string): Promise<number | null>
 }
 
@@ -259,7 +260,7 @@ export class LinkService {
     // Domain lookups only where they can change the verdict: not the page's own site, not
     // trusted or known domains, not IPs, not shorteners (they're Unknown regardless).
     const rdap = new Map<string, Pending<number | null>>()
-    const dnsT = new Map<string, Pending<{ exists: boolean; fastFlux: boolean }>>()
+    const dnsT = new Map<string, Pending<DnsFacts>>()
     const ct = new Map<string, Pending<number | null>>()
     for (const link of parsed.values()) {
       if (!link || link.isIp || !link.domain.includes('.')) continue
@@ -336,7 +337,7 @@ export class LinkService {
     sb: Map<string, Pending<SafeBrowsingResult>>,
     sbConfigured: boolean,
     rdap: Map<string, Pending<number | null>>,
-    dnsT: Map<string, Pending<{ exists: boolean; fastFlux: boolean }>>,
+    dnsT: Map<string, Pending<DnsFacts>>,
     ct: Map<string, Pending<number | null>>
   ): Omit<Evaluated, 'destination'> {
     const link = parsed.get(target)
@@ -492,9 +493,18 @@ export function checkRuns(e: Pick<Evaluated, 'verdict' | 'facts'>, trusted: bool
         runs.push(
           !facts.dns?.exists
             ? { name, state: 'warn', result: 'doesn’t resolve' }
-            : facts.dns.fastFlux
-              ? { name, state: 'warn', result: 'fast-flux pattern' }
-              : { name, state: 'ok', result: 'resolves' }
+            : facts.dns.local
+              ? {
+                  name,
+                  state: 'warn',
+                  result:
+                    facts.dns.local === 'loopback'
+                      ? 'points to this computer'
+                      : 'points to a private network'
+                }
+              : facts.dns.fastFlux
+                ? { name, state: 'warn', result: 'fast-flux pattern' }
+                : { name, state: 'ok', result: 'resolves' }
         )
         break
       case 'certLogs': {

@@ -304,6 +304,34 @@ export function domainAgeDays(domain: string, now = Date.now()): Promise<number 
 export interface DnsFacts {
   exists: boolean
   fastFlux: boolean
+  /**
+   * Every address is on this computer (loopback, 0.0.0.0) or a private network. A public link
+   * that resolves there isn't a website: it's dead or sinkholed, or it reaches local services.
+   */
+  local?: 'loopback' | 'private' | null
+}
+
+/** Where an address points: this computer, a private network, or the public internet. */
+export function addressScope(address: string): 'loopback' | 'private' | 'public' {
+  const a = address.toLowerCase()
+  if (/^127\./.test(a) || a === '0.0.0.0' || a === '::1' || a === '::') return 'loopback'
+  if (
+    /^(10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.)/.test(
+      a
+    )
+  ) {
+    return 'private'
+  }
+  if (/^f[cd][0-9a-f]{2}:/.test(a) || /^fe[89ab][0-9a-f]:/.test(a)) return 'private'
+  return 'public'
+}
+
+/** `loopback` if every address is on this computer, `private` if all are local, else null. */
+export function localOnly(addresses: string[]): 'loopback' | 'private' | null {
+  if (addresses.length === 0) return null
+  const scopes = addresses.map(addressScope)
+  if (scopes.some((s) => s === 'public')) return null
+  return scopes.every((s) => s === 'loopback') ? 'loopback' : 'private'
 }
 
 const dnsCache = new TtlCache<DnsFacts>(HOUR)
@@ -323,14 +351,18 @@ export function dnsFacts(host: string): Promise<DnsFacts> {
   return dnsCache.get(host, async () => {
     try {
       const a = await dns.resolve4(host, { ttl: true })
-      return { exists: true, fastFlux: looksFastFlux(a) }
+      return {
+        exists: true,
+        fastFlux: looksFastFlux(a),
+        local: localOnly(a.map((r) => r.address))
+      }
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code
       if (code !== 'ENOTFOUND' && code !== 'ENODATA') throw err
     }
     try {
-      await dns.resolve6(host)
-      return { exists: true, fastFlux: false }
+      const aaaa = await dns.resolve6(host)
+      return { exists: true, fastFlux: false, local: localOnly(aaaa) }
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code
       if (code === 'ENOTFOUND' || code === 'ENODATA') return { exists: false, fastFlux: false }

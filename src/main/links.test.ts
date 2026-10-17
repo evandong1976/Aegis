@@ -236,3 +236,13 @@ describe('certificate logs stand in for a missing registration date', () => {
     ).toBe('unknown')
   })
 })
+
+describe('a public link that points to this computer', () => {
+  it('is Unknown on its own and adds weight to other signals', () => {
+    const local = { dns: { exists: true, fastFlux: false, local: 'loopback' as const } }
+    const alone = score('http://jiameng.com', 'jiameng.com', local)
+    expect(alone.verdict).toBe('unknown')
+    expect(alone.reasons[0].text).toBe('points to this computer, not a public website')
+    expect(score('http://paypa1-login.com/', '', local).verdict).toBe('suspicious')
+  })
+})

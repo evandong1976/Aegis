@@ -367,7 +367,12 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     - **Certificate logs from Cert Spotter**, not crt.sh (19 s per lookup in testing). Its free API
       lists only unexpired certificates, so the signal is "the oldest valid certificate is days
       old", and it counts only when RDAP has no date (a new domain always has a new certificate).
-      Asked only for unknown domains that are young or undated. `CERTSPOTTER_API_KEY` is optional.
+      Asked only for unknown domains that are young or undated. The free quota without a key ran
+      out during testing (the check then shows "failed"); set `CERTSPOTTER_API_KEY` (free sign-up).
+    - **A domain whose addresses are all on this computer or a private network** (e.g. jiameng.com
+      → 127.0.0.1, found on whynohttps.com) is Unknown: "points to this computer, not a public
+      website". Not Malicious: Workday's own `myworkdayjobs.com` does the same. With other signals
+      it adds 20 points. A site lacking HTTPS is not flagged; Chrome already warns about that.
     - **Domain lookups are skipped** for the page's own site, trusted and known domains, IPs and
       shorteners, to keep a busy page from firing hundreds of requests.
     - **Budget:** a page waits up to 1.5 s for lookups; anything slower is marked `timeout` and keeps
