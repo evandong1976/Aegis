@@ -1,18 +1,22 @@
-## Handoff (updated 2026-10-17 00:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 01:30 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Review against the plan (01:30)**: the image matches PLAN.md › Branches › `sandbox-image` and
+    architectural.md §3.6. Rebuilt from cache to the same image; `selftest.py` passes 7 / 7, both
+    plain and hardened. Still missing for "done": the `demo/` files (Zach, by hand).
+    architectural.md §5 now lists the files in `sandbox/`.
   - **`sandbox-image` (this branch, not merged into `main`)**: the image half of milestone 0b.
     `sandbox/Dockerfile` builds, and `sandbox/selftest.py` passes 7 / 7 with the network off, both
     plain and with the Docker fallback's hardening. Evidence:
     [`logs/2026-10-17-0043-sandbox-image/`](../logs/2026-10-17-0043-sandbox-image/SUMMARY.md). The
     `demo/` test files are the other half: Zach is writing those by hand.
-  - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
-    `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
-    commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
-    Branches. Joint items (0, 3, 10) have no branch and aren't started.
+  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
+    branch's work is in its own commits, and this file is that branch's handoff. Order,
+    prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
+    empty, waiting on milestone 3 (joint).
   - **Verified what works** with `pnpm verify` and recorded the evidence in
     [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
     commit `35cba97` (see "What works today" below)
@@ -20,13 +24,12 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows
-  Bridge = Connected within 30 s (closes milestone 1; the verification only simulated the
-  heartbeat with `curl`). Then split: Evan starts milestone 2 (content script → `/page` → wire
-  `showClickGuard`) and the `demo/` phishing page. Zach claims and starts `sponsor-check` and
-  `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
-  start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
-  milestone 3 (joint) is underway.
+- **Next step:** On this branch: Zach adds the `demo/` test files by hand (the harmless `.pkg` and
+  the script that builds it with `pkgbuild`, test scripts, the prompt-injection script, EICAR) and
+  `demo/README.md`, the rest of milestone 0b's "done when" (PLAN.md › Branches). Then merge into
+  `main`. At milestone 3: build the Daytona snapshot from this image with
+  `--platform linux/amd64`. Outside this branch, still open: load `extension/dist` in Chrome to
+  close milestone 1.
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM because of its demo timestamps, not this branch's
   changes; the fix is on `ui-fixes` (`73c1997`). Three small UI issues open (see "Open issues";

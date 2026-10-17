@@ -545,9 +545,9 @@ Aegis/
 │
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │
-├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, observe.py,
-│                               detonate.py, rules/*.yar, requirements.txt, tests
-│                               (fetch.py later, for mobile)
+├── sandbox/                    Dockerfile, requirements.txt, fetch_capa_rules.py, selftest.py,
+│                               README.md (branch sandbox-image). Planned: entry.py, analyze.py,
+│                               observe.py, detonate.py, rules/*.yar, tests (fetch.py later)
 ├── chalk/                      Planned (M6): features, resolvers, eval config
 ├── evals/                      Planned (M6): labeled links, texts, files; results.json
 ├── demo/                       Planned (M0a/b): phishing page, scam texts, invoice email,
