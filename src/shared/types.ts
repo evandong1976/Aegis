@@ -59,7 +59,9 @@ export const LinkVerdictSchema = z.object({
   reasons: z.array(ReasonSchema),
   trusted: z.boolean(),
   /** Which checks ran; reports show what timed out. */
-  checks: z.record(z.string(), CheckStateSchema)
+  checks: z.record(z.string(), CheckStateSchema),
+  /** How long the app took to reach this verdict. */
+  checkedMs: z.number().nonnegative().optional()
 })
 export type LinkVerdict = z.infer<typeof LinkVerdictSchema>
 

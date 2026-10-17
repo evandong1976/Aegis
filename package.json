@@ -37,6 +37,7 @@
   "dependencies": {
     "@daytona/sdk": "0.220.0",
     "@factory/droid-sdk": "0.9.1",
+    "tldts": "7.4.16",
     "zod": "4.6.7"
   },
   "devDependencies": {

@@ -38,7 +38,7 @@ body {
 }
 .counts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-2);
 }
 .count {
@@ -63,4 +63,27 @@ body {
   font-size: 13px;
   line-height: 19px;
   color: var(--ink-muted);
+}
+.recent {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+.recent li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
+}
+.recent__domain {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent li small {
+  grid-column: 2;
 }

@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Aegis link test</title>
+<style>body{font:16px system-ui;margin:40px;line-height:2.2} a{margin-right:6px}</style></head>
+<body>
+<h1>Your account needs attention</h1>
+<p>Clean: <a id="clean" href="https://github.com/chalk-ai/examples">github.com/chalk-ai/examples</a></p>
+<p>Phish: <a id="phish" href="https://login-northwlnd-io.sbs/sso?session=8f2c1a9e77aa">accounts.google.com</a></p>
+<p>Mismatch (harmless target): <a id="mismatch" href="https://example.com/">paypal.com</a></p>
+<p>Short link: <a id="short" href="https://bit.ly/aegis-test-xyz">Track your parcel</a></p>
+<p>Safe Browsing test URL: <a id="sbtest" href="http://malware.testing.google.test/testing/malware/">Open document</a></p>
+<p>Redirect wrapper: <a id="wrapped" href="https://www.google.com/url?q=https://paypa1-secure.top/verify&amp;sa=D">Verify now</a></p>
+<p>Data link: <a id="data" href="data:text/html;base64,PGgxPmhpPC9oMT4=">Invoice</a></p>
+<p>Void: <a id="void" href="javascript:void(0)">Menu</a></p>
+<p>Plain text URL: visit https://paypal-account-verify.xyz/login to continue.</p>
+<p>On URLhaus (never clicked in this test): <a id="feed" href="http://61.53.153.148:38141/bin.sh">update.sh</a></p>
+<div id="later"></div>
+<script>setTimeout(()=>{document.getElementById('later').innerHTML='Added later: <a id="late" href="https://micros0ft-support.top/help">Microsoft support</a>'},2500)</script>
+</body></html>

@@ -13,15 +13,26 @@ const sample = {
     trusted: false,
     checks: { tier1: 'ok' as const, safeBrowsing: 'ok' as const },
     reasons: [
-      { code: 'domain_age', text: 'registered 2 days ago', weight: 35, hard: false },
-      { code: 'password_form', text: 'asks for a password', weight: 30, hard: false },
-      { code: 'lookalike_brand', text: 'looks like “northwind”', weight: 20, hard: false },
-      { code: 'safe_browsing', text: 'no Safe Browsing match', weight: 0, hard: false }
+      {
+        code: 'text_mismatch',
+        text: 'link says google.com but goes to login-northwlnd-io.sbs',
+        weight: 40,
+        hard: false
+      },
+      {
+        code: 'lookalike_brand',
+        text: 'looks like “northwind” but isn’t',
+        weight: 40,
+        hard: false
+      },
+      { code: 'domain_age', text: 'registered 2 days ago', weight: 25, hard: false },
+      { code: 'risky_tld', text: '.sbs is often used for scams', weight: 15, hard: false }
     ]
   },
   linkText: 'accounts.google.com',
-  headline: 'This link is not the sign-in page it claims to be.',
-  checkedMs: 1200
+  headline: 'This link doesn’t go where it says it does.',
+  checkedMs: 1200,
+  canTrust: true
 }
 
 function open(): void {
@@ -29,11 +40,10 @@ function open(): void {
     sample,
     {
       back: () => console.log('[guard] back'),
-      inspect: () => console.log('[guard] inspect'),
       proceed: () => console.log('[guard] continue'),
       trust: () => console.log('[guard] trust')
     },
-    './'
+    (path) => `./${path}`
   )
 }
 

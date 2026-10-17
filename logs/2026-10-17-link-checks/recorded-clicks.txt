@@ -1,0 +1,7 @@
+seen_in  url                                   verdict     score  action   reason                                                   duration_ms
+-------  ------------------------------------  ----------  -----  -------  -------------------------------------------------------  -----------
+Chrome   https://login-northwlnd-io.sbs/sso    malicious   100    blocked  Link says google.com but goes to login-northwlnd-io.sbs  551        
+Chrome   https://bit.ly/aegis-test-xyz         unknown     0      blocked  Short link: Aegis can’t see where it goes                551        
+Chrome   https://github.com/chalk-ai/examples  clean       0      allowed  No threats found                                         0          
+Chrome   https://example.com/                  suspicious  40     allowed  Link says paypal.com but goes to example.com             107        
+Chrome   https://example.com/                  suspicious  40     allowed  Link says paypal.com but goes to example.com             79         

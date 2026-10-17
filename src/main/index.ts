@@ -20,6 +20,13 @@ import { initTray, updateTray, type TrayActions } from './tray'
 import { getMainWindow, openMainWindow, setQuitting } from './windows'
 import { scheduleCapture } from './devcapture'
 import { startFnKey, stopFnKey } from './fnkey'
+import { LinkService } from './linkService'
+import { refreshFeeds } from './linkData'
+import { registeredDomain } from './links'
+import { SHORTENERS } from './linkLists'
+
+/** The threat feeds are downloaded again this often (MEGA_PROMPT §5.2: cached for an hour). */
+const FEED_REFRESH_MS = 60 * 60 * 1000
 
 app.setName('Aegis')
 app.setAppUserModelId(APP_ID)
@@ -30,6 +37,7 @@ if (!app.requestSingleInstanceLock()) app.quit()
 
 let store: Store | null = null
 let bridge: Server | null = null
+let links: LinkService | null = null
 
 // Health refreshes run one at a time, so each compares against the previous result. (Startup and
 // the extension's first ping used to overlap and log every service twice.)
@@ -107,6 +115,27 @@ app.whenReady().then(async () => {
       .filter((s) => s.action === 'scanning').length
   }
 
+  links = new LinkService({
+    isPaused: () => status.isPaused(),
+    trustedDomains: () => new Set(store?.listTrusted().map((t) => t.domain) ?? []),
+    putScan: (report) => {
+      store?.putScan(report)
+      send('scans:changed', { id: report.id })
+    },
+    log: (level, text) => status.record(level, text),
+    onPage: (page) => {
+      status.page = page
+      status.changed()
+    },
+    onBlocked: () => {
+      if (store && getSettings(store).panelAutoPop) showPanel()
+    }
+  })
+  // Feeds load in the background; until they arrive the feed check reports "skipped".
+  const feedLog = (text: string, ok: boolean): void => status.record(ok ? null : 'warn', text)
+  void refreshFeeds(feedLog)
+  setInterval(() => void refreshFeeds(feedLog), FEED_REFRESH_MS)
+
   try {
     bridge = await startBridge({
       port: config.bridgePort,
@@ -120,9 +149,17 @@ app.whenReady().then(async () => {
           void refreshHealth()
         }
       },
-      trust: (domain) => {
+      page: (req) => links!.check(req),
+      click: (req) => links!.click(req),
+      trust: (input) => {
+        // Trust the registered domain, never a shortener (it would trust every link behind it).
+        const domain = registeredDomain(input) ?? input.toLowerCase()
+        if (SHORTENERS.has(domain)) throw new Error(`${domain} is a link shortener`)
         store?.addTrusted(domain)
-        status.record(null, `trust domain=${domain.toLowerCase()}`)
+        links?.forgetDomain(domain)
+        status.record(null, `trust domain=${domain}`)
+        send('scans:changed', { id: '' })
+        return domain
       }
     })
     status.record(null, `bridge listening host=127.0.0.1 port=${config.bridgePort}`)
@@ -131,7 +168,7 @@ app.whenReady().then(async () => {
     status.record('block', `bridge failed port=${config.bridgePort} error=${String(err)}`)
   }
 
-  registerIpc(store, refreshHealth)
+  registerIpc(store, refreshHealth, (domain) => links?.forgetDomain(domain))
   initTray()
   status.on('changed', () => {
     updateTray(status.get(), trayActions)

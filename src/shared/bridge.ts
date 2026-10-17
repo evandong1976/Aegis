@@ -13,7 +13,8 @@ export const BRIDGE_ROUTES = {
   downloadQuarantined: { method: 'POST', path: '/download/quarantined' },
   inspect: { method: 'POST', path: '/inspect' },
   scan: { method: 'POST', path: '/scan/:id' },
-  trust: { method: 'POST', path: '/trust' }
+  trust: { method: 'POST', path: '/trust' },
+  click: { method: 'POST', path: '/click' }
 } as const
 
 export type BridgeRoute = keyof typeof BRIDGE_ROUTES
@@ -52,6 +53,8 @@ export const PageRequestSchema = z.object({
   tabId: z.number().int(),
   pageUrl: z.string(),
   links: z.array(PageLinkSchema).max(2000),
+  /** Set at a click: wait longer (up to TIMEOUTS_MS.linkAtClick) for lookups still running. */
+  urgent: z.boolean().optional(),
   /** Visible main-content text, capped at PAGE_TEXT_CAP. Untrusted. */
   text: z.string().max(8000).optional(),
   sender: z
@@ -64,11 +67,30 @@ export const PageRequestSchema = z.object({
 })
 export type PageRequest = z.infer<typeof PageRequestSchema>
 export const PageResponseSchema = z.object({
+  /** Protection is paused: no verdicts, nothing outlined or held. */
+  paused: z.boolean(),
   links: z.array(LinkVerdictSchema),
   scamText: ScamTextResultSchema.nullable(),
   sender: z.object({ verdict: VerdictSchema, reasons: z.array(z.string()) }).nullable()
 })
 export type PageResponse = z.infer<typeof PageResponseSchema>
+
+// POST /click — what happened when the user clicked a link; sent again with the same clickId
+// when the user decides in the click guard. The app looks the verdict up itself.
+export const ClickRequestSchema = z.object({
+  clickId: z.string().uuid(),
+  tabId: z.number().int().optional(),
+  pageUrl: z.string(),
+  href: z.string(),
+  linkText: z.string().max(500),
+  /** allowed: it opened; held: the guard is up; blocked: the user went back. */
+  decision: z.enum(['allowed', 'held', 'blocked']),
+  /** Time from the click to the verdict, in the extension. */
+  verdictMs: z.number().nonnegative(),
+  /** The user chose Trust this site. */
+  trusted: z.boolean().optional()
+})
+export type ClickRequest = z.infer<typeof ClickRequestSchema>
 
 // POST /download — metadata in headers, streamed bytes in the body
 export const DOWNLOAD_META_HEADER = 'x-aegis-download'

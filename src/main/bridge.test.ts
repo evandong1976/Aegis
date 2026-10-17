@@ -40,7 +40,12 @@ describe('bridge server', () => {
       version: '0.0.0-test',
       getStatus: () => ({ protection: 'protected', mode: 'block' }),
       onPing: () => pings++,
-      trust: (d) => trusted.push(d)
+      trust: (d) => {
+        trusted.push(d)
+        return d.toLowerCase()
+      },
+      page: async () => ({ paused: false, links: [], scamText: null, sender: null }),
+      click: async () => {}
     }
   }
 

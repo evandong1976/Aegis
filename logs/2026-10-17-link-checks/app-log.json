@@ -1,0 +1,77 @@
+[
+  {
+    "at": "2026-10-17T16:50:13.418Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47397"
+  },
+  {
+    "at": "2026-10-17T16:50:13.460Z",
+    "level": "allow",
+    "text": "fnkey running=true loaded=true"
+  },
+  {
+    "at": "2026-10-17T16:50:14.194Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27758"
+  },
+  {
+    "at": "2026-10-17T16:50:14.253Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-17T16:50:16.086Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-17T16:50:16.086Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-17T16:50:16.086Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "block",
+    "text": "health service=docker state=down"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "allow",
+    "text": "health service=droid state=ok"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-17T16:50:16.087Z",
+    "level": "allow",
+    "text": "health service=fnKey state=ok"
+  }
+]

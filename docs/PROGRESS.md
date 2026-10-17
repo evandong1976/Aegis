@@ -1,43 +1,59 @@
-## Handoff (updated 2026-10-17 12:20 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 16:30 EDT, by Claude Code session, Opus 4.8)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–29, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
-- **Milestones:** 0 done; 1 built and verified, waiting on a real-Chrome check; 2 — click-guard UI
-  only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
-  Table: "Milestone checklist" below.
+- **Milestones:** 0 done; 1 built and verified (final real-Chrome Bridge = Connected check
+  pending); 2 done (merged), verified end to end in headless Chrome; 3 — the Daytona sandbox half
+  (`daytona.ts`, run a file network-off) merged; 4 — approach proven (`pnpm try:droid`); 8 — fn
+  add-on only. Everything else not started. Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Daytona is on Tier 3** (Zach, 15:24; PLAN.md decision 28), checked live with a key from the
-  Tier 3 org: a sandbox with no network setting now has the **whole internet**; allow-lists and
-  changing the network after creation are accepted; `networkBlockAll` at creation still blocks
-  everything. Evidence `logs/2026-10-17-1524-daytona-tier3-newkey/` (the earlier key, 15:17, was
-  still Tier 1/2: `logs/2026-10-17-1517-daytona-tier3/`). `pnpm try:sandbox` passes on Tier 3,
-  7/7, 0 sandboxes left (`logs/2026-10-17-1526-sandbox-run/`). Every Aegis sandbox that holds a
-  sample or runs a check already sets `networkBlockAll` at creation. **Decisions 19 (Droid on
-  the Mac) and 20 (no detonation) stand**; Tier 3 makes both alternatives possible, for the team
+- **Just finished — branch `link-checks`, merged into `main`: milestone 2.** Links are judged
+  without opening them (decision 20); every choice and its cost is decision 29.
+  - Main: `links.ts` (Tier 1 rules, lookalikes incl. digit swaps and Cyrillic, redirect
+    unwrapping, URL secret stripping, the verdict), `linkData.ts` (Safe Browsing with stripped
+    URLs; URLhaus + OpenPhish downloaded hourly and matched on the Mac; RDAP via IANA; DNS incl.
+    fast flux; Cert Spotter), `linkService.ts` (`/page` within 1.5 s, `/click` → Links entries,
+    per-tab "This page" counts), `tldts` for registered domains. Trust refuses shorteners and
+    stores the registered domain. The Report lists every reason for a link.
+  - Three rules added after review against real pages (decision 29): a link whose DNS points only
+    to this computer or a private network is Unknown; a plain-`http` sign-in or payment page is
+    Suspicious; every flagged link gets an always-visible red border.
+  - Extension: `content.ts` (links + plain-text URLs, MutationObserver, Gmail-style URL changes,
+    red borders, hover notes, click guard with Back / Continue / Trust), service-worker relay,
+    per-tab badge with the risky-link count, popup page counts and recent verdicts. **Inspect in
+    sandbox** is gone (open issue 4).
+  - Evidence `logs/2026-10-17-link-checks/` (SUMMARY.md): 110 unit tests; the real app + built
+    extension in headless Chrome, 26 / 26 browser checks, live Safe Browsing and feeds; bugs
+    found by that run and fixed.
+
+- **Daytona is on Tier 3** (Zach, 15:24; PLAN.md › Sponsor findings › Daytona), checked live with a
+  key from the Tier 3 org: a sandbox with no network setting now has the **whole internet**;
+  allow-lists and changing the network after creation are accepted; `networkBlockAll` at creation
+  still blocks everything. Evidence `logs/2026-10-17-1524-daytona-tier3-newkey/` (the earlier key,
+  15:17, was still Tier 1/2: `logs/2026-10-17-1517-daytona-tier3/`). `pnpm try:sandbox` passes on
+  Tier 3, 7/7, 0 sandboxes left (`logs/2026-10-17-1526-sandbox-run/`). Every Aegis sandbox that
+  holds a sample or runs a check already sets `networkBlockAll` at creation. **Decisions 19 (Droid
+  on the Mac) and 20 (no detonation) stand**; Tier 3 makes both alternatives possible, for the team
   to decide (PLAN.md › Open questions). The new key is in `.env`, not `.env.local`.
 
-- **In progress — branch `feature/sandbox` (Zach), not merged:** a shell file goes into a Daytona
-  sandbox and runs there, never on the Mac.
-  - Based on `main` with `sandbox-image` merged in.
+- **Earlier — branch `feature/sandbox` (Zach), merged into `main` (PR #1):** a shell file goes into
+  a Daytona sandbox and runs there, never on the Mac. Built on `main` with `sandbox-image` merged
+  in.
   - `src/main/daytona.ts` (+ 12 tests): network off at creation, SHA-256 verification, bounded
     execution, network probes, execution logging, and guaranteed cleanup.
   - `pnpm try:sandbox` tests a harmless simulated malicious script in an isolated sandbox.
   - Verified in Docker and live on Daytona, including blocked network probes and zero leaked
-    sandboxes. See the detailed logs under `logs/`.
-  - Network checks improved from 36.2 s to 8.1 s.
-  - **Next on this branch:** merge into `main`.
+    sandboxes. Network checks improved from 36.2 s to 8.1 s. Logs under `logs/`.
 
-- **Just finished — branch `extension-status`, merged into `main` (not pushed):**
-  the milestone-1 Chrome check found that the app said Connected but the extension's badge and
-  popup stayed on "Not connected". Chrome leaves `Origin` off an extension's GET requests, so
-  the bridge answered `GET /status` with 403. `/status` and `/scan/:id` are now POST (decision
-  28), and the popup re-reads status every 3 s while open. Verified in headless Chrome 155:
-  requests return 200, popup shows "Protected / Connected", badge clears, and invalid origins
-  and Host rebinding remain blocked. `pnpm verify` smoke checks are updated to POST.
-
+- **Earlier — branch `extension-status`, merged into `main`:** the milestone-1 Chrome check found
+  that the app said Connected but the extension's badge and popup stayed on "Not connected". Chrome
+  leaves `Origin` off an extension's GET requests, so the bridge answered `GET /status` with 403
+  (only `POST /ping` passed). `/status` and `/scan/:id` are now POST (decision 28), and the popup
+  re-reads status every 3 s while open. Verified in headless Chrome 155. `pnpm verify`'s smoke
+  checks are updated to POST.
 - **Earlier — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   ...
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
@@ -99,10 +115,10 @@ test` pass on `main`.
      decision 19 is now 27, and `chalk.yaml` & co. are in `chalk/` (run Chalk commands from there).
      An untracked `hello_chalk.py` (Chalk's hello-world sandbox) appeared in the repo root at 11:46;
      it belongs in `chalk/` if kept.
-  2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
-     RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
-     code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
-     `link-checks` or its own branch.
+  2. **Evan:** `link-checks` (milestone 2) is merged into `main`. Left to do: check it in real
+     Chrome on Gmail (restart Aegis, `pnpm build:extension`, reload the extension, reload Gmail,
+     open a message with links), and clean up open issues 5–7 (detonation leftovers in Settings,
+     Downloads copy, the `/inspect` route and `detonations` table) on their own branch.
   3. **Zach:** `sandbox-image`, `ui-fixes` and `watcher` have work on `origin` (pushed 01:17) that
      predates the decisions above. Merge the latest `main` into each before continuing (PLAN.md ›
      Branches), then `sandbox-image` first.
@@ -177,7 +193,7 @@ for branch `ui-fixes` (PLAN.md › Branches):
 Found while updating the docs (2026-10-17): **the code still assumes link detonation**, which
 decision 20 dropped. Fix on its own branch (e.g. `drop-detonation`) or as part of `link-checks`:
 
-4. `extension/src/guard.ts` still shows **Inspect in sandbox** (hide it).
+4. ~~`extension/src/guard.ts` still shows **Inspect in sandbox**~~ — removed on `link-checks`.
 5. Settings: the "auto-detonate" toggle (`autoDetonate` in `src/shared/ipc.ts`,
    `src/main/settings.ts`, `SettingsView.tsx`), the sandbox-budget description ("Automatic
    detonations stop…") and `PRIVACY_COPY` ("suspicious links are opened in a Daytona sandbox") —
@@ -198,21 +214,21 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 
 ## Milestone checklist
 
-| #   | Milestone                                                              | Owner       | Status                                                                                         |
-| --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
-| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
-| 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile on branch `sandbox-image` (origin); demo files at the end (decision 22)             |
-| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified; real-Chrome check found the GET/Origin bug, fixed on `extension-status`    |
-| 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
-| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
-| 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3         |
-| 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                     |
-| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                    |
-| 7   | ~~Link detonation~~                                                    | Zach        | Dropped for now (decision 20); branch `detonate` parked                                        |
-| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`) |
-| 9   | Stretch                                                                | —           | Not started                                                                                    |
-| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                    |
+| #   | Milestone                                                              | Owner       | Status                                                                                                                 |
+| --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                                                   |
+| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                                         |
+| 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile + self-test merged to `main` (via `feature/sandbox`); demo files at the end (dec. 22)                       |
+| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified; real-Chrome check found the GET/Origin bug, fixed on `extension-status`                            |
+| 2   | Links, judged without opening them (decision 20)                       | Evan        | Done — merged to `main`, verified in headless Chrome (`logs/2026-10-17-link-checks/`); real Chrome/Gmail check pending |
+| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                                            |
+| 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | `pnpm try:droid` proven (dec. 19); `daytona.ts` (run a file network-off) merged; build `worker-a` after M3             |
+| 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                                             |
+| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                                            |
+| 7   | ~~Link detonation~~                                                    | Zach        | Dropped for now (decision 20); branch `detonate` parked                                                                |
+| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`)                         |
+| 9   | Stretch                                                                | —           | Not started                                                                                                            |
+| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                                            |
 
 ### What exists, screen by screen
 

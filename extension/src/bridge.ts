@@ -4,7 +4,11 @@
 import { BRIDGE_HOST, DEFAULT_BRIDGE_PORT } from '@shared/constants'
 import {
   BRIDGE_ROUTES,
+  PageResponseSchema,
   StatusResponseSchema,
+  type ClickRequest,
+  type PageRequest,
+  type PageResponse,
   type PingRequest,
   type StatusResponse
 } from '@shared/bridge'
@@ -42,4 +46,38 @@ export async function ping(): Promise<boolean> {
   } catch {
     return false
   }
+}
+
+async function post(path: string, body: unknown, timeoutMs: number): Promise<Response | null> {
+  try {
+    const res = await fetch(BASE + path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs)
+    })
+    return res.ok ? res : null
+  } catch {
+    return null
+  }
+}
+
+/** Verdicts for a page's links; null when the app isn't running (links then open as normal). */
+export async function postPage(req: PageRequest): Promise<PageResponse | null> {
+  // The app waits up to 1.5 s for lookups (4 s at a click); leave room on top.
+  const res = await post(BRIDGE_ROUTES.page.path, req, req.urgent ? 8000 : 5000)
+  if (!res) return null
+  try {
+    return PageResponseSchema.parse(await res.json())
+  } catch {
+    return null
+  }
+}
+
+export async function postClick(req: ClickRequest): Promise<boolean> {
+  return (await post(BRIDGE_ROUTES.click.path, req, 5000)) !== null
+}
+
+export async function postTrust(domain: string): Promise<boolean> {
+  return (await post(BRIDGE_ROUTES.trust.path, { domain }, 3000)) !== null
 }
