@@ -1,0 +1,39 @@
+npm warn Unknown env config "reporter". This will stop working in the next major version of npm.
+npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm.
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+gyp info it worked if it ends with ok
+gyp info using node-gyp@10.2.0
+gyp info using node@22.16.0 | darwin | arm64
+gyp info find Python using Python version 3.15.0 found at "/opt/homebrew/opt/python@3.15/bin/python3.15"
+
+gyp info spawn /opt/homebrew/opt/python@3.15/bin/python3.15
+gyp info spawn args [
+gyp info spawn args '/Users/evandong/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp/gyp/gyp_main.py',
+gyp info spawn args 'binding.gyp',
+gyp info spawn args '-f',
+gyp info spawn args 'make',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/evandong/Downloads/Aegis/native/fn-key/build/config.gypi',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/evandong/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp/addon.gypi',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/evandong/Library/Caches/node-gyp/44.8.0/include/node/common.gypi',
+gyp info spawn args '-Dlibrary=shared_library',
+gyp info spawn args '-Dvisibility=default',
+gyp info spawn args '-Dnode_root_dir=/Users/evandong/Library/Caches/node-gyp/44.8.0',
+gyp info spawn args '-Dnode_gyp_dir=/Users/evandong/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp',
+gyp info spawn args '-Dnode_lib_file=/Users/evandong/Library/Caches/node-gyp/44.8.0/<(target_arch)/node.lib',
+gyp info spawn args '-Dmodule_root_dir=/Users/evandong/Downloads/Aegis/native/fn-key',
+gyp info spawn args '-Dnode_engine=v8',
+gyp info spawn args '--depth=.',
+gyp info spawn args '--no-parallel',
+gyp info spawn args '--generator-output',
+gyp info spawn args 'build',
+gyp info spawn args '-Goutput_dir=.'
+gyp info spawn args ]
+gyp info spawn make
+gyp info spawn args [ 'BUILDTYPE=Release', '-C', 'build' ]
+  CC(target) Release/obj.target/fn_key/src/fn_key.o
+  SOLINK_MODULE(target) Release/fn_key.node
+gyp info ok 

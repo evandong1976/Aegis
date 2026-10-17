@@ -1,0 +1,82 @@
+[
+  {
+    "at": "2026-10-17T03:39:20.761Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47398"
+  },
+  {
+    "at": "2026-10-17T03:39:20.813Z",
+    "level": "allow",
+    "text": "fnkey running=true loaded=true"
+  },
+  {
+    "at": "2026-10-17T03:39:21.460Z",
+    "level": "allow",
+    "text": "extension connected"
+  },
+  {
+    "at": "2026-10-17T03:39:21.471Z",
+    "level": null,
+    "text": "trust domain=example.com"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "warn",
+    "text": "health service=daytona state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "block",
+    "text": "health service=docker state=down"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "warn",
+    "text": "health service=droid state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": null,
+    "text": "health service=photon state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "warn",
+    "text": "health service=chalk state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "warn",
+    "text": "health service=safeBrowsing state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-17T03:39:21.668Z",
+    "level": "allow",
+    "text": "health service=fnKey state=ok"
+  },
+  {
+    "at": "2026-10-17T03:39:21.981Z",
+    "level": "allow",
+    "text": "health service=bridge state=ok"
+  }
+]

@@ -1,0 +1,20 @@
+# Verification logs
+
+Each folder here is one run of `pnpm verify` (`scripts/verify.sh`): the raw output of every check,
+a `results.tsv` of exit codes, a bridge smoke test against the running app, the app's own health
+report (`screens/*/status.json`, `log.json`) and screenshots of every screen. Each folder's
+`SUMMARY.md` says what passed, what the run found, and what it did **not** verify.
+
+| Run                                           | Commit    | Result                                            |
+| --------------------------------------------- | --------- | ------------------------------------------------- |
+| [2026-10-16-2339](2026-10-16-2339/SUMMARY.md) | `35cba97` | All 16 checks as expected; 3 small UI issues open |
+
+To add a run:
+
+```bash
+pnpm verify
+```
+
+Then write that folder's `SUMMARY.md` from its files, and add a row above. The app runs in
+throwaway profiles on spare ports (47398, 47399), so it never touches a running Aegis or the real
+history; those profiles are git-ignored.

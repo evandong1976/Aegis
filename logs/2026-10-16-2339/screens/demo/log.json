@@ -1,0 +1,97 @@
+[
+  {
+    "at": "2026-10-17T02:04:37.176Z",
+    "level": "allow",
+    "text": "file name=statement-sept.pdf verdict=clean checked=local uploaded=no"
+  },
+  {
+    "at": "2026-10-17T02:43:37.176Z",
+    "level": "allow",
+    "text": "link url=docs.vendor.com/api/auth verdict=clean cached=true"
+  },
+  {
+    "at": "2026-10-17T03:02:37.176Z",
+    "level": "warn",
+    "text": "file name=Q3-summary.xlsm source=watcher verdict=suspicious reason=macro-autoexec"
+  },
+  {
+    "at": "2026-10-17T03:19:37.176Z",
+    "level": "warn",
+    "text": "link url=cdn-assets-delivery.top/pkg.js verdict=suspicious reason=obfuscated-js"
+  },
+  {
+    "at": "2026-10-17T03:29:37.176Z",
+    "level": "block",
+    "text": "file name=invoice_oct.iso sha256=9c1f…04ab verdict=malicious engine=sandbox"
+  },
+  {
+    "at": "2026-10-17T03:33:37.176Z",
+    "level": "block",
+    "text": "link url=login-northwlnd-io.sbs/sso verdict=malicious rule=newly-registered+brand-match"
+  },
+  {
+    "at": "2026-10-17T03:39:37.178Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47399"
+  },
+  {
+    "at": "2026-10-17T03:39:37.220Z",
+    "level": "allow",
+    "text": "fnkey running=true loaded=true"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "warn",
+    "text": "health service=daytona state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "block",
+    "text": "health service=docker state=down"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "warn",
+    "text": "health service=droid state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": null,
+    "text": "health service=photon state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "warn",
+    "text": "health service=chalk state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "warn",
+    "text": "health service=safeBrowsing state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T03:39:37.541Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-17T03:39:37.542Z",
+    "level": "allow",
+    "text": "health service=fnKey state=ok"
+  }
+]

@@ -148,7 +148,7 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
       a second isolated sandbox (another Daytona sandbox, or local Docker) with Chalk's AI doing
       the analysis, and the architecture doc says so.
 
-18. **Photon is out of the current build** (team direction, 2026-10-17). It returns later as the
+18. **Photon is out of the current build** (team direction, 2026-10-16). It returns later as the
     mobile feature: forward a screenshot from your phone over iMessage or SMS, and Aegis reads it,
     runs the same checks and replies with a verdict (`docs/architectural.md` §8). Until then: no
     `photon.ts`, no message intake in the pipeline, no alert texts, no `fetch.py`. The app still

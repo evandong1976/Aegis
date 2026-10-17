@@ -1,0 +1,17 @@
+check	exit	expected	log
+typecheck (main, renderer, extension)	0	0	typecheck.log
+lint + tokens.css check	0	0	lint.log
+unit tests (vitest, verbose)	0	0	tests.log
+production build (electron-vite)	0	0	build.log
+extension build	0	0	extension-build.log
+extension ID matches the manifest key	0	0	extension-id.log
+fn add-on build (node-gyp)	0	0	native-build.log
+fn add-on loads in Electron	0	0	native-load.log
+build:sandbox placeholder fails loudly	1	1	placeholder-sandbox.log
+eval placeholder fails loudly	1	1	placeholder-eval.log
+bridge smoke (14 pass, 0 fail)	0	0	bridge-smoke.log
+real mode: app launched, 8 screenshots	8	8	app-real.log
+real mode: live status + health written	0	0	screens/real/status.json
+real mode: renderer and main errors	0	0	renderer-errors.log
+demo mode: app launched, 8 screenshots	8	8	app-demo.log
+demo mode: renderer and main errors	0	0	renderer-errors-demo.log

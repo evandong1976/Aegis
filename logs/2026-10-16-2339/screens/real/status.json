@@ -1,0 +1,99 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "ok",
+      "detail": "Listening on 127.0.0.1:47398; extension seen 0 s ago."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "unconfigured",
+      "detail": "DAYTONA_API_KEY not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "pending",
+      "detail": "The Aegis snapshot is built with pnpm build:sandbox (milestone 3)."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "down",
+      "detail": "Docker is not running. It is only the fallback when Daytona is down."
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "unconfigured",
+      "detail": "FACTORY_API_KEY not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "unconfigured",
+      "detail": "PHOTON_* not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "unconfigured",
+      "detail": "CHALK_* not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "unconfigured",
+      "detail": "SAFE_BROWSING_KEY not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-17T03:39:21.981Z",
+      "state": "ok",
+      "detail": "Tap fn to open and close the panel."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": "2026-10-17T03:39:21.460Z",
+  "demo": false,
+  "page": null
+}

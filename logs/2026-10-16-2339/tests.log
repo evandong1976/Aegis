@@ -1,0 +1,34 @@
+
+ RUN  v4.1.12 /Users/evandong/Downloads/Aegis
+
+(node:65658) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/main/verdict.test.ts > verdictFromScore > uses the 0–29 / 30–69 / 70–100 bands 1ms
+ ✓ src/main/verdict.test.ts > combine > sums weights and caps at 100 0ms
+ ✓ src/main/verdict.test.ts > combine > ignores negative weights 0ms
+ ✓ src/main/verdict.test.ts > combine > a hard rule makes it malicious regardless of score 0ms
+ ✓ src/main/verdict.test.ts > combine > incomplete evidence turns clean into unknown, never into clean 0ms
+ ✓ src/main/verdict.test.ts > AI can only raise > raises clean → unknown → suspicious → malicious 0ms
+ ✓ src/main/verdict.test.ts > AI can only raise > never lowers a verdict 0ms
+ ✓ src/main/verdict.test.ts > wording > uses the four design-system words and never says "safe" 1ms
+ ✓ src/main/store.test.ts > store > creates every table from BUILD_PROMPT §4.3 3ms
+ ✓ src/main/store.test.ts > store > migrations are idempotent 0ms
+ ✓ src/main/store.test.ts > store > rebuilds the pre-release none/caution/danger schema 1ms
+ ✓ src/main/store.test.ts > store > rejects verdicts outside the four words 1ms
+ ✓ src/main/store.test.ts > store > round-trips a report 1ms
+ ✓ src/main/store.test.ts > store > filters by tab and search 1ms
+ ✓ src/main/store.test.ts > store > computes the overview counts 2ms
+ ✓ src/main/store.test.ts > store > stores settings and trusted sites 0ms
+ ✓ src/main/bridge.test.ts > origin check > accepts only our extension 1ms
+ ✓ src/main/bridge.test.ts > origin check > rejects rebinding hosts 0ms
+ ✓ src/main/bridge.test.ts > bridge server > rejects requests without our Origin 8ms
+ ✓ src/main/bridge.test.ts > bridge server > serves /status to the extension 1ms
+ ✓ src/main/bridge.test.ts > bridge server > records pings and trusts domains 4ms
+ ✓ src/main/bridge.test.ts > bridge server > rejects malformed bodies 2ms
+ ✓ src/main/bridge.test.ts > bridge server > marks routes from later milestones as not implemented 1ms
+
+ Test Files  3 passed (3)
+      Tests  23 passed (23)
+   Start at  23:39:17
+   Duration  160ms (transform 84ms, setup 0ms, import 145ms, tests 35ms, environment 0ms)
+
