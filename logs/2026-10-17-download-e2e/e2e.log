@@ -1,0 +1,30 @@
+(node:63106) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  extension loads  — onljkbhkoinihmjibfofcalimkolemam
+PASS  extension service worker running
+PASS  aegis-terminal-demo.command: unknown, held  — unknown / held / chrome / 1295 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 0.7 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  aegis-terminal-demo.command: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — 213c8a0b-83a2-4266-83ce-9104bcb3491e network=off destroyed=2026-10-17T23:36:21.719Z
+PASS  statement.pdf: clean, delivered  — clean / delivered / chrome / 258 ms; checks: Local pre-check=ok(cleared on this Mac)
+PASS  statement.pdf: never uploaded
+PASS  photo.jpg: malicious, quarantined  — malicious / quarantined / chrome / 1517 ms; checks: Local pre-check=fail(named .jpg but is really a Mac program), Daytona sandbox=ok(network off, 1.0 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  photo.jpg: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — c766a4f7-844c-417a-bf64-b021951264f3 network=off destroyed=2026-10-17T23:36:23.455Z
+PASS  report.sh: unknown, held  — unknown / held / chrome / 2520 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 1.2 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  report.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — c3417223-3709-4139-b65e-a1c4077cb7f9 network=off destroyed=2026-10-17T23:36:25.846Z
+PASS  hello.sh: unknown, held  — unknown / held / chrome / 3034 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 2.0 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  hello.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — c8e1c713-63c2-4283-ac3e-c185d7d81578 network=off destroyed=2026-10-17T23:36:28.921Z
+PASS  invoice.pdf: unknown, held  — unknown / held / chrome / 3026 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 1.1 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  invoice.pdf: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — eebaad37-e1c5-4444-ac71-b10524636c7c network=off destroyed=2026-10-17T23:36:31.956Z
+PASS  notes.sh: unknown, held  — unknown / held / chrome / 6548 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 5.0 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)
+PASS  notes.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — de83eb5d-a77f-4365-b575-84a4a254c413 network=off destroyed=2026-10-17T23:36:38.471Z
+PASS  aegis-terminal-demo.command: never written to the downloads folder
+PASS  photo.jpg: never written to the downloads folder
+PASS  report.sh: never written to the downloads folder
+PASS  hello.sh: never written to the downloads folder
+PASS  statement.pdf: delivered into the downloads folder
+PASS  logged-in download: Chrome and the in-memory refetch both sent the cookie  — 2 requests: session=ok | session=ok
+PASS  one-time link: fetched again for the fallback (3 requests)  — 3 requests
+PASS  watcher: a file dropped into the folder is quarantined and scanned  — unknown / held after 4283 ms; left the folder at +23347 ms
+PASS  watcher: an old file that changes is left alone
+PASS  held files are .aegis with mode 600  — 7 files
+
+26 / 26 passed

@@ -1,7 +1,7 @@
 ## Handoff (updated 2026-10-17 18:45 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–30, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–31, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
@@ -35,6 +35,28 @@ disagree, PLAN.md › Decisions wins.
     session's worktree: 863 errors in its vendored files). Remove that worktree or ignore
     `.claude/` in `eslint.config.mjs`.
 
+- **Merged into `main` (not pushed) — branch `feature/download` (Evan): milestone 3's intake and
+  sandbox half** (PLAN.md decision 31). Zach's `watcher` branch is merged into it (docs kept from `main`).
+  - Extension: every download is held at `onDeterminingFilename`; when the app is up it's cancelled
+    and erased, the offscreen document fetches the bytes in memory with the user's cookies and
+    POSTs them to `/download`, then polls `/scan/:id` for the verdict (notifications). Fallbacks:
+    one-time links / sign-in pages / `blob:` / >200 MB / already finished → Chrome saves it and
+    the app takes it at once (`/download/quarantined`). App not running → let through.
+  - Main: `precheck.ts` (magic bytes, SHA-256, macros / PDF actions; plain documents and real media
+    stay on the Mac), `scans.ts` (`ScanService`: pre-check → upload into a `networkBlockAll`
+    sandbox → SHA-256 checked inside → `analyze` hook (empty until M4) → delete → verdict →
+    deliver the exact bytes or hold in the app's quarantine), bridge routes, watcher wired in
+    (only items created after it started or since the last run), daily sandbox budget, 3 at once.
+  - Without an analyst, everything that goes to the sandbox is **Unknown and held** (block mode).
+  - Evidence `logs/2026-10-17-download-e2e/` (SUMMARY.md): 175 unit tests; 26 / 26 end to end
+    with the real app, headless Chrome and live Daytona (7 sandboxes, all network-off, 0 left).
+    Four Chrome behaviours found live and handled (decision 31).
+  - **Two sandbox pipelines now sit side by side on `main`, to reconcile:** `/download` and the
+    watcher go through `scans.ts` (`ScanService`: pre-check, quarantine, deliver/hold, budget, no
+    run, no live view); Zach's **Test the sandbox** goes through `sandboxScan.ts` (runs the file,
+    live view, desktop, scripted agent). Next step: have `ScanService` hand files that need the
+    cloud to `sandboxScan()` (or move the live view onto `ScanService`), so real downloads get the
+    live view and there's one sandbox path. Worker A then implements `LiveAgent` once.
 - **Just finished — branch `link-checks`, merged into `main`: milestone 2.** Links are judged
   without opening them (decision 20); every choice and its cost is decision 29.
   - Main: `links.ts` (Tier 1 rules, lookalikes incl. digit swaps and Cyrillic, redirect
@@ -247,7 +269,7 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 | 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile + self-test merged to `main` (via `feature/sandbox`); demo files at the end (dec. 22)                       |
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified; real-Chrome check found the GET/Origin bug, fixed on `extension-status`                            |
 | 2   | Links, judged without opening them (decision 20)                       | Evan        | Done — merged to `main`, verified in headless Chrome (`logs/2026-10-17-link-checks/`); real Chrome/Gmail check pending |
-| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                                            |
+| 3   | Downloads (core demo)                                                  | Evan + Zach | Intake + sandbox half done on `feature/download` (`logs/2026-10-17-download-e2e/`); analyst not built                  |
 | 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | `pnpm try:droid` proven (dec. 19); `daytona.ts` (run a file network-off) merged; build `worker-a` after M3             |
 | 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                                             |
 | 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                                            |
@@ -308,7 +330,8 @@ Not yet seen in a running app's Settings › Connections.
 ## Stubs and simulations
 
 - Demo data only under `AEGIS_DEMO=1`, in its own database, with a "Demo data" chip in the UI.
-- Bridge `/page`, `/download`, `/download/quarantined`, `/inspect`, `/scan/:id` → 501 `notImplemented`.
+- Bridge `/inspect` → 501 `notImplemented` (detonation parked). `/download`, `/download/quarantined`
+  and `/scan/:id` are live (`feature/download`).
 - Report actions disabled until quarantine handling (milestone 8).
 - `pnpm build:sandbox` and `pnpm eval` exit 1 with "not implemented yet".
 - Sandbox budget meter shows 0 until the queue records jobs (milestone 3).
@@ -338,9 +361,17 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | `feature/sandbox` live runs, 12:30                      | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)                             |
 | `feature/sandbox` faster check, 12:39                   | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)                             |
 | Tier 3 probes + `try:sandbox`, 15:17–15:27              | 0 (`logs/2026-10-17-1526-sandbox-run/leak-check.txt`)                             |
+| `feature/download` end to end, 22:43 UTC                | 0 (`logs/2026-10-17-download-e2e/leak-check.txt`)                                 |
 | `feature/visualization` probes + live view, 18:17–18:39 | 0 (`daytona.list({ app: 'aegis' })`, `logs/2026-10-17-1834-live-view/SUMMARY.md`) |
 
 ## Decisions log
+
+- 2026-10-17 19:00: `feature/download` merged into `main` after `feature/visualization`; its
+  decision renumbered 30 → 31 (Zach's live view took 30).
+- 2026-10-17 18:45: `feature/download`: downloads held at `onDeterminingFilename`; fallback saved
+  under Chrome's name and taken by the app at once; held as Unknown until an analyst exists
+  (PLAN.md decision 31). `watcher` merged in. New dev env vars: `AEGIS_DOWNLOADS_DIR`,
+  `AEGIS_CAPTURE_DELAY_MS`.
 
 - 2026-10-17 18:45: The live view (PLAN.md decision 30) on `feature/visualization`, Zach's
   choices: in the main window, turning into the Report; Terminal + Desktop tabs; Droid drawn

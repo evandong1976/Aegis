@@ -1,0 +1,92 @@
+[
+  {
+    "at": "2026-10-17T22:53:07.565Z",
+    "path": "/",
+    "cookie": null
+  },
+  {
+    "at": "2026-10-17T22:53:07.632Z",
+    "path": "/favicon.ico",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:53:12.954Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:53:13.003Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:19.014Z",
+    "path": "/",
+    "cookie": null
+  },
+  {
+    "at": "2026-10-17T23:36:19.042Z",
+    "path": "/favicon.ico",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:20.565Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:20.602Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:21.832Z",
+    "path": "/dl/statement.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:21.845Z",
+    "path": "/dl/statement.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:22.094Z",
+    "path": "/dl/photo.jpg",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:22.110Z",
+    "path": "/dl/photo.jpg",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:23.608Z",
+    "path": "/private/report.sh",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:23.625Z",
+    "path": "/private/report.sh",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:29.169Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:29.228Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:29.230Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:38.756Z",
+    "path": "/requests",
+    "cookie": null
+  }
+]

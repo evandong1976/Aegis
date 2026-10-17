@@ -1,0 +1,332 @@
+[
+  {
+    "at": "2026-10-17T23:36:11.902Z",
+    "level": null,
+    "text": "watcher started dir=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/Downloads"
+  },
+  {
+    "at": "2026-10-17T23:36:11.909Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47398"
+  },
+  {
+    "at": "2026-10-17T23:36:11.987Z",
+    "level": "allow",
+    "text": "fnkey running=true loaded=true"
+  },
+  {
+    "at": "2026-10-17T23:36:12.844Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "block",
+    "text": "health service=docker state=down"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "warn",
+    "text": "health service=droid state=unconfigured"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:12.977Z",
+    "level": "allow",
+    "text": "health service=fnKey state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:13.726Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27760"
+  },
+  {
+    "at": "2026-10-17T23:36:16.682Z",
+    "level": "allow",
+    "text": "extension connected"
+  },
+  {
+    "at": "2026-10-17T23:36:17.061Z",
+    "level": "allow",
+    "text": "health service=bridge state=ok"
+  },
+  {
+    "at": "2026-10-17T23:36:20.562Z",
+    "level": null,
+    "text": "link click verdict=clean domain=127.0.0.1 score=25 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:20.610Z",
+    "level": null,
+    "text": "download received scan=6823982e-d5c6-44eb-b676-b6b89eea1e5e name=aegis-terminal-demo.command size=524 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-17T23:36:20.610Z",
+    "level": null,
+    "text": "precheck scan=6823982e-d5c6-44eb-b676-b6b89eea1e5e type=script sha256=a332c59fa476 cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-17T23:36:21.645Z",
+    "level": "allow",
+    "text": "sandbox upload scan=6823982e-d5c6-44eb-b676-b6b89eea1e5e sandbox=213c8a0b-83a2-4266-83ce-9104bcb3491e network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:21.794Z",
+    "level": null,
+    "text": "sandbox deleted scan=6823982e-d5c6-44eb-b676-b6b89eea1e5e sandbox=213c8a0b-83a2-4266-83ce-9104bcb3491e"
+  },
+  {
+    "at": "2026-10-17T23:36:21.800Z",
+    "level": "warn",
+    "text": "download held scan=6823982e-d5c6-44eb-b676-b6b89eea1e5e verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/6823982e-d5c6-44eb-b676-b6b89eea1e5e/aegis-terminal-demo.command.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:21.827Z",
+    "level": null,
+    "text": "link click verdict=clean domain=127.0.0.1 score=10 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:21.848Z",
+    "level": null,
+    "text": "download received scan=42fc1b71-6516-400c-8250-2dd16fac56ef name=statement.pdf size=64 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-17T23:36:21.848Z",
+    "level": null,
+    "text": "precheck scan=42fc1b71-6516-400c-8250-2dd16fac56ef type=pdf sha256=9aa88369067c cloud=false why=\"document with no macros, embedded objects or actions\""
+  },
+  {
+    "at": "2026-10-17T23:36:21.857Z",
+    "level": "allow",
+    "text": "download delivered scan=42fc1b71-6516-400c-8250-2dd16fac56ef verdict=clean path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/Downloads/statement.pdf"
+  },
+  {
+    "at": "2026-10-17T23:36:22.088Z",
+    "level": null,
+    "text": "link click verdict=clean domain=127.0.0.1 score=10 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:22.113Z",
+    "level": null,
+    "text": "download received scan=8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f name=photo.jpg size=4096 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-17T23:36:22.114Z",
+    "level": "block",
+    "text": "precheck scan=8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f type=macho sha256=60099fe38a04 cloud=true why=\".jpg file that is really a program\""
+  },
+  {
+    "at": "2026-10-17T23:36:23.389Z",
+    "level": "allow",
+    "text": "sandbox upload scan=8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f sandbox=c766a4f7-844c-417a-bf64-b021951264f3 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:23.533Z",
+    "level": null,
+    "text": "sandbox deleted scan=8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f sandbox=c766a4f7-844c-417a-bf64-b021951264f3"
+  },
+  {
+    "at": "2026-10-17T23:36:23.539Z",
+    "level": "block",
+    "text": "download quarantined scan=8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f verdict=malicious path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/8a44cb34-bae2-4d98-9f1b-7bdc31c9c96f/photo.jpg.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:23.603Z",
+    "level": null,
+    "text": "link click verdict=clean domain=127.0.0.1 score=25 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:23.629Z",
+    "level": null,
+    "text": "download received scan=ef8f6bb9-1b45-45e2-b473-4740b994e76f name=report.sh size=25 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-17T23:36:23.629Z",
+    "level": null,
+    "text": "precheck scan=ef8f6bb9-1b45-45e2-b473-4740b994e76f type=script sha256=0c8a5649874c cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-17T23:36:25.610Z",
+    "level": "allow",
+    "text": "sandbox upload scan=ef8f6bb9-1b45-45e2-b473-4740b994e76f sandbox=c3417223-3709-4139-b65e-a1c4077cb7f9 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:25.893Z",
+    "level": null,
+    "text": "sandbox deleted scan=ef8f6bb9-1b45-45e2-b473-4740b994e76f sandbox=c3417223-3709-4139-b65e-a1c4077cb7f9"
+  },
+  {
+    "at": "2026-10-17T23:36:25.901Z",
+    "level": "warn",
+    "text": "download held scan=ef8f6bb9-1b45-45e2-b473-4740b994e76f verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/ef8f6bb9-1b45-45e2-b473-4740b994e76f/report.sh.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:26.130Z",
+    "level": null,
+    "text": "link click verdict=clean domain=- score=15 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:26.157Z",
+    "level": null,
+    "text": "download received scan=1a80f303-4c66-4121-b7ab-8946295e49e7 name=hello.sh size=24 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-17T23:36:26.157Z",
+    "level": null,
+    "text": "precheck scan=1a80f303-4c66-4121-b7ab-8946295e49e7 type=script sha256=c58a9ff1548e cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-17T23:36:28.851Z",
+    "level": "allow",
+    "text": "sandbox upload scan=1a80f303-4c66-4121-b7ab-8946295e49e7 sandbox=c8e1c713-63c2-4283-ac3e-c185d7d81578 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:28.975Z",
+    "level": null,
+    "text": "sandbox deleted scan=1a80f303-4c66-4121-b7ab-8946295e49e7 sandbox=c8e1c713-63c2-4283-ac3e-c185d7d81578"
+  },
+  {
+    "at": "2026-10-17T23:36:28.979Z",
+    "level": "warn",
+    "text": "download held scan=1a80f303-4c66-4121-b7ab-8946295e49e7 verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/1a80f303-4c66-4121-b7ab-8946295e49e7/hello.sh.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:29.160Z",
+    "level": null,
+    "text": "link click verdict=clean domain=127.0.0.1 score=10 action=allowed"
+  },
+  {
+    "at": "2026-10-17T23:36:29.674Z",
+    "level": "warn",
+    "text": "download quarantined scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd name=invoice.pdf from=chrome"
+  },
+  {
+    "at": "2026-10-17T23:36:29.677Z",
+    "level": null,
+    "text": "download received scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd name=invoice.pdf size=80 from=chrome"
+  },
+  {
+    "at": "2026-10-17T23:36:29.677Z",
+    "level": null,
+    "text": "precheck scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd type=html sha256=b8024ef7da45 cloud=true why=\"pdf (html)\""
+  },
+  {
+    "at": "2026-10-17T23:36:31.849Z",
+    "level": "allow",
+    "text": "sandbox upload scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd sandbox=eebaad37-e1c5-4444-ac71-b10524636c7c network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:32.017Z",
+    "level": null,
+    "text": "sandbox deleted scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd sandbox=eebaad37-e1c5-4444-ac71-b10524636c7c"
+  },
+  {
+    "at": "2026-10-17T23:36:32.020Z",
+    "level": "warn",
+    "text": "download held scan=ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/ca0bbab3-15ea-4b9d-9a13-ba3e1c1f9fcd/invoice.pdf.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:32.277Z",
+    "level": "warn",
+    "text": "download quarantined scan=e22f807b-e230-4d32-b201-c8bac82ba190 name=notes.sh from=chrome"
+  },
+  {
+    "at": "2026-10-17T23:36:32.279Z",
+    "level": null,
+    "text": "download received scan=e22f807b-e230-4d32-b201-c8bac82ba190 name=notes.sh size=24 from=chrome"
+  },
+  {
+    "at": "2026-10-17T23:36:32.280Z",
+    "level": null,
+    "text": "precheck scan=e22f807b-e230-4d32-b201-c8bac82ba190 type=script sha256=930fb6b78503 cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-17T23:36:38.366Z",
+    "level": "allow",
+    "text": "sandbox upload scan=e22f807b-e230-4d32-b201-c8bac82ba190 sandbox=de83eb5d-a77f-4365-b575-84a4a254c413 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:38.566Z",
+    "level": null,
+    "text": "sandbox deleted scan=e22f807b-e230-4d32-b201-c8bac82ba190 sandbox=de83eb5d-a77f-4365-b575-84a4a254c413"
+  },
+  {
+    "at": "2026-10-17T23:36:38.570Z",
+    "level": "warn",
+    "text": "download held scan=e22f807b-e230-4d32-b201-c8bac82ba190 verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/e22f807b-e230-4d32-b201-c8bac82ba190/notes.sh.aegis"
+  },
+  {
+    "at": "2026-10-17T23:36:40.964Z",
+    "level": "warn",
+    "text": "watcher found name=airdrop-tool.command reason=\"script\""
+  },
+  {
+    "at": "2026-10-17T23:36:40.967Z",
+    "level": "warn",
+    "text": "download quarantined scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 name=airdrop-tool.command from=watcher"
+  },
+  {
+    "at": "2026-10-17T23:36:40.970Z",
+    "level": null,
+    "text": "download received scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 name=airdrop-tool.command size=32 from=watcher"
+  },
+  {
+    "at": "2026-10-17T23:36:40.970Z",
+    "level": null,
+    "text": "precheck scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 type=script sha256=35dd879f78d9 cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-17T23:36:42.755Z",
+    "level": "allow",
+    "text": "sandbox upload scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 sandbox=ac02d86b-ccd6-40fa-801d-9de283871a83 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-17T23:36:42.909Z",
+    "level": null,
+    "text": "sandbox deleted scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 sandbox=ac02d86b-ccd6-40fa-801d-9de283871a83"
+  },
+  {
+    "at": "2026-10-17T23:36:42.914Z",
+    "level": "warn",
+    "text": "download held scan=f57a4318-74d9-4029-a2ea-dc8dedfb6151 verdict=unknown path=/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/f57a4318-74d9-4029-a2ea-dc8dedfb6151/airdrop-tool.command.aegis"
+  }
+]

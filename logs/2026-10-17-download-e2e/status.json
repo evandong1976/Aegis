@@ -1,0 +1,110 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "Listening on 127.0.0.1:47398; extension seen 56 s ago."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "API reachable and the key works. The live test runs at start and on Check now.",
+      "latencyMs": 129
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); Docker not running, so no local image."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "down",
+      "detail": "Docker is not running. It is only the fallback when Daytona is down."
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "unconfigured",
+      "detail": "FACTORY_API_KEY not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "pending",
+      "detail": "Key set. The live Photon check arrives with milestone 5."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "pending",
+      "detail": "Key set. The live Chalk check arrives with milestone 6."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "Test URL matched as expected.",
+      "latencyMs": 76
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-17T23:37:13.213Z",
+      "state": "ok",
+      "detail": "Tap fn to open and close the panel."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": "2026-10-17T23:36:16.682Z",
+  "demo": false,
+  "page": {
+    "url": "http://127.0.0.1:8766/",
+    "counts": {
+      "clean": 6,
+      "unknown": 0,
+      "suspicious": 0,
+      "malicious": 0
+    },
+    "top": null
+  }
+}

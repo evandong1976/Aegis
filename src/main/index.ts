@@ -31,6 +31,9 @@ import { scriptedAgent } from './liveAgent'
 import { startSandboxScan, type SandboxScanInput } from './sandboxScan'
 import type { SandboxClient } from './daytona'
 import { FAKE_INSTALLER } from './testSamples'
+import { ScanService } from './scans'
+import { createQuarantine } from './quarantine'
+import { createDeliveredLedger, startWatcher, type Watcher } from './watcher'
 
 /** The threat feeds are downloaded again this often (MEGA_PROMPT §5.2: cached for an hour). */
 const FEED_REFRESH_MS = 60 * 60 * 1000
@@ -45,6 +48,26 @@ if (!app.requestSingleInstanceLock()) app.quit()
 let store: Store | null = null
 let bridge: Server | null = null
 let links: LinkService | null = null
+let scans: ScanService | null = null
+let watcher: Watcher | null = null
+let daytona: SandboxClient | null = null
+
+/** Daytona's client, made on first use; null without DAYTONA_API_KEY. */
+async function sandboxClient(): Promise<SandboxClient | null> {
+  if (!config.has('DAYTONA_API_KEY')) return null
+  if (!daytona) {
+    const { Daytona } = await import('@daytona/sdk')
+    daytona = new Daytona() as unknown as SandboxClient
+  }
+  return daytona
+}
+
+/** Where downloads land. AEGIS_DOWNLOADS_DIR points tests and verification runs elsewhere. */
+function downloadsDir(): string {
+  return process.env.AEGIS_DOWNLOADS_DIR
+    ? resolve(process.env.AEGIS_DOWNLOADS_DIR)
+    : app.getPath('downloads')
+}
 
 // Health refreshes run one at a time, so each compares against the previous result. (Startup and
 // the extension's first ping used to overlap and log every service twice.)
@@ -196,6 +219,53 @@ app.whenReady().then(async () => {
     }
   })
   // Feeds load in the background; until they arrive the feed check reports "skipped".
+  // Downloads (milestone 3): the extension's in-memory bytes and files found in ~/Downloads both
+  // go through ScanService. Held files live in the app's own quarantine, never in ~/Downloads.
+  const ledger = createDeliveredLedger()
+  scans = new ScanService({
+    putScan: (report, extra) => {
+      store?.putScan(report, extra)
+      send('scans:changed', { id: report.id })
+    },
+    quarantine: createQuarantine(join(app.getPath('userData'), 'quarantine')),
+    downloadsDir: downloadsDir(),
+    ledger,
+    sandboxClient,
+    snapshot: process.env.AEGIS_DAYTONA_SNAPSHOT || undefined,
+    mode: () => status.mode,
+    takeSandboxJob: () => store?.takeSandboxJob(getSettings(store).sandboxDailyBudget) ?? false,
+    concurrency: config.sandboxConcurrency,
+    log: (level, text) => status.record(level, text),
+    onActive: (count) => {
+      status.activeScans = count
+      status.changed()
+      if (count > 0 && store && getSettings(store).panelAutoPop) showPanel()
+    }
+  })
+  if (getSettings(store).watchDownloads && !status.demo) {
+    // Files that arrived while Aegis was closed are picked up too (MEGA_PROMPT §5.1).
+    const lastSeen = Number(store.getSetting('watcherSeenAt') ?? NaN)
+    const markSeen = (): void => store?.setSetting('watcherSeenAt', String(Date.now()))
+    watcher = startWatcher({
+      dir: downloadsDir(),
+      delivered: ledger,
+      since: Number.isFinite(lastSeen) ? lastSeen : undefined,
+      onFile: async (file) => {
+        if (status.isPaused()) return
+        if (!file.needsScan) {
+          status.record(null, `watcher skip name=${file.name} reason="${file.reason}"`)
+          return
+        }
+        status.record('warn', `watcher found name=${file.name} reason="${file.reason}"`)
+        await scans?.fromPath({ path: file.path, source: 'watcher' })
+      },
+      onError: (err) => status.record('warn', `watcher error=${String(err)}`)
+    })
+    markSeen()
+    setInterval(markSeen, HEALTH_INTERVAL_MS)
+    status.record(null, `watcher started dir=${downloadsDir()}`)
+  }
+
   const feedLog = (text: string, ok: boolean): void => status.record(ok ? null : 'warn', text)
   void refreshFeeds(feedLog)
   setInterval(() => void refreshFeeds(feedLog), FEED_REFRESH_MS)
@@ -224,7 +294,17 @@ app.whenReady().then(async () => {
         status.record(null, `trust domain=${domain}`)
         send('scans:changed', { id: '' })
         return domain
-      }
+      },
+      download: (bytes, meta) => scans!.fromChrome(bytes, meta),
+      downloadQuarantined: (req) =>
+        scans!.fromPath({
+          path: req.path,
+          source: 'chrome',
+          url: req.url,
+          referrer: req.referrer,
+          filename: req.filename
+        }),
+      scanStatus: (id) => scans?.status(id) ?? null
     })
     status.record(null, `bridge listening host=127.0.0.1 port=${config.bridgePort}`)
   } catch (err) {
@@ -267,9 +347,8 @@ app.whenReady().then(async () => {
   if (process.env.AEGIS_CAPTURE_DIR) {
     // AEGIS_CAPTURE_SCAN picks the scan the report route opens, by file name or URL.
     const pick = process.env.AEGIS_CAPTURE_SCAN
-    const reportId = pick
-      ? store.listScans({ kind: 'any', search: pick, limit: 1 })[0]?.id
-      : undefined
+    const reportId = (): string | undefined =>
+      pick ? store?.listScans({ kind: 'any', search: pick, limit: 1 })[0]?.id : undefined
     openMainWindow('overview')
     showPanel()
     const sample = process.env.AEGIS_CAPTURE_LIVE as LiveSampleKey | undefined
@@ -293,6 +372,8 @@ app.on('before-quit', () => {
   setQuitting()
   globalShortcut.unregisterAll()
   stopFnKey()
+  watcher?.stop()
+  if (watcher) store?.setSetting('watcherSeenAt', String(Date.now()))
   bridge?.close()
   store?.close()
 })

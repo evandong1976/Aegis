@@ -109,6 +109,15 @@ describe('store', () => {
     store.close()
   })
 
+  it('updates what the pre-check learned on a scan saved before it', () => {
+    const store = openStore(':memory:')
+    const s = scan({ fileKind: null, size: null })
+    store.putScan(s)
+    store.putScan({ ...s, fileKind: 'Script', size: 524 }, { fileCategory: 'Script' })
+    expect(store.getScan(s.id)).toMatchObject({ fileKind: 'Script', size: 524 })
+    store.close()
+  })
+
   it('filters by tab and search', () => {
     const store = openStore(':memory:')
     store.putScan(scan({ filename: 'held.pkg', action: 'held' }))

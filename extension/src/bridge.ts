@@ -4,12 +4,20 @@
 import { BRIDGE_HOST, DEFAULT_BRIDGE_PORT } from '@shared/constants'
 import {
   BRIDGE_ROUTES,
+  DOWNLOAD_META_HEADER,
+  DownloadResponseSchema,
   PageResponseSchema,
+  QuarantinedResponseSchema,
+  ScanStatusResponseSchema,
   StatusResponseSchema,
+  encodeDownloadMeta,
   type ClickRequest,
+  type DownloadMeta,
   type PageRequest,
   type PageResponse,
   type PingRequest,
+  type QuarantinedRequest,
+  type ScanStatusResponse,
   type StatusResponse
 } from '@shared/bridge'
 
@@ -80,4 +88,54 @@ export async function postClick(req: ClickRequest): Promise<boolean> {
 
 export async function postTrust(domain: string): Promise<boolean> {
   return (await post(BRIDGE_ROUTES.trust.path, { domain }, 3000)) !== null
+}
+
+export type DownloadPost = { scanId: string } | { tooLarge: true } | null
+
+/** Hands a download's in-memory bytes to the app. null when the app isn't reachable. */
+export async function postDownload(bytes: Blob, meta: DownloadMeta): Promise<DownloadPost> {
+  try {
+    const res = await fetch(BASE + BRIDGE_ROUTES.download.path, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/octet-stream',
+        [DOWNLOAD_META_HEADER]: encodeDownloadMeta(meta)
+      },
+      body: bytes,
+      signal: AbortSignal.timeout(120_000)
+    })
+    if (res.status === 413) return { tooLarge: true }
+    if (!res.ok) return null
+    return DownloadResponseSchema.parse(await res.json())
+  } catch {
+    return null
+  }
+}
+
+/**
+ * A download Chrome wrote to disk (the fallback, or it finished before the cancel landed).
+ * Returns the scan ID, null if the app took nothing, undefined if the app isn't reachable.
+ */
+export async function postQuarantined(req: QuarantinedRequest): Promise<string | null | undefined> {
+  const res = await post(BRIDGE_ROUTES.downloadQuarantined.path, req, 10_000)
+  if (!res) return undefined
+  try {
+    return QuarantinedResponseSchema.parse(await res.json()).scanId
+  } catch {
+    return undefined
+  }
+}
+
+export async function fetchScan(scanId: string): Promise<ScanStatusResponse | null> {
+  const res = await post(
+    BRIDGE_ROUTES.scan.path.replace(':id', encodeURIComponent(scanId)),
+    {},
+    3000
+  )
+  if (!res) return null
+  try {
+    return ScanStatusResponseSchema.parse(await res.json())
+  } catch {
+    return null
+  }
 }

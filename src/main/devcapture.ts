@@ -2,7 +2,8 @@
 // AEGIS_CAPTURE_ROUTES, comma-separated) and of the panel, so a headless session can check the UI
 // against the Figma references. At the end it also writes status.json (live status, including every
 // health check) and log.json (the scan log), as evidence for scripts/verify.sh. Does nothing
-// otherwise.
+// otherwise. AEGIS_CAPTURE_DELAY_MS (default 5000) holds the capture back, so an end-to-end run
+// can drive the app first and capture what it did.
 
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
@@ -22,7 +23,8 @@ async function save(dir: string, name: string, win: BrowserWindow | null): Promi
 export function scheduleCapture(opts: {
   main: () => BrowserWindow | null
   panel: () => BrowserWindow | null
-  reportId?: string
+  /** Looked up when the report is captured, so it can be a scan made after launch. */
+  reportId?: () => string | undefined
   /** With AEGIS_CAPTURE_LIVE: starts a test run through a real sandbox (uses Daytona credits). */
   live?: {
     start: () => Promise<{ scanId: string } | { error: string }>
@@ -39,12 +41,12 @@ export function scheduleCapture(opts: {
     })
   }
   void (async () => {
-    await wait(5000)
+    await wait(Number(process.env.AEGIS_CAPTURE_DELAY_MS) || 5000)
     await save(dir, 'panel', opts.panel())
     for (const route of routes) {
       opts.main()?.webContents.send('navigate', {
         route,
-        scanId: route === 'report' ? opts.reportId : undefined
+        scanId: route === 'report' ? opts.reportId?.() : undefined
       })
       await wait(1200)
       await save(dir, route, opts.main())
