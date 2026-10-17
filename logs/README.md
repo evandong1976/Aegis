@@ -8,7 +8,6 @@ report (`screens/*/status.json`, `log.json`) and screenshots of every screen. Ea
 | Run                                           | Commit    | Result                                            |
 | --------------------------------------------- | --------- | ------------------------------------------------- |
 | [2026-10-16-2339](2026-10-16-2339/SUMMARY.md) | `35cba97` | All 16 checks as expected; 3 small UI issues open |
-| [2026-10-17-0043-sandbox-image](2026-10-17-0043-sandbox-image/SUMMARY.md) | branch `sandbox-image` | Targeted check (not `pnpm verify`): image builds; self-test 7 / 7, plain and hardened |
 
 To add a run:
 

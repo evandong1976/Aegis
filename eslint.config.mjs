@@ -9,7 +9,6 @@ export default defineConfig(
   {
     ignores: [
       '**/node_modules',
-      '**/.venv',
       '**/dist',
       '**/out',
       'design-system/**',

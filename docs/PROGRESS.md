@@ -9,37 +9,15 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Daytona is on Tier 3** (Zach, 15:24; PLAN.md decision 28), checked live with a key from the
-  Tier 3 org: a sandbox with no network setting now has the **whole internet**; allow-lists and
-  changing the network after creation are accepted; `networkBlockAll` at creation still blocks
-  everything. Evidence `logs/2026-10-17-1524-daytona-tier3-newkey/` (the earlier key, 15:17, was
-  still Tier 1/2: `logs/2026-10-17-1517-daytona-tier3/`). `pnpm try:sandbox` passes on Tier 3,
-  7/7, 0 sandboxes left (`logs/2026-10-17-1526-sandbox-run/`). Every Aegis sandbox that holds a
-  sample or runs a check already sets `networkBlockAll` at creation. **Decisions 19 (Droid on
-  the Mac) and 20 (no detonation) stand**; Tier 3 makes both alternatives possible, for the team
-  to decide (PLAN.md › Open questions). The new key is in `.env`, not `.env.local`.
-
-- **In progress — branch `feature/sandbox` (Zach), not merged:** a shell file goes into a Daytona
-  sandbox and runs there, never on the Mac.
-  - Based on `main` with `sandbox-image` merged in.
-  - `src/main/daytona.ts` (+ 12 tests): network off at creation, SHA-256 verification, bounded
-    execution, network probes, execution logging, and guaranteed cleanup.
-  - `pnpm try:sandbox` tests a harmless simulated malicious script in an isolated sandbox.
-  - Verified in Docker and live on Daytona, including blocked network probes and zero leaked
-    sandboxes. See the detailed logs under `logs/`.
-  - Network checks improved from 36.2 s to 8.1 s.
-  - **Next on this branch:** merge into `main`.
-
-- **Just finished — branch `extension-status`, merged into `main` (not pushed):**
-  the milestone-1 Chrome check found that the app said Connected but the extension's badge and
-  popup stayed on "Not connected". Chrome leaves `Origin` off an extension's GET requests, so
-  the bridge answered `GET /status` with 403. `/status` and `/scan/:id` are now POST (decision
-  28), and the popup re-reads status every 3 s while open. Verified in headless Chrome 155:
-  requests return 200, popup shows "Protected / Connected", badge clears, and invalid origins
-  and Host rebinding remain blocked. `pnpm verify` smoke checks are updated to POST.
-
+- **Just finished — branch `extension-status`, merged into `main` (not pushed):** the milestone-1 Chrome check
+  found that the app said Connected but the extension's badge and popup stayed on "Not
+  connected". Chrome leaves `Origin` off an extension's GET requests, so the bridge answered
+  `GET /status` with 403 (only `POST /ping` passed). `/status` and `/scan/:id` are now POST
+  (decision 28), and the popup re-reads the status every 3 s while open. Checked in a headless
+  Chrome 155 with the built extension against the new bridge code: every request 200, popup
+  "Protected / Connected", badge cleared; no Origin, other origins and rebinding Hosts still 403,
+  GET 404. `pnpm verify`'s smoke checks are updated to POST.
 - **Earlier — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
-  ...
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
     free lookups every 60 s, a tiny live test at start and on Check now. Zach tested it against
@@ -284,14 +262,9 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
 | `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
 | `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
-| `feature/sandbox` live runs, 12:30          | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)     |
-| `feature/sandbox` faster check, 12:39       | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)     |
-| Tier 3 probes + `try:sandbox`, 15:17–15:27  | 0 (`logs/2026-10-17-1526-sandbox-run/leak-check.txt`)     |
 
 ## Decisions log
 
-- 2026-10-17 15:30: Daytona Tier 3 checked live and recorded (PLAN.md decision 28): analysis
-  sandboxes stay network-off from creation; decisions 19 and 20 stand, open to revisit.
 - 2026-10-17 11:50: `sponsor-check-sync` and `droid-tool-lockdown` merged into `main`; `main`
   pushed to `origin`.
 - 2026-10-17 11:45: `sponsor-check-sync`: Zach's live sponsor checks (decision 27, was his 19),
@@ -331,10 +304,6 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
   haven't run yet (no keys). New optional env vars: `AEGIS_DAYTONA_SNAPSHOT`, `DROID_PATH`,
   `DAYTONA_API_URL` / `DAYTONA_TARGET`. Open choice for Worker A: Droid inside the sandbox (A) or
   connected to it through MCP tools (B).
-- 2026-10-17 00:45: `sandbox-image`: `sandbox/Dockerfile` (Python 3.12.14 pinned by digest; capa 9.4.0
-  with matching rules checked by SHA-256; Playwright 1.63.0 Chromium; every version at least two
-  weeks old), `selftest.py` and `sandbox/README.md`. The image holds tools only: the scripts come
-  with M3 and M7, and the `demo/` test files are Zach's to write by hand.
 - 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
   `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
   prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and
