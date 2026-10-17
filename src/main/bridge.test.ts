@@ -47,14 +47,20 @@ describe('bridge server', () => {
   const url = (path: string): string => `http://127.0.0.1:${port}${path}`
 
   it('rejects requests without our Origin', async () => {
-    const res = await fetch(url('/status'))
+    const res = await fetch(url('/status'), { method: 'POST' })
     expect(res.status).toBe(403)
-    const other = await fetch(url('/status'), { headers: { origin: 'https://evil.example' } })
+    const other = await fetch(url('/status'), {
+      method: 'POST',
+      headers: { origin: 'https://evil.example' }
+    })
     expect(other.status).toBe(403)
   })
 
   it('serves /status to the extension', async () => {
-    const res = await fetch(url('/status'), { headers: { origin: EXTENSION_ORIGIN } })
+    const res = await fetch(url('/status'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN }
+    })
     expect(res.status).toBe(200)
     expect(res.headers.get('access-control-allow-origin')).toBe(EXTENSION_ORIGIN)
     expect(await res.json()).toMatchObject({ app: 'aegis', protection: 'protected' })

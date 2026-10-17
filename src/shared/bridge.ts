@@ -1,17 +1,18 @@
 // The HTTP contract between the Chrome extension and the app's bridge (127.0.0.1 only).
-// Every request must carry `Origin: chrome-extension://<EXTENSION_ID>`.
+// Every request must carry `Origin: chrome-extension://<EXTENSION_ID>`. Every route is POST, reads
+// included: Chrome leaves Origin off an extension's GET requests to hosts it has permission for.
 
 import { z } from 'zod'
 import { LinkVerdictSchema, ScamTextResultSchema, ScanStatusSchema, VerdictSchema } from './types'
 
 export const BRIDGE_ROUTES = {
-  status: { method: 'GET', path: '/status' },
+  status: { method: 'POST', path: '/status' },
   ping: { method: 'POST', path: '/ping' },
   page: { method: 'POST', path: '/page' },
   download: { method: 'POST', path: '/download' },
   downloadQuarantined: { method: 'POST', path: '/download/quarantined' },
   inspect: { method: 'POST', path: '/inspect' },
-  scan: { method: 'GET', path: '/scan/:id' },
+  scan: { method: 'POST', path: '/scan/:id' },
   trust: { method: 'POST', path: '/trust' }
 } as const
 
@@ -24,7 +25,7 @@ export const BridgeErrorSchema = z.object({
 })
 export type BridgeError = z.infer<typeof BridgeErrorSchema>
 
-// GET /status
+// POST /status
 export const StatusResponseSchema = z.object({
   app: z.literal('aegis'),
   version: z.string(),
@@ -100,7 +101,7 @@ export const InspectRequestSchema = z.object({
 export type InspectRequest = z.infer<typeof InspectRequestSchema>
 export const InspectResponseSchema = z.object({ scanId: z.string() })
 
-// GET /scan/:id
+// POST /scan/:id
 export const ScanStatusResponseSchema = z.object({
   scanId: z.string(),
   status: ScanStatusSchema,

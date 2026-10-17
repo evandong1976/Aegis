@@ -76,7 +76,7 @@ export function handleRequest(deps: BridgeDeps) {
     const route = `${req.method} ${path}`
 
     try {
-      if (route === `GET ${BRIDGE_ROUTES.status.path}`) {
+      if (route === `POST ${BRIDGE_ROUTES.status.path}`) {
         const body: StatusResponse = { app: 'aegis', version: deps.version, ...deps.getStatus() }
         send(res, 200, body)
         return
@@ -102,7 +102,7 @@ export function handleRequest(deps: BridgeDeps) {
       ]
       if (
         pending.some((r) => route === `${r.method} ${r.path}`) ||
-        /^GET \/scan\/[^/]+$/.test(route)
+        /^POST \/scan\/[^/]+$/.test(route)
       ) {
         fail(res, 501, `${route} is not implemented yet`, true)
         return
