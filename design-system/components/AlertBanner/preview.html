@@ -17,15 +17,15 @@
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     h('div', {className:'col'},
-      h(A.AlertBanner, {tone:'critical', title:'Active intrusion on auth-gateway-01',
-        action:h(A.Button,{variant:'danger',size:'sm'},'Isolate')},
-        'Repeated failed logins from 185.220.101.44 followed by one success at 14:02.'),
-      h(A.AlertBanner, {tone:'warning', title:'27 endpoints missing the October patch'},
-        'Rollout stalled on hosts that have not checked in for 6 days.'),
-      h(A.AlertBanner, {tone:'info', title:'Scheduled scan starts at 02:00 UTC'},
-        'Agents will report elevated CPU for roughly twenty minutes.'),
-      h(A.AlertBanner, {tone:'success', title:'All critical findings resolved'},
-        'The last of this cycle closed 40 minutes ago.')
+      h(A.AlertBanner, {tone:'critical', title:'Phishing campaign targeting 14 people',
+        action:h(A.Button,{variant:'danger',size:'sm'},'Block domain')},
+        'Fourteen mails since 13:40 carry links to login-northwlnd-io.sbs, registered two days ago.'),
+      h(A.AlertBanner, {tone:'warning', title:'Chat links are only scanned in one of three workspaces'},
+        'Links shared in the other two reach people unscanned.'),
+      h(A.AlertBanner, {tone:'info', title:'Sandbox maintenance at 02:00 UTC'},
+        'Archives are delivered without detonation for roughly twenty minutes.'),
+      h(A.AlertBanner, {tone:'success', title:'Nothing is waiting for review'},
+        'The last held link was released 40 minutes ago.')
     ));
 
 </script>

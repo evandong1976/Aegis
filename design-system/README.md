@@ -1,7 +1,8 @@
-Aegis is the design system for a security operations product: threat monitoring, asset inventory,
-identity posture and incident response. It is built for people reading dense, urgent data on a dark
-screen for hours, so the system spends its brightness carefully — one luminous cyan against deep navy,
-and nothing else that glows.
+Aegis is the design system for a link and download scanner: it checks every URL someone clicks and
+every file they download, returns a verdict, and holds or blocks what looks dangerous. The interface
+is four screens — Overview, Links, Downloads, Settings — read by people watching a queue of verdicts
+on a dark screen for hours, so the system spends its brightness carefully: one luminous cyan against
+deep navy, and nothing else that glows.
 
 The palette comes from a single reference image: deep navy grounds, electric blue circuitry, and one
 cyan highlight where a hand touches the interface. `Night ops` (dark) is the primary theme and the one
@@ -15,17 +16,20 @@ problem that is not one.
 
 - **State what is true, then what to do.** "Active intrusion on auth-gateway-01" before "Isolate host".
   Never lead with the product's activity ("We detected…"): lead with the finding.
-- **Always name the specifics.** Host, IP, rule, time, count. "Repeated failed logins from
-  185.220.101.44 followed by one success at 14:02" is the message; "Suspicious activity detected" is
-  not.
+- **Always name the specifics.** URL, file, user, rule, time, count. "Fourteen mails since 13:40 carry
+  links to login-northwlnd-io.sbs, registered two days ago" is the message; "Suspicious activity
+  detected" is not.
+- **A verdict is one of four words** — Malicious, Suspicious, Unknown, Clean — and they map onto the
+  severity levels `critical`, `high`, `medium` and `secure`. Never invent a fifth, and never show a
+  verdict as a colour alone.
 - **Second person for actions the user takes, no first person for the system.** "Rotate this key", not
   "We recommend that we rotate". The product does not say "I".
 - **Sentence case everywhere** except the `label` style, which is uppercase by rule, and acronyms,
   which keep their case: CVE, MFA, TLS, SOC, IP, CIDR.
 - **No alarm language.** No "URGENT", no exclamation marks, no red where a severity badge already says
   critical. Severity is a field, not a tone of voice.
-- **Empty is good news, and says why.** "No active threats — every detection in this window has been
-  resolved or suppressed. The next sweep runs at 02:00 UTC."
+- **Empty is good news, and says why.** "Nothing held — every link and file in this window came back
+  clean. Verdicts usually land in about a second."
 - **Numbers keep their units and their basis.** "14 min mean time to respond, vs. last week", not "14".
 - **No emoji.** Status is carried by `SeverityBadge` and the icon set.
 
@@ -44,13 +48,13 @@ reference swatches and illustration fills, not UI colors — reach for the seman
 
 **Type.** Sora is the display face, for page titles, card titles and every number that matters
 (`metric-xl`, `metric-md`). Manrope sets all running text, labels and controls. JetBrains Mono sets
-anything a machine produced — IPs, hashes, ports, timestamps in tables, API keys, log lines — and that
-rule is absolute: a hand-typed hostname in body text still goes in `mono`, so values stay scannable in
-a column. The `label` style is the only uppercase text in the system.
+anything a machine produced — URLs, file names, hashes, sizes, timestamps in tables, API keys, log
+lines — and that rule is absolute: a hand-typed URL in body text still goes in `mono`, so values stay
+scannable in a column. The `label` style is the only uppercase text in the system.
 
 **Spacing and layout.** The scale is a 4px grid: `space-1` through `space-16`. Cards pad at `space-6`,
 grids gap at `space-5`, page gutters are `space-8`. Dashboards are bento grids of `Card` and
-`StatTile` on `ground`; the detection list is full width below them. One `Card` per view may carry
+`StatTile` on `ground`; the verdict list is full width below them. One `Card` per view may carry
 `highlight`.
 
 **Borders, shadows and radii.** `border` is decorative — card edges, row dividers. `border-strong`
@@ -71,7 +75,7 @@ both themes; `chart-1` is the hero series. Sparklines inside `StatTile` are shap
 tooltip. A chart never encodes severity by color alone: label the series.
 
 **Motion.** 150ms ease on color and transform, and nothing else. No entrance animation on data, no
-pulsing on a critical badge: a dashboard that moves while being read costs the reader the thing they
+pulsing on a malicious badge: a queue that moves while being read costs the reader the thing they
 were reading.
 
 ## Iconography

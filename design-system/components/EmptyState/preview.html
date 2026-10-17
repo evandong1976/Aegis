@@ -17,9 +17,9 @@
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     h(A.Card, null,
-      h(A.EmptyState, {icon:'radar', title:'No active threats',
-        description:'Every detection in this window has been resolved or suppressed. The next sweep runs at 02:00 UTC.',
-        action:h(A.Button,{variant:'secondary',icon:'scan'},'Run a scan now')})
+      h(A.EmptyState, {icon:'radar', title:'Nothing held',
+        description:'Every link and file in this window came back clean. Verdicts usually land in about a second.',
+        action:h(A.Button,{variant:'secondary',icon:'file-search'},'See today’s verdicts')})
     ));
 
 </script>

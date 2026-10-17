@@ -1,0 +1,1862 @@
+{
+ "$schema": "https://aegis.local/figma-variables.v1.json",
+ "note": "Generated from design-system/tokens.json. tokens.json is the source of truth; regenerate rather than editing this file.",
+ "collections": [
+  {
+   "name": "Aegis Color",
+   "modes": [
+    "Night ops",
+    "Daylight"
+   ],
+   "defaultMode": "Night ops",
+   "variables": [
+    {
+     "name": "navy/950",
+     "codeSyntax": {
+      "WEB": "var(--navy-950)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch, the deepest ground. In UI use the semantic `ground` token.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#04111f",
+       "rgba": {
+        "r": 0.015686,
+        "g": 0.066667,
+        "b": 0.121569,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#04111f",
+       "rgba": {
+        "r": 0.015686,
+        "g": 0.066667,
+        "b": 0.121569,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "navy/900",
+     "codeSyntax": {
+      "WEB": "var(--navy-900)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: dark panel ground.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#05192c",
+       "rgba": {
+        "r": 0.019608,
+        "g": 0.098039,
+        "b": 0.172549,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#05192c",
+       "rgba": {
+        "r": 0.019608,
+        "g": 0.098039,
+        "b": 0.172549,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "navy/800",
+     "codeSyntax": {
+      "WEB": "var(--navy-800)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: raised panels.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0a2a43",
+       "rgba": {
+        "r": 0.039216,
+        "g": 0.164706,
+        "b": 0.262745,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#0a2a43",
+       "rgba": {
+        "r": 0.039216,
+        "g": 0.164706,
+        "b": 0.262745,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "navy/700",
+     "codeSyntax": {
+      "WEB": "var(--navy-700)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: hover and selected panel fills.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#093657",
+       "rgba": {
+        "r": 0.035294,
+        "g": 0.211765,
+        "b": 0.341176,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#093657",
+       "rgba": {
+        "r": 0.035294,
+        "g": 0.211765,
+        "b": 0.341176,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "blue/700",
+     "codeSyntax": {
+      "WEB": "var(--blue-700)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: deep blue fills, large blocks.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#084168",
+       "rgba": {
+        "r": 0.031373,
+        "g": 0.254902,
+        "b": 0.407843,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#084168",
+       "rgba": {
+        "r": 0.031373,
+        "g": 0.254902,
+        "b": 0.407843,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "blue/600",
+     "codeSyntax": {
+      "WEB": "var(--blue-600)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: ring and circuit lines on dark grounds, large blocks.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0f5682",
+       "rgba": {
+        "r": 0.058824,
+        "g": 0.337255,
+        "b": 0.509804,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#0f5682",
+       "rgba": {
+        "r": 0.058824,
+        "g": 0.337255,
+        "b": 0.509804,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "blue/500",
+     "codeSyntax": {
+      "WEB": "var(--blue-500)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch: electric blue, the `brand` fill in the dark theme.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#1a74c4",
+       "rgba": {
+        "r": 0.101961,
+        "g": 0.454902,
+        "b": 0.768627,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#1a74c4",
+       "rgba": {
+        "r": 0.101961,
+        "g": 0.454902,
+        "b": 0.768627,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "blue/400",
+     "codeSyntax": {
+      "WEB": "var(--blue-400)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: mid-blue strokes and borders on dark grounds.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#3a7195",
+       "rgba": {
+        "r": 0.227451,
+        "g": 0.443137,
+        "b": 0.584314,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#3a7195",
+       "rgba": {
+        "r": 0.227451,
+        "g": 0.443137,
+        "b": 0.584314,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "blue/300",
+     "codeSyntax": {
+      "WEB": "var(--blue-300)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: soft blue highlights and tints.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#57aad0",
+       "rgba": {
+        "r": 0.341176,
+        "g": 0.666667,
+        "b": 0.815686,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#57aad0",
+       "rgba": {
+        "r": 0.341176,
+        "g": 0.666667,
+        "b": 0.815686,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "cyan/400",
+     "codeSyntax": {
+      "WEB": "var(--cyan-400)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch sampled from the reference image: the luminous cyan, `accent` in the dark theme.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#50e6ff",
+       "rgba": {
+        "r": 0.313725,
+        "g": 0.901961,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#50e6ff",
+       "rgba": {
+        "r": 0.313725,
+        "g": 0.901961,
+        "b": 1.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "cyan/200",
+     "codeSyntax": {
+      "WEB": "var(--cyan-200)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Palette swatch: hover state of cyan, `accent-hover` in the dark theme.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#8bf0ff",
+       "rgba": {
+        "r": 0.545098,
+        "g": 0.941176,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#8bf0ff",
+       "rgba": {
+        "r": 0.545098,
+        "g": 0.941176,
+        "b": 1.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "ground",
+     "codeSyntax": {
+      "WEB": "var(--ground)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Page background behind every card and panel. Text on it: `ink`, `ink-muted`, `ink-subtle`, `accent`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#04111f",
+       "rgba": {
+        "r": 0.015686,
+        "g": 0.066667,
+        "b": 0.121569,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#edf4f9",
+       "rgba": {
+        "r": 0.929412,
+        "g": 0.956863,
+        "b": 0.976471,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "surface",
+     "codeSyntax": {
+      "WEB": "var(--surface)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Default card, table and panel fill. Text on it: `ink`, `ink-muted`, `ink-subtle`, `accent`, status colors.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#071d33",
+       "rgba": {
+        "r": 0.027451,
+        "g": 0.113725,
+        "b": 0.2,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#ffffff",
+       "rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "surface-raised",
+     "codeSyntax": {
+      "WEB": "var(--surface-raised)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Inputs, hovered rows, nested tiles and secondary buttons on `surface`. Same text rules as `surface`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0a2a43",
+       "rgba": {
+        "r": 0.039216,
+        "g": 0.164706,
+        "b": 0.262745,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#f3f8fc",
+       "rgba": {
+        "r": 0.952941,
+        "g": 0.972549,
+        "b": 0.988235,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "surface-overlay",
+     "codeSyntax": {
+      "WEB": "var(--surface-overlay)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Menus, popovers, selected rows and toggle tracks. Text on it: `ink`, `ink-muted`, `accent`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0f3a5c",
+       "rgba": {
+        "r": 0.058824,
+        "g": 0.227451,
+        "b": 0.360784,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#e2edf5",
+       "rgba": {
+        "r": 0.886275,
+        "g": 0.929412,
+        "b": 0.960784,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "border",
+     "codeSyntax": {
+      "WEB": "var(--border)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "STROKE_COLOR"
+     ],
+     "description": "Decorative hairlines: card edges, table row dividers, section rules. Never the only boundary of a control.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#164463",
+       "rgba": {
+        "r": 0.086275,
+        "g": 0.266667,
+        "b": 0.388235,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#c5d8e6",
+       "rgba": {
+        "r": 0.772549,
+        "g": 0.847059,
+        "b": 0.901961,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "border-strong",
+     "codeSyntax": {
+      "WEB": "var(--border-strong)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "STROKE_COLOR"
+     ],
+     "description": "Borders of inputs, secondary buttons and toggles. At least 3:1 on `ground`, `surface` and `surface-raised` in both themes.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#4a82a6",
+       "rgba": {
+        "r": 0.290196,
+        "g": 0.509804,
+        "b": 0.65098,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#5b839f",
+       "rgba": {
+        "r": 0.356863,
+        "g": 0.513725,
+        "b": 0.623529,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "ink",
+     "codeSyntax": {
+      "WEB": "var(--ink)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "TEXT_FILL"
+     ],
+     "description": "Primary text and icons on `ground`, `surface`, `surface-raised` and `surface-overlay`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#e6f3fb",
+       "rgba": {
+        "r": 0.901961,
+        "g": 0.952941,
+        "b": 0.984314,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#05233b",
+       "rgba": {
+        "r": 0.019608,
+        "g": 0.137255,
+        "b": 0.231373,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "ink-muted",
+     "codeSyntax": {
+      "WEB": "var(--ink-muted)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "TEXT_FILL"
+     ],
+     "description": "Secondary text: descriptions, helper text, table cells. On every surface above and on `accent-soft`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#9fbdd1",
+       "rgba": {
+        "r": 0.623529,
+        "g": 0.741176,
+        "b": 0.819608,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#3b5b73",
+       "rgba": {
+        "r": 0.231373,
+        "g": 0.356863,
+        "b": 0.45098,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "ink-subtle",
+     "codeSyntax": {
+      "WEB": "var(--ink-subtle)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "TEXT_FILL"
+     ],
+     "description": "Tertiary text: eyebrow labels, axis labels, timestamps. 4.5:1 on `ground`, `surface`, `surface-raised` and `surface-overlay`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#86a9c0",
+       "rgba": {
+        "r": 0.52549,
+        "g": 0.662745,
+        "b": 0.752941,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#4d6d85",
+       "rgba": {
+        "r": 0.301961,
+        "g": 0.427451,
+        "b": 0.521569,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "accent",
+     "codeSyntax": {
+      "WEB": "var(--accent)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Interactive accent: links, active nav, primary button fill, focus and progress strokes. Text on `ground`, `surface`, `surface-raised`, `surface-overlay`, `accent-soft`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#50e6ff",
+       "rgba": {
+        "r": 0.313725,
+        "g": 0.901961,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#006d91",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.427451,
+        "b": 0.568627,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "accent-hover",
+     "codeSyntax": {
+      "WEB": "var(--accent-hover)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Hover state of `accent` fills and accent links.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#8bf0ff",
+       "rgba": {
+        "r": 0.545098,
+        "g": 0.941176,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#005a7a",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.352941,
+        "b": 0.478431,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "accent-pressed",
+     "codeSyntax": {
+      "WEB": "var(--accent-pressed)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Pressed state of `accent` fills.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#2cc4e0",
+       "rgba": {
+        "r": 0.172549,
+        "g": 0.768627,
+        "b": 0.878431,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#004a66",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.290196,
+        "b": 0.4,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "accent-soft",
+     "codeSyntax": {
+      "WEB": "var(--accent-soft)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Tinted fill behind active nav items, ghost-button hover and accent badges. Text on it: `accent`, `ink`, `ink-muted`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0b3b52",
+       "rgba": {
+        "r": 0.043137,
+        "g": 0.231373,
+        "b": 0.321569,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#d3eef7",
+       "rgba": {
+        "r": 0.827451,
+        "g": 0.933333,
+        "b": 0.968627,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "on-accent",
+     "codeSyntax": {
+      "WEB": "var(--on-accent)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "TEXT_FILL"
+     ],
+     "description": "Text and icons placed on an `accent` fill (primary button). Not white: cyan needs dark text.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#031a2b",
+       "rgba": {
+        "r": 0.011765,
+        "g": 0.101961,
+        "b": 0.168627,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#ffffff",
+       "rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "brand",
+     "codeSyntax": {
+      "WEB": "var(--brand)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Electric-blue fill for large brand surfaces, illustrations and the cover. Text on it: `on-brand`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#1a74c4",
+       "rgba": {
+        "r": 0.101961,
+        "g": 0.454902,
+        "b": 0.768627,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#0b6fb8",
+       "rgba": {
+        "r": 0.043137,
+        "g": 0.435294,
+        "b": 0.721569,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "on-brand",
+     "codeSyntax": {
+      "WEB": "var(--on-brand)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "TEXT_FILL"
+     ],
+     "description": "Text and icons placed on a `brand` fill.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#ffffff",
+       "rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#ffffff",
+       "rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "focus-ring",
+     "codeSyntax": {
+      "WEB": "var(--focus-ring)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "STROKE_COLOR"
+     ],
+     "description": "Two-pixel focus outline on every interactive element. At least 3:1 on `ground`, `surface`, `surface-raised`, `surface-overlay` in both themes.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#50e6ff",
+       "rgba": {
+        "r": 0.313725,
+        "g": 0.901961,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#006d91",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.427451,
+        "b": 0.568627,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "danger",
+     "codeSyntax": {
+      "WEB": "var(--danger)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Critical severity, destructive actions, errors. Text and icons on `surface`, `surface-raised` and `danger-bg`. Always paired with an icon and the word.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#ff6b80",
+       "rgba": {
+        "r": 1.0,
+        "g": 0.419608,
+        "b": 0.501961,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#b8102c",
+       "rgba": {
+        "r": 0.721569,
+        "g": 0.062745,
+        "b": 0.172549,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "danger-bg",
+     "codeSyntax": {
+      "WEB": "var(--danger-bg)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Fill behind critical badges and error alerts. Text on it: `danger`, `ink`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#3a1a2a",
+       "rgba": {
+        "r": 0.227451,
+        "g": 0.101961,
+        "b": 0.164706,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#fde7ea",
+       "rgba": {
+        "r": 0.992157,
+        "g": 0.905882,
+        "b": 0.917647,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "warning",
+     "codeSyntax": {
+      "WEB": "var(--warning)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "High severity, caution. Text and icons on `surface`, `surface-raised` and `warning-bg`. Always paired with an icon and the word.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#ffb547",
+       "rgba": {
+        "r": 1.0,
+        "g": 0.709804,
+        "b": 0.278431,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#8a5300",
+       "rgba": {
+        "r": 0.541176,
+        "g": 0.32549,
+        "b": 0.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "warning-bg",
+     "codeSyntax": {
+      "WEB": "var(--warning-bg)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Fill behind high-severity badges and warning alerts. Text on it: `warning`, `ink`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#38290f",
+       "rgba": {
+        "r": 0.219608,
+        "g": 0.160784,
+        "b": 0.058824,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#fff0d6",
+       "rgba": {
+        "r": 1.0,
+        "g": 0.941176,
+        "b": 0.839216,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "success",
+     "codeSyntax": {
+      "WEB": "var(--success)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Secure, resolved, healthy. A teal, not a pure green, so it separates from `danger` away from the red-green axis. Text on `surface`, `surface-raised` and `success-bg`. Always paired with an icon and the word.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#2fe0b5",
+       "rgba": {
+        "r": 0.184314,
+        "g": 0.878431,
+        "b": 0.709804,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#00674f",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.403922,
+        "b": 0.309804,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "success-bg",
+     "codeSyntax": {
+      "WEB": "var(--success-bg)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Fill behind clear and resolved badges and success alerts. Text on it: `success`, `ink`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#0b3a3a",
+       "rgba": {
+        "r": 0.043137,
+        "g": 0.227451,
+        "b": 0.227451,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#d9f5ee",
+       "rgba": {
+        "r": 0.85098,
+        "g": 0.960784,
+        "b": 0.933333,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "info",
+     "codeSyntax": {
+      "WEB": "var(--info)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Medium severity, neutral notices. Text and icons on `surface`, `surface-raised` and `info-bg`. Always paired with an icon and the word.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#7cb7ff",
+       "rgba": {
+        "r": 0.486275,
+        "g": 0.717647,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#1550b0",
+       "rgba": {
+        "r": 0.082353,
+        "g": 0.313725,
+        "b": 0.690196,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "info-bg",
+     "codeSyntax": {
+      "WEB": "var(--info-bg)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Fill behind medium-severity badges and info alerts. Text on it: `info`, `ink`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#10304f",
+       "rgba": {
+        "r": 0.062745,
+        "g": 0.188235,
+        "b": 0.309804,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#e0ecfb",
+       "rgba": {
+        "r": 0.878431,
+        "g": 0.92549,
+        "b": 0.984314,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "scrim",
+     "codeSyntax": {
+      "WEB": "var(--scrim)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "TEXT_FILL"
+     ],
+     "description": "Backdrop behind modals and drawers.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#020a14cc",
+       "rgba": {
+        "r": 0.007843,
+        "g": 0.039216,
+        "b": 0.078431,
+        "a": 0.8
+       }
+      },
+      "Daylight": {
+       "hex": "#05233b99",
+       "rgba": {
+        "r": 0.019608,
+        "g": 0.137255,
+        "b": 0.231373,
+        "a": 0.6
+       }
+      }
+     }
+    },
+    {
+     "name": "chart/1",
+     "codeSyntax": {
+      "WEB": "var(--chart-1)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "description": "First data series and the hero series. Cyan in dark, deep teal-blue in light. Marks need 3:1 on `surface`.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#50e6ff",
+       "rgba": {
+        "r": 0.313725,
+        "g": 0.901961,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#006d91",
+       "rgba": {
+        "r": 0.0,
+        "g": 0.427451,
+        "b": 0.568627,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "chart/2",
+     "codeSyntax": {
+      "WEB": "var(--chart-2)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "description": "Second data series: amber. Differs from `chart-1` in lightness and hue.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#ffb547",
+       "rgba": {
+        "r": 1.0,
+        "g": 0.709804,
+        "b": 0.278431,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#a85c00",
+       "rgba": {
+        "r": 0.658824,
+        "g": 0.360784,
+        "b": 0.0,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "chart/3",
+     "codeSyntax": {
+      "WEB": "var(--chart-3)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "description": "Third data series: coral red. Use for threat or loss series.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#ff6b80",
+       "rgba": {
+        "r": 1.0,
+        "g": 0.419608,
+        "b": 0.501961,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#b8102c",
+       "rgba": {
+        "r": 0.721569,
+        "g": 0.062745,
+        "b": 0.172549,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "chart/4",
+     "codeSyntax": {
+      "WEB": "var(--chart-4)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "description": "Fourth data series: periwinkle blue.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#8fa8ff",
+       "rgba": {
+        "r": 0.560784,
+        "g": 0.658824,
+        "b": 1.0,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#3c53c8",
+       "rgba": {
+        "r": 0.235294,
+        "g": 0.32549,
+        "b": 0.784314,
+        "a": 1.0
+       }
+      }
+     }
+    },
+    {
+     "name": "chart/5",
+     "codeSyntax": {
+      "WEB": "var(--chart-5)"
+     },
+     "type": "COLOR",
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "description": "Fifth data series: neutral slate, for baselines and totals.",
+     "valuesByMode": {
+      "Night ops": {
+       "hex": "#b7c9d6",
+       "rgba": {
+        "r": 0.717647,
+        "g": 0.788235,
+        "b": 0.839216,
+        "a": 1.0
+       }
+      },
+      "Daylight": {
+       "hex": "#5d7385",
+       "rgba": {
+        "r": 0.364706,
+        "g": 0.45098,
+        "b": 0.521569,
+        "a": 1.0
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Aegis Spacing",
+   "modes": [
+    "Value"
+   ],
+   "variables": [
+    {
+     "name": "space-1",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-1)"
+     },
+     "description": "Icon-to-text hairline gaps.",
+     "value": 4.0
+    },
+    {
+     "name": "space-2",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-2)"
+     },
+     "description": "Gap inside badges and between icon and label.",
+     "value": 8.0
+    },
+    {
+     "name": "space-3",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-3)"
+     },
+     "description": "Gap between controls in a row; compact card padding.",
+     "value": 12.0
+    },
+    {
+     "name": "space-4",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-4)"
+     },
+     "description": "Input padding, gap between stacked fields.",
+     "value": 16.0
+    },
+    {
+     "name": "space-5",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-5)"
+     },
+     "description": "Bento grid gap between cards.",
+     "value": 20.0
+    },
+    {
+     "name": "space-6",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-6)"
+     },
+     "description": "Card padding.",
+     "value": 24.0
+    },
+    {
+     "name": "space-8",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-8)"
+     },
+     "description": "Page padding; gap between sections.",
+     "value": 32.0
+    },
+    {
+     "name": "space-10",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-10)"
+     },
+     "description": "Large section separation.",
+     "value": 40.0
+    },
+    {
+     "name": "space-12",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-12)"
+     },
+     "description": "Hero and empty-state padding.",
+     "value": 48.0
+    },
+    {
+     "name": "space-16",
+     "type": "FLOAT",
+     "scopes": [
+      "GAP",
+      "WIDTH_HEIGHT"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--space-16)"
+     },
+     "description": "Page top and bottom breathing room.",
+     "value": 64.0
+    }
+   ]
+  },
+  {
+   "name": "Aegis Radius",
+   "modes": [
+    "Value"
+   ],
+   "variables": [
+    {
+     "name": "radius-xs",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-xs)"
+     },
+     "description": "Inline code chips and small tags.",
+     "value": 6.0
+    },
+    {
+     "name": "radius-sm",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-sm)"
+     },
+     "description": "Menu items, table row hover, checkboxes.",
+     "value": 10.0
+    },
+    {
+     "name": "radius-md",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-md)"
+     },
+     "description": "Inputs, alerts, nav items.",
+     "value": 14.0
+    },
+    {
+     "name": "radius-lg",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-lg)"
+     },
+     "description": "Cards and tables.",
+     "value": 20.0
+    },
+    {
+     "name": "radius-xl",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-xl)"
+     },
+     "description": "Floating nav rail, modals, hero panels.",
+     "value": 28.0
+    },
+    {
+     "name": "radius-pill",
+     "type": "FLOAT",
+     "scopes": [
+      "CORNER_RADIUS"
+     ],
+     "codeSyntax": {
+      "WEB": "var(--radius-pill)"
+     },
+     "description": "Buttons, badges, toggles.",
+     "value": 999.0
+    }
+   ]
+  }
+ ],
+ "textStyles": [
+  {
+   "name": "Display/display-xl",
+   "figmaTextStyle": "display-xl",
+   "fontFamily": "Sora",
+   "fontSize": 56.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 60.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "-0.03em",
+   "textCase": "ORIGINAL",
+   "usage": "Hero numerals and page titles on marketing and onboarding screens. One per screen."
+  },
+  {
+   "name": "Display/display-lg",
+   "figmaTextStyle": "display-lg",
+   "fontFamily": "Sora",
+   "fontSize": 40.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 46.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "-0.025em",
+   "textCase": "ORIGINAL",
+   "usage": "Section titles on dashboards and report covers."
+  },
+  {
+   "name": "Display/display-md",
+   "figmaTextStyle": "display-md",
+   "fontFamily": "Sora",
+   "fontSize": 30.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 36.0
+   },
+   "fontWeight": 600,
+   "letterSpacing": "-0.02em",
+   "textCase": "ORIGINAL",
+   "usage": "Page headers inside the app."
+  },
+  {
+   "name": "Heading/heading-lg",
+   "figmaTextStyle": "heading-lg",
+   "fontFamily": "Sora",
+   "fontSize": 22.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 28.0
+   },
+   "fontWeight": 600,
+   "letterSpacing": "-0.01em",
+   "textCase": "ORIGINAL",
+   "usage": "Card group titles, modal titles."
+  },
+  {
+   "name": "Heading/heading-md",
+   "figmaTextStyle": "heading-md",
+   "fontFamily": "Sora",
+   "fontSize": 18.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 24.0
+   },
+   "fontWeight": 600,
+   "letterSpacing": "-0.005em",
+   "textCase": "ORIGINAL",
+   "usage": "Card titles."
+  },
+  {
+   "name": "Heading/heading-sm",
+   "figmaTextStyle": "heading-sm",
+   "fontFamily": "Manrope",
+   "fontSize": 15.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 20.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Table group headers, list titles, nav section titles."
+  },
+  {
+   "name": "Text/body-lg",
+   "figmaTextStyle": "body-lg",
+   "fontFamily": "Manrope",
+   "fontSize": 17.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 26.0
+   },
+   "fontWeight": 400,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Lead paragraphs and onboarding copy."
+  },
+  {
+   "name": "Text/body",
+   "figmaTextStyle": "body",
+   "fontFamily": "Manrope",
+   "fontSize": 15.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 22.0
+   },
+   "fontWeight": 400,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Default interface text."
+  },
+  {
+   "name": "Text/body-sm",
+   "figmaTextStyle": "body-sm",
+   "fontFamily": "Manrope",
+   "fontSize": 13.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 19.0
+   },
+   "fontWeight": 500,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Table cells, helper text, dense lists."
+  },
+  {
+   "name": "Text/label",
+   "figmaTextStyle": "label",
+   "fontFamily": "Manrope",
+   "fontSize": 12.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 16.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "0.08em",
+   "textCase": "UPPER",
+   "usage": "Eyebrow labels and table headers. Set in uppercase (the `.ae-label` class does it)."
+  },
+  {
+   "name": "Text/caption",
+   "figmaTextStyle": "caption",
+   "fontFamily": "Manrope",
+   "fontSize": 12.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 16.0
+   },
+   "fontWeight": 500,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Timestamps, chart axis labels, footnotes."
+  },
+  {
+   "name": "Data/metric-xl",
+   "figmaTextStyle": "metric-xl",
+   "fontFamily": "Sora",
+   "fontSize": 48.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 52.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "-0.03em",
+   "textCase": "ORIGINAL",
+   "usage": "The headline number in a stat tile or score ring."
+  },
+  {
+   "name": "Data/metric-md",
+   "figmaTextStyle": "metric-md",
+   "fontFamily": "Sora",
+   "fontSize": 28.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 32.0
+   },
+   "fontWeight": 700,
+   "letterSpacing": "-0.02em",
+   "textCase": "ORIGINAL",
+   "usage": "Secondary numbers in compact tiles."
+  },
+  {
+   "name": "Data/mono",
+   "figmaTextStyle": "mono",
+   "fontFamily": "JetBrains Mono",
+   "fontSize": 13.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 20.0
+   },
+   "fontWeight": 500,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "IP addresses, hashes, log lines, timestamps in tables, API keys."
+  },
+  {
+   "name": "Data/mono-sm",
+   "figmaTextStyle": "mono-sm",
+   "fontFamily": "JetBrains Mono",
+   "fontSize": 12.0,
+   "lineHeight": {
+    "unit": "PIXELS",
+    "value": 18.0
+   },
+   "fontWeight": 500,
+   "letterSpacing": "0",
+   "textCase": "ORIGINAL",
+   "usage": "Inline code and terse log metadata."
+  }
+ ],
+ "effectStyles": [
+  {
+   "name": "glow-sm",
+   "valuesByMode": {
+    "Night ops": "0 0 12px rgba(80,230,255,0.28)",
+    "Daylight": "0 1px 2px rgba(5,35,59,0.14)"
+   },
+   "usage": "Primary buttons and active nav items. A cyan glow in dark, a hairline lift in light."
+  },
+  {
+   "name": "glow-md",
+   "valuesByMode": {
+    "Night ops": "0 0 32px rgba(80,230,255,0.22)",
+    "Daylight": "0 8px 24px rgba(5,35,59,0.12)"
+   },
+   "usage": "The one highlighted card per view and the score ring."
+  },
+  {
+   "name": "elev-card",
+   "valuesByMode": {
+    "Night ops": "0 12px 40px rgba(0,8,20,0.45)",
+    "Daylight": "0 4px 16px rgba(5,35,59,0.08)"
+   },
+   "usage": "Resting elevation of cards and tables."
+  },
+  {
+   "name": "inset-edge",
+   "valuesByMode": {
+    "Night ops": "inset 0 1px 0 rgba(160,220,255,0.10)",
+    "Daylight": "inset 0 1px 0 rgba(255,255,255,0.90)"
+   },
+   "usage": "Top edge light on cards, adds the glass feel."
+  }
+ ],
+ "fonts": [
+  {
+   "family": "Sora",
+   "file": "design-system/fonts/Sora-Variable.woff2",
+   "weights": "100 800"
+  },
+  {
+   "family": "Manrope",
+   "file": "design-system/fonts/Manrope-Variable.woff2",
+   "weights": "200 800"
+  },
+  {
+   "family": "JetBrains Mono",
+   "file": "design-system/fonts/JetBrainsMono-Variable.woff2",
+   "weights": "100 800"
+  }
+ ]
+}

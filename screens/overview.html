@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Overview</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment, V = window.Shell.Verdict;
+
+  var recent = [
+    ['malicious', 'login-northwlnd-io.sbs/sso', 'Mail', 'd.okafor', '14:02:11'],
+    ['malicious', 'invoice_oct.iso', 'Chrome', 'a.silva', '13:58:40'],
+    ['suspicious', 'cdn-assets-delivery.top/pkg.js', 'Chat', 'm.haddad', '13:47:50'],
+    ['suspicious', 'Q3-summary.xlsm', 'Edge', 'r.chen', '13:31:02'],
+    ['clean', 'docs.vendor.com/api/auth', 'Browser', 'd.okafor', '13:12:27']
+  ].map(function (r) {
+    return {verdict: h(V, {verdict: r[0]}), what: r[1], source: r[2], who: r[3], time: r[4]};
+  });
+  var cols = [
+    {key:'verdict', header:'Verdict'}, {key:'what', header:'URL or file', mono:true},
+    {key:'source', header:'Seen in', nowrap:true}, {key:'who', header:'User', nowrap:true},
+    {key:'time', header:'Scanned', align:'right', mono:true}
+  ];
+
+  S.mount(h(S.Shell, {page:'overview', eyebrow:'Overview', title:'What got through today'},
+    h(A.AlertBanner, {tone:'critical', title:'Phishing campaign targeting 14 people',
+      action: h(A.Button, {variant:'danger', size:'sm', icon:'globe'}, 'Block domain')},
+      'Fourteen mails since 13:40 carry links to login-northwlnd-io.sbs, registered two days ago. Two people clicked; both were blocked at the click.'),
+
+    h('div', {className:'grid grid--hero'},
+      h(A.Card, {highlight:true},
+        h('div', {className:'ring-panel'},
+          h(A.ScoreRing, {value:92, label:'Coverage'}),
+          h('p', {className:'muted ring-panel__note'}, 'Share of clicks and downloads that reach a scanner. Chat is the gap.')
+        )),
+      h('div', {className:'grid grid--2'},
+        h(A.StatTile, {label:'Links scanned', value:'24,118', icon:'globe', delta:'9%', direction:'up', intent:'good', caption:'vs. yesterday', points:[12,14,13,18,16,21,19,24]}),
+        h(A.StatTile, {label:'Links blocked', value:'212', icon:'shield-check', delta:'38', direction:'up', intent:'bad', caption:'mostly one campaign'}),
+        h(A.StatTile, {label:'Files scanned', value:'1,840', icon:'file-search', caption:'9 archives detonated'}),
+        h(A.StatTile, {label:'Files quarantined', value:'37', icon:'lock', delta:'6', direction:'up', intent:'bad', caption:'awaiting review', points:[2,3,5,4,6,5,7,9]})
+      )
+    ),
+
+    h('div', {className:'grid grid--split'},
+      h(A.Card, {title:'Latest verdicts', description:'Every link clicked and file downloaded, newest first.',
+        action: h(A.Button, {variant:'ghost', size:'sm', iconEnd:'arrow'}, 'All links')},
+        h(A.ThreatTable, {columns:cols, rows:recent})),
+      h(A.Card, {title:'Where we can see', description:'A click we never see is a click we never scanned.'},
+        h('div', {className:'stack'},
+          h(A.Meter, {label:'Mail links rewritten', value:96, display:'96%', tone:'success'}),
+          h(A.Meter, {label:'Browser extension installed', value:88, display:'88%'}),
+          h(A.Meter, {label:'Downloads intercepted', value:81, display:'81%'}),
+          h(A.Meter, {label:'Chat links scanned', value:41, display:'41%', tone:'warning'})
+        ))
+    ),
+
+    h(A.Card, {title:'Scan log', description:'Raw, as the scanners report it.',
+      action: h(A.Button, {variant:'ghost', size:'sm', iconEnd:'arrow'}, 'Open log')},
+      h(A.LogStream, {lines:[
+        {time:'14:02:11', level:'block', text:'link user=d.okafor url=login-northwlnd-io.sbs/sso verdict=malicious rule=newly-registered+brand-match'},
+        {time:'13:58:40', level:'block', text:'file user=a.silva name=invoice_oct.iso sha256=9c1f…04ab verdict=malicious engine=sandbox'},
+        {time:'13:47:50', level:'warn', text:'link user=m.haddad url=cdn-assets-delivery.top/pkg.js verdict=suspicious reason=obfuscated-js'},
+        {time:'13:31:02', level:'warn', text:'file user=r.chen name=Q3-summary.xlsm verdict=suspicious reason=macro-autoexec'},
+        {time:'13:12:27', level:'allow', text:'link user=d.okafor url=docs.vendor.com/api/auth verdict=clean cached=true'}
+      ]}))
+  ));
+
+})();
+</script>
+</body>
+</html>

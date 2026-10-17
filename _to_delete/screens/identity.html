@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Identity</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment;
+
+  var rows = [
+    ['d.okafor@northwind.io','Security lead','Passkey','secure','2 min ago'],
+    ['svc-backup','Service account','None','critical','4 h ago'],
+    ['m.haddad@northwind.io','Analyst','TOTP','secure','11 min ago'],
+    ['svc-ci-runner','Service account','Key (91 d)','high','27 min ago'],
+    ['a.silva@northwind.io','Contractor','SMS','medium','3 d ago']
+  ].map(function (r) {
+    return {who:r[0], role:r[1], factor:r[2], risk:h(A.SeverityBadge,{level:r[3], subtle:true}), seen:r[4]};
+  });
+  var cols = [
+    {key:'who', header:'Account', nowrap:true}, {key:'role', header:'Role'}, {key:'factor', header:'Second factor', nowrap:true},
+    {key:'risk', header:'Risk'}, {key:'seen', header:'Last seen', align:'right', mono:true}
+  ];
+
+  S.mount(h(S.Shell, {page:'identity', eyebrow:'Identity', title:'Accounts and access'},
+    h(A.AlertBanner, {tone:'warning', title:'Three service accounts are past the 90-day key rotation window',
+      action: h(A.Button, {variant:'secondary', size:'sm', icon:'key'}, 'Rotate keys')},
+      'svc-backup, svc-ci-runner and svc-reporting have keys issued before 18 July.'),
+    h('div', {className:'grid grid--4'},
+      h(A.StatTile, {label:'Accounts', value:'2,104', icon:'users', caption:'214 privileged'}),
+      h(A.StatTile, {label:'MFA enrolment', value:'68', unit:'%', icon:'lock', delta:'4%', direction:'up', intent:'good', caption:'vs. last month'}),
+      h(A.StatTile, {label:'Dormant 90 d+', value:'87', icon:'activity', delta:'12', direction:'up', intent:'bad', caption:'candidates to disable'}),
+      h(A.StatTile, {label:'Keys past rotation', value:'3', icon:'key', caption:'service accounts'})
+    ),
+    h('div', {className:'grid grid--split'},
+      h(A.Card, {title:'Highest-risk accounts', description:'Privileged or unprotected, by last activity.'},
+        h(A.ThreatTable, {columns:cols, rows:rows})),
+      h('div', {className:'stack'},
+        h(A.Card, {title:'Second factor in use'},
+          h('div', {className:'stack'},
+            h(A.Meter, {label:'Passkey', value:41, display:'863', tone:'success'}),
+            h(A.Meter, {label:'TOTP app', value:27, display:'568'}),
+            h(A.Meter, {label:'SMS', value:9, display:'190', tone:'warning'}),
+            h(A.Meter, {label:'None', value:23, display:'483', tone:'danger'})
+          )),
+        h(A.Card, {title:'Privileged access'},
+          h(S.KV, {items:[
+            {k:'Admins', v:'38'},
+            {k:'Break-glass accounts', v:'2'},
+            {k:'Standing access', v:'214'},
+            {k:'Just-in-time grants today', v:'19'}
+          ]}))
+      )
+    )
+  ));
+
+})();
+</script>
+</body>
+</html>

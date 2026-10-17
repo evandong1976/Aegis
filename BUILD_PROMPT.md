@@ -219,12 +219,22 @@ There's no design file, so follow this. Keep it clean and calm; the product is a
 
 ### 5.1 Look
 
-- **Tokens** in `src/renderer/src/assets/main.css` under `@theme`:
-  - background: near-white `#F7F8FA` light, `#0E1116` dark (follow the system appearance)
-  - surface cards: white / `#161B22`, 12 px radius, 1 px hairline border
-  - accent (Aegis): deep blue `#2B59C3`
-  - verdicts: **No threats found** green `#1F9D55`, **Caution** amber `#D98E04`, **Danger** red `#D64545`; always paired with an icon and a word, never colour alone
-  - fonts: Inter for UI, JetBrains Mono for code, bundled via `@fontsource/*`
+- **Tokens** come from the Aegis design system — `design-system/tokens.json` is the source of
+  truth, compiled to `design-system/tokens.css` by `node design-system/build-tokens.mjs`. Import
+  that stylesheet; do not restate hex values in `main.css`. Read `design-system/README.md` before
+  building any UI.
+  - two themes: **Night ops** (dark, the default and the one to design in) and **Daylight**, which
+    follows the system appearance
+  - backgrounds `--ground`, cards `--surface` with `--border` hairlines and `--radius-lg` corners
+  - accent: luminous cyan `--accent`, on deep navy. Text on an accent fill is `--on-accent`, never
+    white
+  - verdicts: **Malicious** `--danger`, **Suspicious** `--warning`, **Unknown** `--info`,
+    **Clean** `--success`; always paired with an icon and the word, never colour alone. Use the
+    `SeverityBadge` component, which enforces it
+  - fonts: **Sora** display, **Manrope** UI, **JetBrains Mono** for code and any machine output
+    (URLs, file names, hashes, sizes, timestamps) — the `woff2` files are in `design-system/fonts/`
+  - components: `design-system/components/bundle.js` exposes `window.Aegis`; each component has its
+    own README with the rules for it
 - **Mini panel:** native macOS vibrancy behind a light translucent tint, white cards inside.
 - **Code evidence:** monospace, line numbers, dangerous lines highlighted in the verdict colour with the finding's title in the margin.
 - **Copy:** short, plain English, no jargon in headlines ("This installer would add itself to your login items"). Technical detail goes below a "Details" disclosure.

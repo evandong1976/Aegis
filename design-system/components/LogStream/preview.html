@@ -17,11 +17,11 @@
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     h(A.LogStream, {lines:[
-      {time:'14:02:11', level:'block', text:'auth-gateway-01 ← 185.220.101.44 rule=brute-force hits=412'},
-      {time:'14:01:58', level:'warn', text:'k8s-node-7 container escaped seccomp profile (pid 2291)'},
-      {time:'13:59:40', level:'allow', text:'vpn-eu-3 ← 10.2.44.19 user=d.okafor mfa=passkey'},
-      {time:'13:58:02', level:'allow', text:'scan complete targets=1284 findings=37 duration=92s'},
-      {time:'13:55:19', level:'warn', text:'cdn-edge-eu certificate expires in 6 days'}
+      {time:'14:02:11', level:'block', text:'link user=d.okafor url=login-northwlnd-io.sbs/sso verdict=malicious rule=brand-match'},
+      {time:'13:58:40', level:'block', text:'file user=a.silva name=invoice_oct.iso verdict=malicious engine=sandbox'},
+      {time:'13:47:50', level:'warn', text:'link user=m.haddad url=cdn-assets-delivery.top/pkg.js verdict=suspicious reason=obfuscated-js'},
+      {time:'13:31:02', level:'warn', text:'file user=r.chen name=Q3-summary.xlsm verdict=suspicious reason=macro-autoexec'},
+      {time:'13:12:27', level:'allow', text:'link user=d.okafor url=docs.vendor.com/api/auth verdict=clean cached=true'}
     ]}));
 
 </script>

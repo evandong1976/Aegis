@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Threats</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment;
+
+  var rows = [
+    ['critical','Credential stuffing','auth-gateway-01','185.220.101.44','14:02:11','Unassigned'],
+    ['critical','Ransomware signature','file-store-03','10.2.18.44','13:52:09','D. Okafor'],
+    ['high','Privilege escalation','k8s-node-7','10.2.44.19','13:47:50','D. Okafor'],
+    ['high','Token replay','sso-broker','10.2.5.61','13:40:11','M. Haddad'],
+    ['medium','Unencrypted transfer','backup-store','10.2.9.3','13:31:02','Unassigned'],
+    ['medium','Anomalous egress volume','analytics-02','10.4.11.8','13:12:27','Unassigned'],
+    ['low','Expired certificate','cdn-edge-eu','172.16.8.120','12:58:44','Automation']
+  ].map(function (r) {
+    return {severity:h(A.SeverityBadge,{level:r[0]}), threat:r[1], asset:r[2], source:r[3], time:r[4], owner:r[5]};
+  });
+  var cols = [
+    {key:'severity', header:'Severity'}, {key:'threat', header:'Detection'}, {key:'asset', header:'Asset', nowrap:true},
+    {key:'source', header:'Source IP', mono:true}, {key:'time', header:'Seen', mono:true},
+    {key:'owner', header:'Owner', align:'right', nowrap:true}
+  ];
+
+  function Page() {
+    var s = React.useState('open'), tab = s[0], setTab = s[1];
+    return h(S.Shell, {page:'threats', eyebrow:'Threats', title:'Detections'},
+      h('div', {className:'grid grid--4'},
+        h(A.StatTile, {label:'Critical', value:'2', icon:'shield-alert', caption:'oldest 22 min'}),
+        h(A.StatTile, {label:'High', value:'2', icon:'alert', caption:'oldest 34 min'}),
+        h(A.StatTile, {label:'Medium', value:'6', icon:'info', caption:'oldest 3 h'}),
+        h(A.StatTile, {label:'Resolved today', value:'318', icon:'check-circle', delta:'8%', direction:'up', intent:'good', caption:'vs. yesterday'})
+      ),
+      h(A.Card, {title:'Detection queue', description:'Sorted by severity, then newest first.',
+        action: h('div', {className:'row'},
+          h(A.Button, {variant:'secondary', size:'sm', icon:'file-search'}, 'Export'),
+          h(A.Button, {variant:'primary', size:'sm', icon:'scan'}, 'Run sweep'))},
+        h('div', {className:'stack'},
+          h('div', {className:'row row--between'},
+            h(A.Tabs, {value:tab, onChange:setTab, items:[
+              {label:'Open', value:'open', count:12},
+              {label:'Investigating', value:'inv', count:4},
+              {label:'Resolved', value:'res', count:318},
+              {label:'Suppressed', value:'sup'}
+            ]}),
+            h('div', {style:{width:'320px'}}, h(A.SearchField, {placeholder:'Filter by asset, IP or rule'}))
+          ),
+          h(A.ThreatTable, {columns:cols, rows:rows})
+        ))
+    );
+  }
+  S.mount(h(Page));
+
+})();
+</script>
+</body>
+</html>

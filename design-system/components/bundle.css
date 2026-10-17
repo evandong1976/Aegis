@@ -113,7 +113,10 @@
 /* ThreatTable */
 .ae-table-wrap {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--inset-edge);
+  border-radius: var(--radius-lg); box-shadow: var(--inset-edge);
+  /* columns that must not wrap can outgrow the card: scroll them rather than
+     clipping a hostname or a hash out of sight */
+  overflow-x: auto; overflow-y: hidden;
 }
 .ae-table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); }
 .ae-table th { text-align: left; padding: var(--space-3) var(--space-5); background: var(--surface-raised); border-bottom: 1px solid var(--border); }
@@ -123,6 +126,7 @@
   color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: middle;
 }
 .ae-table tbody tr:last-child td { border-bottom: none; }
+.ae-table td.ae-mono, .ae-table td.is-nowrap { white-space: nowrap; }
 .ae-table tbody tr:hover td { background: var(--surface-raised); }
 .ae-table td.ae-mono { color: var(--ink-muted); }
 

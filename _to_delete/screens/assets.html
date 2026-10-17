@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Assets</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment;
+
+  var rows = [
+    ['auth-gateway-01','Edge service','secure','Linux 6.8','94','10.2.1.4'],
+    ['k8s-node-7','Kubernetes node','critical','Talos 1.7','61','10.2.44.19'],
+    ['file-store-03','Storage','critical','Windows Server 2022','38','10.2.18.44'],
+    ['backup-store','Storage','medium','Linux 6.6','72','10.2.9.3'],
+    ['cdn-edge-eu','Edge service','low','Managed','88','172.16.8.120'],
+    ['analytics-02','Workload','medium','Linux 6.8','77','10.4.11.8']
+  ].map(function (r) {
+    return {
+      name:r[0], kind:r[1], posture:h(A.SeverityBadge,{level:r[2], subtle:true}),
+      os:r[3], coverage:h(A.Meter,{label:'', value:Number(r[4]), display:r[4]+'%'}), ip:r[5]
+    };
+  });
+  var cols = [
+    {key:'name', header:'Asset', nowrap:true}, {key:'kind', header:'Kind'}, {key:'posture', header:'Posture'},
+    {key:'os', header:'Platform', nowrap:true}, {key:'coverage', header:'Agent coverage'}, {key:'ip', header:'Address', mono:true, align:'right'}
+  ];
+
+  S.mount(h(S.Shell, {page:'assets', eyebrow:'Assets', title:'Inventory'},
+    h('div', {className:'grid grid--4'},
+      h(A.StatTile, {label:'Tracked assets', value:'1,284', icon:'database', delta:'46', direction:'up', intent:'good', caption:'discovered this week'}),
+      h(A.StatTile, {label:'Unmonitored', value:'23', icon:'radar', delta:'5', direction:'up', intent:'bad', caption:'no agent check-in'}),
+      h(A.StatTile, {label:'Cloud workloads', value:'612', icon:'globe', caption:'3 accounts'}),
+      h(A.StatTile, {label:'Endpoints', value:'549', icon:'layout-dashboard', caption:'42 offline'})
+    ),
+    h('div', {className:'grid grid--split'},
+      h(A.Card, {title:'All assets', description:'Everything Aegis can see, with its agent coverage.',
+        action: h(A.Button, {variant:'secondary', size:'sm', icon:'file-search'}, 'Export CSV')},
+        h('div', {className:'stack'},
+          h('div', {style:{maxWidth:'360px'}}, h(A.SearchField, {placeholder:'Filter by name, platform or address'})),
+          h(A.ThreatTable, {columns:cols, rows:rows}))),
+      h('div', {className:'stack'},
+        h(A.Card, {title:'By kind'},
+          h(S.Bars, {max:700, columns:[
+            {label:'Cloud', segments:[{token:'chart-1', value:612, label:'Cloud'}]},
+            {label:'Endpoint', segments:[{token:'chart-4', value:549, label:'Endpoint'}]},
+            {label:'Network', segments:[{token:'chart-2', value:78, label:'Network'}]},
+            {label:'Identity', segments:[{token:'chart-5', value:45, label:'Identity'}]}
+          ]})),
+        h(A.Card, {title:'Discovery'},
+          h('div', {className:'stack'},
+            h(S.KV, {items:[
+              {k:'Last discovery sweep', v:'13:58 UTC'},
+              {k:'Sources connected', v:'7'},
+              {k:'New since Monday', v:'46'},
+              {k:'Decommissioned', v:'11'}
+            ]}),
+            h(A.Button, {variant:'secondary', icon:'scan', full:true}, 'Discover now')))
+      )
+    )
+  ));
+
+})();
+</script>
+</body>
+</html>

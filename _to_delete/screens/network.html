@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Network</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment;
+
+  var rows = [
+    ['185.220.101.44','Tor exit node','critical','412','Blocked'],
+    ['45.133.1.78','Scanner','high','188','Blocked'],
+    ['103.77.19.5','Unknown','medium','61','Rate limited'],
+    ['10.4.11.8','analytics-02','medium','34','Watched'],
+    ['92.118.39.12','Known botnet','high','27','Blocked']
+  ].map(function (r) {
+    return {ip:r[0], who:r[1], sev:h(A.SeverityBadge,{level:r[2], subtle:true}), hits:r[3], action:r[4]};
+  });
+  var cols = [
+    {key:'ip', header:'Source', mono:true}, {key:'who', header:'Attribution', nowrap:true}, {key:'sev', header:'Severity'},
+    {key:'hits', header:'Hits', align:'right', mono:true}, {key:'action', header:'Action', align:'right', nowrap:true}
+  ];
+
+  S.mount(h(S.Shell, {page:'network', eyebrow:'Network', title:'Traffic and segmentation'},
+    h('div', {className:'grid grid--4'},
+      h(A.StatTile, {label:'Blocked today', value:'8,412', icon:'shield-check', delta:'12%', direction:'up', intent:'good', caption:'vs. yesterday', points:[4,6,5,9,7,12,10,14]}),
+      h(A.StatTile, {label:'Egress volume', value:'4.2', unit:'TB', icon:'globe', delta:'0.6 TB', direction:'up', intent:'bad', caption:'above baseline'}),
+      h(A.StatTile, {label:'Open ports', value:'34', icon:'scan', caption:'9 internet-facing'}),
+      h(A.StatTile, {label:'Legacy TLS', value:'12', icon:'wifi-off', delta:'3', direction:'down', intent:'bad', caption:'hosts remaining'})
+    ),
+    h('div', {className:'grid grid--split'},
+      h('div', {className:'stack'},
+        h(A.Card, {title:'Top blocked sources', description:'Last 24 hours, by rule hits.'},
+          h(A.ThreatTable, {columns:cols, rows:rows})),
+        h(A.Card, {title:'Firewall events'},
+          h(A.LogStream, {lines:[
+            {time:'14:02:11', level:'block', text:'auth-gateway-01 \u2190 185.220.101.44 rule=brute-force hits=412'},
+            {time:'14:00:02', level:'block', text:'edge-eu \u2190 45.133.1.78 rule=port-scan ports=1-1024'},
+            {time:'13:59:40', level:'allow', text:'vpn-eu-3 \u2190 10.2.44.19 user=d.okafor mfa=passkey'},
+            {time:'13:57:12', level:'warn', text:'analytics-02 \u2192 203.0.113.9 egress=820MB baseline=120MB'},
+            {time:'13:55:19', level:'warn', text:'cdn-edge-eu certificate expires in 6 days'},
+            {time:'13:54:01', level:'allow', text:'policy reload rules=1284 duration=1.2s'}
+          ]}))),
+      h('div', {className:'stack'},
+        h(A.Card, {title:'Segment isolation'},
+          h('div', {className:'stack'},
+            h(A.Meter, {label:'Production', value:96, display:'96%', tone:'success'}),
+            h(A.Meter, {label:'Corporate', value:81, display:'81%'}),
+            h(A.Meter, {label:'Lab', value:44, display:'44%', tone:'warning'}),
+            h(A.Meter, {label:'Guest wifi', value:100, display:'100%', tone:'success'}))),
+        h(A.Card, {title:'Inbound by hour'},
+          h(S.Bars, {max:100, columns:[
+            {label:'09', segments:[{token:'chart-1', value:42, label:'Allowed'},{token:'chart-3', value:8, label:'Blocked'}]},
+            {label:'10', segments:[{token:'chart-1', value:51, label:'Allowed'},{token:'chart-3', value:12, label:'Blocked'}]},
+            {label:'11', segments:[{token:'chart-1', value:48, label:'Allowed'},{token:'chart-3', value:9, label:'Blocked'}]},
+            {label:'12', segments:[{token:'chart-1', value:61, label:'Allowed'},{token:'chart-3', value:22, label:'Blocked'}]},
+            {label:'13', segments:[{token:'chart-1', value:58, label:'Allowed'},{token:'chart-3', value:31, label:'Blocked'}]},
+            {label:'14', segments:[{token:'chart-1', value:44, label:'Allowed'},{token:'chart-3', value:38, label:'Blocked'}]}
+          ], legend:[{token:'chart-1', label:'Allowed'},{token:'chart-3', label:'Blocked'}]}))
+      )
+    )
+  ));
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Links</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment, V = window.Shell.Verdict;
+
+  var rows = [
+    ['malicious','login-northwlnd-io.sbs/sso','Brand impersonation','d.okafor','Mail','14:02:11','Blocked'],
+    ['malicious','secure-doc-share.sbs/view','Credential harvesting','k.novak','Mail','13:59:02','Blocked'],
+    ['suspicious','cdn-assets-delivery.top/pkg.js','Obfuscated script','m.haddad','Chat','13:47:50','Held'],
+    ['suspicious','bit.ly/3xQ9f2k','Shortener, unresolved','a.silva','Chat','13:44:19','Held'],
+    ['unknown','partner-portal.vendorx.io','Newly registered','r.chen','Browser','13:38:55','Allowed'],
+    ['clean','docs.vendor.com/api/auth','Known good','d.okafor','Browser','13:12:27','Allowed'],
+    ['clean','github.com/northwind/aegis','Known good','m.haddad','Chat','12:58:44','Allowed']
+  ].map(function (r) {
+    return {verdict:h(V,{verdict:r[0]}), url:r[1], why:r[2], who:r[3], source:r[4], time:r[5], action:r[6]};
+  });
+  var cols = [
+    {key:'verdict', header:'Verdict'}, {key:'url', header:'URL', mono:true},
+    {key:'why', header:'Reason', nowrap:true}, {key:'who', header:'User', nowrap:true},
+    {key:'source', header:'Clicked in', nowrap:true}, {key:'time', header:'Scanned', mono:true},
+    {key:'action', header:'Action', align:'right', nowrap:true}
+  ];
+
+  function Page() {
+    var s = React.useState('review'), tab = s[0], setTab = s[1];
+    return h(S.Shell, {page:'links', eyebrow:'Links', title:'URL verdicts'},
+      h('div', {className:'grid grid--4'},
+        h(A.StatTile, {label:'Scanned today', value:'24,118', icon:'globe', delta:'9%', direction:'up', intent:'good', caption:'vs. yesterday'}),
+        h(A.StatTile, {label:'Blocked', value:'212', icon:'shield-check', caption:'194 from one campaign'}),
+        h(A.StatTile, {label:'Awaiting review', value:'46', icon:'search', delta:'11', direction:'up', intent:'bad', caption:'held at the click'}),
+        h(A.StatTile, {label:'Median verdict time', value:'1.2', unit:'s', icon:'activity', delta:'0.3 s', direction:'down', intent:'bad', caption:'faster'})
+      ),
+      h(A.Card, {title:'Clicked links', description:'A held link shows the user an interstitial until someone decides.',
+        action: h('div', {className:'row'},
+          h(A.Button, {variant:'secondary', size:'sm', icon:'file-search'}, 'Export'),
+          h(A.Button, {variant:'primary', size:'sm', icon:'check'}, 'Review held'))},
+        h('div', {className:'stack'},
+          h('div', {className:'row row--between'},
+            h(A.Tabs, {value:tab, onChange:setTab, items:[
+              {label:'Awaiting review', value:'review', count:46},
+              {label:'Blocked', value:'blocked', count:212},
+              {label:'Allowed', value:'allowed'},
+              {label:'Allowlisted', value:'alw'}
+            ]}),
+            h('div', {style:{width:'320px'}}, h(A.SearchField, {placeholder:'Filter by URL, user or reason'}))
+          ),
+          h(A.ThreatTable, {columns:cols, rows:rows})
+        ))
+    );
+  }
+  S.mount(h(Page));
+
+})();
+</script>
+</body>
+</html>

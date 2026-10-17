@@ -92,8 +92,10 @@ export interface ThreatColumn {
   /** Key into each row object. */
   key: string;
   header: ReactNode;
-  /** Set the cell in the mono scale: IPs, hashes, timestamps. */
+  /** Set the cell in the mono scale: IPs, hashes, timestamps. Mono cells never wrap. */
   mono?: boolean;
+  /** Keep the cell on one line — hostnames and other values that must not break mid-token. */
+  nowrap?: boolean;
   align?: 'left' | 'right';
 }
 export interface ThreatTableProps {

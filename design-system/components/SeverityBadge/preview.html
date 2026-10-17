@@ -25,9 +25,10 @@
         h(A.SeverityBadge, {level:'secure'})
       ),
       h('div', {className:'row'},
-        h(A.SeverityBadge, {level:'critical', subtle:true}, 'CVE-2026-4417'),
-        h(A.SeverityBadge, {level:'secure', subtle:true}, 'Patched'),
-        h(A.SeverityBadge, {level:'low', subtle:true}, 'Informational')
+        h(A.SeverityBadge, {level:'critical', subtle:true}, 'Malicious'),
+        h(A.SeverityBadge, {level:'high', subtle:true}, 'Suspicious'),
+        h(A.SeverityBadge, {level:'medium', subtle:true}, 'Unknown'),
+        h(A.SeverityBadge, {level:'secure', subtle:true}, 'Clean')
       )
     ));
 

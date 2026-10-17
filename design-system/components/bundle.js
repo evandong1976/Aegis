@@ -166,7 +166,7 @@
         }))),
         h('tbody', null, rows.map(function (row, ri) {
           return h('tr', { key: ri }, cols.map(function (col, ci) {
-            return h('td', { key: ci, className: cx(col.mono && 'ae-mono', col.align === 'right' && 'is-right') }, row[col.key]);
+            return h('td', { key: ci, className: cx(col.mono && 'ae-mono', col.nowrap && 'is-nowrap', col.align === 'right' && 'is-right') }, row[col.key]);
           }));
         }))
       )

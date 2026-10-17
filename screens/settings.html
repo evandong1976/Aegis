@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Settings</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment, V = window.Shell.Verdict;
+
+  function Page() {
+    var s = React.useState({newdom:true, detonate:true, quarantine:true, shorten:false}), v = s[0], set = s[1];
+    function toggle(k) { return function () { var n = Object.assign({}, v); n[k] = !n[k]; set(n); }; }
+    return h(S.Shell, {page:'settings', eyebrow:'Settings', title:'Workspace'},
+      h('div', {className:'grid grid--2'},
+        h(A.Card, {title:'Workspace', description:'Shown on the interstitial users see when a link is held.'},
+          h('div', {className:'stack'},
+            h(A.Field, {label:'Organisation name', defaultValue:'Northwind', hint:'Appears on every block page and report.'}),
+            h(A.Field, {label:'Security contact', icon:'users', defaultValue:'security@northwind.io', hint:'Where "report a false block" mails go.'}),
+            h(A.Field, {label:'Verdict retention', defaultValue:'90 days', disabled:true, hint:'Set by your plan.'})
+          )),
+        h(A.Card, {title:'Access', description:'Keys and domains that bypass scanning.'},
+          h('div', {className:'stack'},
+            h(A.Field, {label:'API key', icon:'key', defaultValue:'ak_live_8f2c', error:'This key was revoked on 4 Oct.'}),
+            h(A.Field, {label:'Allowlisted domains', icon:'globe', placeholder:'vendor.com, docs.internal'}),
+            h('div', {className:'row'},
+              h(A.Button, {variant:'primary', icon:'key'}, 'Issue new key'),
+              h(A.Button, {variant:'ghost'}, 'View audit log'))
+          ))
+      ),
+      h('div', {className:'grid grid--2'},
+        h(A.Card, {title:'Scanning policy', description:'What Aegis does before a human looks.'},
+          h('div', {className:'rows'},
+            h('div', {className:'rows__row'},
+              h('div', null,
+                h('p', {className:'rows__label'}, 'Hold links to newly registered domains'),
+                h('p', {className:'subtle'}, 'Anything registered in the last 14 days waits for review.')),
+              h(A.Toggle, {checked:v.newdom, onChange:toggle('newdom')})),
+            h('div', {className:'rows__row'},
+              h('div', null,
+                h('p', {className:'rows__label'}, 'Detonate archives and installers'),
+                h('p', {className:'subtle'}, 'Adds about 40 seconds before the file is delivered.')),
+              h(A.Toggle, {checked:v.detonate, onChange:toggle('detonate')})),
+            h('div', {className:'rows__row'},
+              h('div', null,
+                h('p', {className:'rows__label'}, 'Quarantine rather than delete'),
+                h('p', {className:'subtle'}, 'Keeps the file for 30 days so a wrong verdict can be undone.')),
+              h(A.Toggle, {checked:v.quarantine, onChange:toggle('quarantine')})),
+            h('div', {className:'rows__row'},
+              h('div', null,
+                h('p', {className:'rows__label'}, 'Resolve shortened links before the click'),
+                h('p', {className:'subtle'}, 'Requires the browser extension on every device.')),
+              h(A.Toggle, {checked:v.shorten, onChange:toggle('shorten')})),
+            h('div', {className:'rows__row'},
+              h('div', null,
+                h('p', {className:'rows__label'}, 'Audit logging'),
+                h('p', {className:'subtle'}, 'Required by policy; cannot be turned off.')),
+              h(A.Toggle, {checked:true, disabled:true})))),
+        h('div', {className:'stack'},
+          h(A.Card, {title:'Where Aegis is watching'},
+            h(S.KV, {items:[
+              {k:'Browser extension installs', v:'482 / 549'},
+              {k:'Mail gateway', v:'Connected'},
+              {k:'Chat workspaces', v:'1 of 3'},
+              {k:'Managed devices', v:'549'}
+            ]})),
+          h(A.AlertBanner, {tone:'warning', title:'Chat links are only scanned in one of three workspaces',
+            action: h(A.Button, {variant:'secondary', size:'sm', icon:'settings'}, 'Connect')},
+            'Links shared in the other two reach people unscanned.'))
+      )
+    );
+  }
+  S.mount(h(Page));
+
+})();
+</script>
+</body>
+</html>

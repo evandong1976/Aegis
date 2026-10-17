@@ -17,12 +17,12 @@
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     h('div', {className:'grid', style:{gridTemplateColumns:'repeat(3, 1fr)'}},
-      h(A.StatTile, {label:'Threats blocked', value:'8,412', icon:'shield-check', delta:'12%',
-        direction:'up', intent:'good', caption:'vs. last week', points:[4,6,5,9,7,12,10,14]}),
-      h(A.StatTile, {label:'Mean time to respond', value:'14', unit:'min', icon:'activity',
-        delta:'3 min', direction:'down', intent:'bad', caption:'faster'}),
-      h(A.StatTile, {label:'Assets unmonitored', value:'23', icon:'database', delta:'5',
-        direction:'up', intent:'bad', caption:'new this week', points:[9,8,10,12,11,15,18,23]})
+      h(A.StatTile, {label:'Links scanned', value:'24,118', icon:'globe', delta:'9%',
+        direction:'up', intent:'good', caption:'vs. yesterday', points:[12,14,13,18,16,21,19,24]}),
+      h(A.StatTile, {label:'Median verdict time', value:'1.2', unit:'s', icon:'activity',
+        delta:'0.3 s', direction:'down', intent:'bad', caption:'faster'}),
+      h(A.StatTile, {label:'Files quarantined', value:'37', icon:'lock', delta:'6',
+        direction:'up', intent:'bad', caption:'awaiting review', points:[2,3,5,4,6,5,7,9]})
     ));
 
 </script>

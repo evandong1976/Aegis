@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis — Vulnerabilities</title>
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="../design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  var A = window.Aegis, S = window.Shell, h = React.createElement, F = React.Fragment;
+
+  var rows = [
+    ['CVE-2026-4417','critical','Remote code execution in edge proxy','12','9.8','Patch available'],
+    ['CVE-2026-3902','critical','Container escape via seccomp bypass','3','9.1','Patch available'],
+    ['CVE-2026-2281','high','Auth bypass in SSO broker','1','8.4','Vendor advisory'],
+    ['CVE-2026-1990','high','Path traversal in file store','4','7.9','Patch available'],
+    ['CVE-2025-9981','medium','Weak cipher negotiation','28','5.6','Config change']
+  ].map(function (r) {
+    return {
+      cve:r[0], sev:h(A.SeverityBadge,{level:r[1]}), title:r[2], assets:r[3], score:r[4], fix:r[5]
+    };
+  });
+  var cols = [
+    {key:'cve', header:'CVE', mono:true}, {key:'sev', header:'Severity'}, {key:'title', header:'Finding'},
+    {key:'assets', header:'Assets', align:'right', mono:true}, {key:'score', header:'CVSS', align:'right', mono:true},
+    {key:'fix', header:'Remediation', align:'right', nowrap:true}
+  ];
+
+  S.mount(h(S.Shell, {page:'vulnerabilities', eyebrow:'Vulnerabilities', title:'Findings and patching'},
+    h('div', {className:'grid grid--4'},
+      h(A.StatTile, {label:'Open findings', value:'48', icon:'bug', delta:'6', direction:'down', intent:'bad', caption:'closed this week'}),
+      h(A.StatTile, {label:'Critical', value:'2', icon:'shield-alert', caption:'15 assets affected'}),
+      h(A.StatTile, {label:'Patch compliance', value:'41', unit:'%', icon:'check-circle', delta:'9%', direction:'up', intent:'good', caption:'rollout in progress'}),
+      h(A.StatTile, {label:'Mean time to patch', value:'9', unit:'d', icon:'activity', caption:'target is 7'})
+    ),
+    h(A.Card, {title:'Open findings', description:'Ranked by severity, then by assets affected.',
+      action: h(A.Button, {variant:'primary', size:'sm', icon:'scan'}, 'Rescan')},
+      h(A.ThreatTable, {columns:cols, rows:rows})),
+    h('div', {className:'grid grid--2'},
+      h(A.Card, {title:'Findings by week', description:'Open findings at the close of each week.'},
+        h(S.Bars, {max:70, legend:[
+            {token:'chart-3', label:'Critical'}, {token:'chart-2', label:'High'}, {token:'chart-1', label:'Medium'}
+          ], columns:[
+          {label:'W38', segments:[{token:'chart-3', value:6, label:'Critical'},{token:'chart-2', value:14, label:'High'},{token:'chart-1', value:42, label:'Medium'}]},
+          {label:'W39', segments:[{token:'chart-3', value:5, label:'Critical'},{token:'chart-2', value:11, label:'High'},{token:'chart-1', value:38, label:'Medium'}]},
+          {label:'W40', segments:[{token:'chart-3', value:4, label:'Critical'},{token:'chart-2', value:9, label:'High'},{token:'chart-1', value:31, label:'Medium'}]},
+          {label:'W41', segments:[{token:'chart-3', value:2, label:'Critical'},{token:'chart-2', value:7, label:'High'},{token:'chart-1', value:26, label:'Medium'}]}
+        ]})),
+      h(A.Card, {title:'Patch rollout', description:'Share of each fleet on the October patch.'},
+        h('div', {className:'stack'},
+          h(A.Meter, {label:'Endpoints', value:72, display:'72%'}),
+          h(A.Meter, {label:'Servers', value:48, display:'48%', tone:'warning'}),
+          h(A.Meter, {label:'Containers', value:91, display:'91%', tone:'success'}),
+          h(A.Meter, {label:'Network gear', value:22, display:'22%', tone:'danger'})))
+    )
+  ));
+
+})();
+</script>
+</body>
+</html>
