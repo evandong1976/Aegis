@@ -281,6 +281,20 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     feature unless the team wants them hidden. MEGA_PROMPT §5.5 (messaging agent) is deferred, not
     dropped.
 
+19. **Sponsor checks spend credits only when asked** (team decision, 2026-10-17). `sponsors.ts`
+    checks Daytona, the sandbox image and Droid for `health.ts` at two depths.
+    - **Every 60 s, free lookups only:** Daytona lists sandboxes and looks up the snapshot named
+      by `AEGIS_DAYTONA_SNAPSHOT`; Droid lists models through its CLI.
+    - **At start and on Check now, the live tests from BUILD_PROMPT §4.1:** Daytona creates a
+      network-off, ephemeral sandbox (20 s start limit), runs one command and deletes it in a
+      `finally`; Droid answers one tiny prompt, with every tool request refused, in an empty folder.
+    - **Credit guards:** a passing result is reused at start for 15 minutes, even across launches
+      (it's saved in the store), and Check now ignores repeat presses within 30 seconds. A failed
+      result is retried at the next start. Dev captures (`pnpm capture`, `pnpm verify`) never run
+      live tests.
+    - **Not here:** building the snapshot (`pnpm build:sandbox`) stays with milestone 3. The
+      Sandbox image check also looks for a local Docker image named `aegis-sandbox`.
+
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
 Do this before writing each integration, record the exact calls here, and get

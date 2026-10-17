@@ -1,9 +1,17 @@
-## Handoff (updated 2026-10-17 01:20 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 10:20 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Live sponsor checks in the app (10:15)**: `src/main/sponsors.ts` checks Daytona, the sandbox
+    image and Droid for real, and shows the result in Settings › Connections, the mini panel and
+    the tray (PLAN.md decision 19).
+    - Every 60 s: free lookups only.
+    - At start and on Check now: the live tests (a tiny network-off sandbox, a tiny Droid prompt),
+      with cooldowns to save credits.
+    - 20 new tests against mocked SDKs; nothing has called the real APIs. Evidence:
+      [`logs/2026-10-17-1015-sponsor-checks/`](../logs/2026-10-17-1015-sponsor-checks/SUMMARY.md).
   - **Review against the plan (01:20)**: `try-droid` now also runs Droid inside a Daytona sandbox
     (option A), as PLAN.md › Branches asks. `try-daytona` now uses the 20 s sandbox-start limit
     with one retry (architectural.md §4.6). New optional env var: `AEGIS_FACTORY_DOMAINS`.
@@ -12,7 +20,7 @@
     (`@daytona/sdk` 0.220.0, `@factory/droid-sdk` 0.9.1). `pnpm try:daytona` and `pnpm try:droid`
     typecheck, but **have not run**: no keys are set, and the droid CLI isn't installed. Without
     keys each exits 1 with a clear message.
-  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
+  - **Branches for Zach's items**: six branches cut from `main`, pushed to origin. Each
     branch's work is in its own commits, and this file is that branch's handoff. Order,
     prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
     empty, waiting on milestone 3 (joint).
@@ -23,12 +31,18 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** On this branch: add `DAYTONA_API_KEY` and `FACTORY_API_KEY` to `.env`, install
-  the droid CLI (`brew install --cask droid`), then run `pnpm try:daytona` and `pnpm try:droid`.
-  Record the timings and answers in `docs/PLAN.md` › Sponsor findings, check the Daytona
-  dashboard for leaked sandboxes (› Sandbox leak check below), and merge into `main` when both
-  pass. Then the team picks Worker A option A or B. Outside this branch, still open: load
+- **Next step:** On this branch, when credits allow:
+  1. Add `DAYTONA_API_KEY` and `FACTORY_API_KEY` to `.env` and install the droid CLI
+     (`brew install --cask droid`).
+  2. Start `pnpm dev`. Settings › Connections should show Daytona and Droid as Connected, with
+     "Live test just now". That run spends one tiny sandbox and one tiny Droid prompt.
+  3. Run `pnpm try:daytona` and `pnpm try:droid` for the full findings, record them in `docs/PLAN.md`
+     › Sponsor findings, and check the Daytona dashboard for leaked sandboxes.
+  4. Merge into `main`.
+
+  Until then everything is tested against mocked SDKs only. Outside this branch, still open: load
   `extension/dist` in Chrome to close milestone 1.
+
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
   small UI issues open (see "Open issues"; branch `ui-fixes`).
@@ -138,19 +152,19 @@ behind clicks is not yet covered by a logged run (see "Not verified yet").
 
 From `logs/2026-10-16-2339/screens/real/status.json`:
 
-| Check             | State        | Note                                                    |
-| ----------------- | ------------ | ------------------------------------------------------- |
-| Bridge            | ok           | After the simulated heartbeat; degraded before it       |
-| Local store       | ok           |                                                         |
-| Daytona           | unconfigured | No key                                                  |
-| Sandbox image     | pending      | Milestone 3                                             |
-| Docker (fallback) | down         | Docker is installed but not running on Evan's Mac       |
-| Droid             | unconfigured | No key                                                  |
-| Photon            | unconfigured | Deferred feature; optional                              |
-| Chalk             | unconfigured | No key                                                  |
-| Safe Browsing     | unconfigured | No key; the live check is implemented but not exercised |
-| Downloads folder  | ok           | Granted to Electron under `pnpm dev`                    |
-| fn key            | ok           | Add-on built; Input Monitoring granted to Electron      |
+| Check             | State        | Note                                                                  |
+| ----------------- | ------------ | --------------------------------------------------------------------- |
+| Bridge            | ok           | After the simulated heartbeat; degraded before it                     |
+| Local store       | ok           |                                                                       |
+| Daytona           | unconfigured | No key. Live check built on `sponsor-check` (decision 19)             |
+| Sandbox image     | pending      | Snapshot built at M3; `sponsor-check` looks it up and the local image |
+| Docker (fallback) | down         | Docker is installed but not running on Evan's Mac                     |
+| Droid             | unconfigured | No key. Live check built on `sponsor-check` (decision 19)             |
+| Photon            | unconfigured | Deferred feature; optional                                            |
+| Chalk             | unconfigured | No key                                                                |
+| Safe Browsing     | unconfigured | No key; the live check is implemented but not exercised               |
+| Downloads folder  | ok           | Granted to Electron under `pnpm dev`                                  |
+| fn key            | ok           | Add-on built; Input Monitoring granted to Electron                    |
 
 ## Stubs and simulations
 
@@ -174,6 +188,9 @@ scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 
 ## Decisions log
 
+- 2026-10-17 10:20: `sponsor-check`: live Daytona, sandbox image and Droid checks in the app
+  (`sponsors.ts`, PLAN.md decision 19): free lookups every 60 s, and credit-using live tests only at
+  start and on Check now, with cooldowns. Tested against mocked SDKs only; no keys are set.
 - 2026-10-17 00:50: `sponsor-check`: Daytona and Droid findings recorded in PLAN.md. The SDKs are
   pinned. `scripts/try-daytona.mts` and `scripts/try-droid.mts` are written and typechecked, but
   haven't run yet (no keys). New optional env vars: `AEGIS_DAYTONA_SNAPSHOT`, `DROID_PATH`,

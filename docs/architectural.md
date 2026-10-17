@@ -161,31 +161,32 @@ decisions itself: every verdict comes from the app through the bridge.
 
 The brain. It owns the bridge, every decision, every outside service, the store and the windows.
 
-| Module                              | Status           | Role                                                                                              |
-| ----------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
-| `index.ts`                          | Built            | Startup order: identity → `.env` → store → bridge → IPC → tray → shortcuts → panel → health loop  |
-| `bridge.ts`                         | Built (partial)  | HTTP server for the extension. `/status`, `/ping`, `/trust` live; the rest answer 501 until built |
-| `store.ts`                          | Built            | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)          |
-| `status.ts`                         | Built            | Live app status (protection state, health, page snapshot, active scans) and the scan log          |
-| `health.ts`                         | Built            | Checks every connection at start, every 60 s and on demand; drives "degraded"                     |
-| `verdict.ts`                        | Built            | Score bands, hard rules, Unknown, "AI can only raise". Every verdict passes through here          |
-| `settings.ts`, `config.ts`          | Built            | User settings in SQLite; secrets and config from `.env`                                           |
-| `ipc.ts`                            | Built            | Handlers for every channel in `src/shared/ipc.ts`                                                 |
-| `windows.ts`, `panel.ts`, `tray.ts` | Built            | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu            |
-| `fnkey.ts`                          | Built            | Loads `native/fn-key`; a clean fn tap toggles the panel                                           |
-| `demo.ts`, `devcapture.ts`          | Built (dev)      | `AEGIS_DEMO=1` demo database; headless screenshots for design checks                              |
-| `links.ts`                          | Planned (M2)     | Tier 1 link rules, Tranco, allow list, URL secret stripping                                       |
-| `chalk.ts`, `text.ts`               | Planned (M6)     | Chalk online features (cached), AI Gateway client; scam-text check                                |
-| `precheck.ts`                       | Planned (M3)     | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only               |
-| `queue.ts`                          | Planned (M3)     | Sandbox job queue: 3 at once, priorities, daily budget                                            |
-| `daytona.ts`, `docker.ts`           | Planned (M3, M8) | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)         |
-| `scans.ts`                          | Planned (M3)     | The download pipeline and its persisted state machine (`received → … → compared → done`)          |
-| `workerA.ts` (Daytona + Droid)      | Planned (M4)     | Starts a Daytona sandbox with Droid inside, hands it the file, collects verdict, evidence and log |
-| `workerB.ts` (Chalk)                | Planned (M6)     | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log           |
-| `compare.ts`                        | Planned (M4, M6) | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)        |
-| `detonate.ts`                       | Planned (M7)     | Decides when to detonate a link, queues it, rescans the final URL                                 |
-| `watcher.ts`, `quarantine.ts`       | Planned (M8)     | `~/Downloads` watcher; quarantine, restore, delete                                                |
-| `photon.ts`                         | Later (§8)       | Mobile: screenshots forwarded from a phone → checks → verdict reply. Not in the current build     |
+| Module                              | Status           | Role                                                                                                                        |
+| ----------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`                          | Built            | Startup order: identity → `.env` → store → bridge → IPC → tray → shortcuts → panel → health loop                            |
+| `bridge.ts`                         | Built (partial)  | HTTP server for the extension. `/status`, `/ping`, `/trust` live; the rest answer 501 until built                           |
+| `store.ts`                          | Built            | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)                                    |
+| `status.ts`                         | Built            | Live app status (protection state, health, page snapshot, active scans) and the scan log                                    |
+| `health.ts`                         | Built            | Checks every connection at start, every 60 s and on demand; drives "degraded"                                               |
+| `verdict.ts`                        | Built            | Score bands, hard rules, Unknown, "AI can only raise". Every verdict passes through here                                    |
+| `settings.ts`, `config.ts`          | Built            | User settings in SQLite; secrets and config from `.env`                                                                     |
+| `ipc.ts`                            | Built            | Handlers for every channel in `src/shared/ipc.ts`                                                                           |
+| `windows.ts`, `panel.ts`, `tray.ts` | Built            | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu                                      |
+| `fnkey.ts`                          | Built            | Loads `native/fn-key`; a clean fn tap toggles the panel                                                                     |
+| `demo.ts`, `devcapture.ts`          | Built (dev)      | `AEGIS_DEMO=1` demo database; headless screenshots for design checks                                                        |
+| `links.ts`                          | Planned (M2)     | Tier 1 link rules, Tranco, allow list, URL secret stripping                                                                 |
+| `chalk.ts`, `text.ts`               | Planned (M6)     | Chalk online features (cached), AI Gateway client; scam-text check                                                          |
+| `precheck.ts`                       | Planned (M3)     | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only                                         |
+| `queue.ts`                          | Planned (M3)     | Sandbox job queue: 3 at once, priorities, daily budget                                                                      |
+| `daytona.ts`, `docker.ts`           | Planned (M3, M8) | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)                                   |
+| `scans.ts`                          | Planned (M3)     | The download pipeline and its persisted state machine (`received → … → compared → done`)                                    |
+| `workerA.ts` (Daytona + Droid)      | Planned (M4)     | Starts a Daytona sandbox with Droid inside, hands it the file, collects verdict, evidence and log                           |
+| `workerB.ts` (Chalk)                | Planned (M6)     | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log                                     |
+| `compare.ts`                        | Planned (M4, M6) | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)                                  |
+| `detonate.ts`                       | Planned (M7)     | Decides when to detonate a link, queues it, rescans the final URL                                                           |
+| `sponsors.ts`                       | Built            | Live Daytona, sandbox image and Droid checks for `health.ts`: free lookups every 60 s, live tests at start and on Check now |
+| `watcher.ts`, `quarantine.ts`       | Planned (M8)     | `~/Downloads` watcher; quarantine, restore, delete                                                                          |
+| `photon.ts`                         | Later (§8)       | Mobile: screenshots forwarded from a phone → checks → verdict reply. Not in the current build                               |
 
 ### 3.4 Preload — `src/preload/` · Built
 

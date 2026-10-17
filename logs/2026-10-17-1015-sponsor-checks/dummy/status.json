@@ -1,0 +1,100 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "degraded",
+      "detail": "Extension not connected. Run pnpm build:extension and load extension/dist in chrome://extensions."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "down",
+      "detail": "Daytona API: connect ECONNREFUSED 127.0.0.1:9. Docker is the fallback."
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "down",
+      "detail": "Daytona snapshot lookup failed: connect ECONNREFUSED 127.0.0.1:9; no local Docker image aegis-sandbox."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "ok",
+      "detail": "Docker 29.2.1 is running.",
+      "latencyMs": 110
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "down",
+      "detail": "No droid CLI at /nonexistent/droid. Install it (brew install --cask droid) or set DROID_PATH in .env, then restart Aegis. Reports run without Droid until then."
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "unconfigured",
+      "detail": "PHOTON_* not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "unconfigured",
+      "detail": "CHALK_* not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "unconfigured",
+      "detail": "SAFE_BROWSING_KEY not set. Add it to .env, then restart Aegis."
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-17T14:11:56.329Z",
+      "state": "unconfigured",
+      "detail": "The fn add-on is not built. Run pnpm build:native, then restart Aegis. ⌃⌥A works meanwhile."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": null,
+  "demo": false,
+  "page": null
+}
