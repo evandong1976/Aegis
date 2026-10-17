@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   SAMPLE_PATH,
   createSandbox,
+  PROBE_URLS,
   observeCommand,
   probeCommand,
   parseObservation,
@@ -129,10 +130,37 @@ describe('SandboxSession.upload', () => {
 })
 
 describe('probeCommand', () => {
-  it('caps every tool with timeout and stops wget retrying', () => {
-    const cmd = probeCommand('https://example.com')
-    expect(cmd.match(/timeout -k 1 8 /g)).toHaveLength(3)
-    expect(cmd).toContain('--tries=1')
+  it('runs every tool for every host at once, each capped, wget trying once', () => {
+    const cmd = probeCommand(PROBE_URLS)
+    expect(cmd.match(/timeout -k 1 8 /g)).toHaveLength(6)
+    expect(cmd.match(/ &$/gm)).toHaveLength(6)
+    expect(cmd).toContain('\nwait\n')
+    expect(cmd.match(/--tries=1/g)).toHaveLength(2)
+  })
+})
+
+describe('networkIsOff', () => {
+  it('passes when nothing got through, with one log step', async () => {
+    const s = await createSandbox(fakeClient(fakeSandbox()), { labels: {} })
+    await expect(s.networkIsOff()).resolves.toBe(true)
+    expect(s.log.at(-1)).toMatchObject({ ok: true, detail: 'all blocked' })
+  })
+
+  it('fails and names what got through', async () => {
+    const box = fakeSandbox({
+      process: {
+        executeCommand: vi.fn(async () => ({
+          exitCode: 0,
+          result: 'REACHED curl https://registry.npmjs.org/\n'
+        }))
+      }
+    })
+    const s = await createSandbox(fakeClient(box), { labels: {} })
+    await expect(s.networkIsOff()).resolves.toBe(false)
+    expect(s.log.at(-1)).toMatchObject({
+      ok: false,
+      detail: 'REACHED curl https://registry.npmjs.org/'
+    })
   })
 })
 

@@ -133,6 +133,8 @@ truth. Evan's next branch is `link-checks` (M2).
   `.env.local`) and the leak check shows 0 sandboxes.
 - **Result (2026-10-17 12:29):** passes live, 0 sandboxes left
   (`logs/2026-10-17-1229-sandbox-run/`).
+- **12:38:** network check runs its six probes at once: 36.2 s → 8.1 s, still 7/7 live
+  (`logs/2026-10-17-1238-sandbox-run/`).
 - **Then:** M3's `scans.ts` and `workerA.ts` use `withSandbox`; `observe.py` in the image can
   replace the shell-based observation when the snapshot exists.
 

@@ -32,8 +32,11 @@ disagree, PLAN.md › Decisions wins.
     0 sandboxes. Evidence `logs/2026-10-17-1229-sandbox-run/` (`SUMMARY.md`). Two earlier runs are
     kept: the first failed safely (a slow `wget` probe; now capped), the second showed the 30 s
     limit stopping the sample's own retrying `wget`.
-  - **Next on this branch:** the probes take about 18 s each (a third of the 120 s budget); shorten
-    them before M3. Then merge into `main`.
+  - **Network check sped up (12:38): 36.2 s → 8.1 s**, by running all six probes at once (each
+    keeps its full limit). Proven both ways in Docker (BLOCKED with no network; names what got
+    through with it on) and live on Daytona, 7/7, 0 sandboxes left. Evidence
+    `logs/2026-10-17-1238-sandbox-run/`.
+  - **Next on this branch:** merge into `main`.
 - **Just finished — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
@@ -278,6 +281,7 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 | `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
 | `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
 | `feature/sandbox` live runs, 12:30          | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)     |
+| `feature/sandbox` faster check, 12:39       | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)     |
 
 ## Decisions log
 

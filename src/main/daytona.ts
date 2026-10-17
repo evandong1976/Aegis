@@ -146,38 +146,59 @@ export class SandboxSession {
     return full
   }
 
-  /** True when neither an ordinary website nor a Daytona "essential service" can be reached. */
+  /**
+   * True when neither an ordinary website nor a Daytona "essential service" can be reached. Every
+   * probe runs at once, so this takes about one probe's limit, not the sum. A probe command that
+   * still runs out of time throws, so the sample is never run on an unproven network.
+   */
   async networkIsOff(): Promise<boolean> {
-    for (const url of ['https://example.com', 'https://registry.npmjs.org/']) {
-      // Three tools at most PROBE_TOOL_S each, plus headroom. A probe that still runs out of time
-      // throws, so the sample is never run on an unproven network.
-      const res = await this.exec(
-        `network probe ${url}`,
-        `if ${probeCommand(url)}; then echo REACHED; else echo BLOCKED; fi`,
-        3 * PROBE_TOOL_S + 15
-      )
-      if (res.result.trim() !== 'BLOCKED') return false
-    }
-    return true
+    const res = await this.exec(
+      `network probe (${PROBE_URLS.length} hosts × 3 tools, in parallel)`,
+      probeCommand(PROBE_URLS),
+      PROBE_TOOL_S + 15
+    )
+    const last = this.log[this.log.length - 1]
+    const off = res.result.trim() === 'BLOCKED'
+    last.ok = res.exitCode === 0 && off
+    last.detail = off ? 'all blocked' : res.result.trim().split('\n').join('; ')
+    return last.ok
   }
 }
 
-/** Hard limit per probe tool, in seconds. */
+/**
+ * Probe targets: an ordinary website, and a Daytona "essential service" (npm), which this
+ * account's tier keeps reachable unless the network is blocked at creation (PLAN.md › Sponsor
+ * findings › Daytona).
+ */
+export const PROBE_URLS = ['https://example.com', 'https://registry.npmjs.org/']
+
+/** Hard limit per probe, in seconds. */
 export const PROBE_TOOL_S = 8
 
 /**
- * Any of curl, wget or python3 reaching `url` means the network is on. Each is capped by
- * `timeout`, and wget tries once: by default it retries up to 20 times, which made a blocked
- * network look like a hang (logs/2026-10-17-1226-sandbox-run/).
+ * Tries every URL with curl, wget and python3 at once, each capped by `timeout` (wget tries once:
+ * by default it retries up to 20 times, logs/2026-10-17-1226-sandbox-run/). Prints
+ * `REACHED <tool> <url>` for each one that got through, or `BLOCKED` if none did.
  */
-export function probeCommand(url: string): string {
-  return [
-    `curl -sS -m 5 -o /dev/null ${url}`,
-    `wget -q -T 5 --tries=1 -O /dev/null ${url}`,
-    `python3 -c "import urllib.request; urllib.request.urlopen('${url}', timeout=5)"`
+export function probeCommand(urls: string[]): string {
+  const tools = (url: string): Array<[string, string]> => [
+    ['curl', `curl -sS -m 5 -o /dev/null ${url}`],
+    ['wget', `wget -q -T 5 --tries=1 -O /dev/null ${url}`],
+    ['python3', `python3 -c "import urllib.request; urllib.request.urlopen('${url}', timeout=5)"`]
   ]
-    .map((c) => `(timeout -k 1 ${PROBE_TOOL_S} ${c}) 2>/dev/null`)
-    .join(' || ')
+  const jobs = urls.flatMap((url) =>
+    tools(url).map(
+      ([name, c]) =>
+        `(timeout -k 1 ${PROBE_TOOL_S} ${c} && echo "REACHED ${name} ${url}" >>"$P/hits") 2>/dev/null &`
+    )
+  )
+  return [
+    'P=$(mktemp -d)',
+    ...jobs,
+    'wait',
+    'if [ -s "$P/hits" ]; then cat "$P/hits"; else echo BLOCKED; fi',
+    'rm -rf "$P"'
+  ].join('\n')
 }
 
 /**
