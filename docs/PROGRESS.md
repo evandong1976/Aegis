@@ -1,4 +1,4 @@
-## Handoff (updated 2026-10-17 11:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 12:20 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
 1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
@@ -9,7 +9,15 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
+- **Just finished — branch `extension-status` (uncommitted):** the milestone-1 Chrome check
+  found that the app said Connected but the extension's badge and popup stayed on "Not
+  connected". Chrome leaves `Origin` off an extension's GET requests, so the bridge answered
+  `GET /status` with 403 (only `POST /ping` passed). `/status` and `/scan/:id` are now POST
+  (decision 28), and the popup re-reads the status every 3 s while open. Checked in a headless
+  Chrome 155 with the built extension against the new bridge code: every request 200, popup
+  "Protected / Connected", badge cleared; no Origin, other origins and rebinding Hosts still 403,
+  GET 404. `pnpm verify`'s smoke checks are updated to POST.
+- **Earlier — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
     free lookups every 60 s, a tiny live test at start and on Check now. Zach tested it against
@@ -76,8 +84,10 @@ test` pass on `main`.
   3. **Zach:** `sandbox-image`, `ui-fixes` and `watcher` have work on `origin` (pushed 01:17) that
      predates the decisions above. Merge the latest `main` into each before continuing (PLAN.md ›
      Branches), then `sandbox-image` first.
-  4. In Chrome: reload the Aegis extension and confirm Settings › Connections shows Bridge =
-     Connected (closes milestone 1).
+  4. With `extension-status`: restart Aegis (`pnpm dev` doesn't reload the main process), run
+     `pnpm build:extension`, reload the extension in Chrome, and confirm Settings › Connections
+     shows Bridge = Connected **and** the popup shows Connected with no `!` badge (closes
+     milestone 1).
   5. Write `scripts/try-chalk` (it must prove Worker B's network is off, PLAN.md › Sponsor findings
      › Chalk) and `scripts/try-photon`. `CHALK_ENVIRONMENT` is already set in `.env.local`.
   6. Rotate the Factory key (it was pasted into chat on 2026-10-17).
@@ -171,7 +181,7 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 | 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
 | 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
 | 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile on branch `sandbox-image` (origin); demo files at the end (decision 22)             |
-| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
+| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified; real-Chrome check found the GET/Origin bug, fixed on `extension-status`    |
 | 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
 | 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3         |

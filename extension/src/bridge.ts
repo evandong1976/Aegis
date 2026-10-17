@@ -14,6 +14,7 @@ const BASE = `http://${BRIDGE_HOST}:${DEFAULT_BRIDGE_PORT}`
 export async function fetchStatus(timeoutMs = 2000): Promise<StatusResponse | null> {
   try {
     const res = await fetch(BASE + BRIDGE_ROUTES.status.path, {
+      method: 'POST',
       signal: AbortSignal.timeout(timeoutMs)
     })
     if (!res.ok) return null

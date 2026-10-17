@@ -85,3 +85,5 @@ async function render(): Promise<void> {
 }
 
 void render()
+// Keep up with the app starting, stopping or pausing while the popup is open.
+setInterval(() => void render(), 3000)
