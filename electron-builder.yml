@@ -1,0 +1,29 @@
+appId: com.aegis.app
+productName: Aegis
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!extension/*'
+  - '!design-system/*'
+  - '!docs/*'
+  - '!scripts/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!vitest.config.{js,ts,mjs,mts,cjs}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,BRAINSTORM.md,BUILD_PROMPT.md,MEGA_PROMPT.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - resources/**
+mac:
+  target: dir
+  category: public.app-category.utilities
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    # Menu bar app: no Dock icon, no app menu.
+    LSUIElement: true
+    # Only what Aegis needs (BUILD_PROMPT §4.4).
+    NSDownloadsFolderUsageDescription: Aegis watches your Downloads folder so it can scan files from other apps before you open them.
+  notarize: false
+npmRebuild: false

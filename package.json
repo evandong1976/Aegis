@@ -1,0 +1,64 @@
+{
+  "name": "aegis",
+  "productName": "Aegis",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aegis opens the dangerous stuff so you don't have to, and shows you exactly what it would have done.",
+  "main": "./out/main/index.js",
+  "author": "Aegis team",
+  "homepage": "https://github.com/PomatoesBeep/Aegis",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "start": "electron-vite preview",
+    "build": "pnpm typecheck && electron-vite build",
+    "format": "prettier --write .",
+    "lint": "eslint --cache .",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck:extension": "tsc --noEmit -p extension/tsconfig.json",
+    "typecheck": "pnpm typecheck:node && pnpm typecheck:web && pnpm typecheck:extension",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:extension": "node extension/build.mjs",
+    "build:sandbox": "node scripts/not-yet.mjs build:sandbox 3",
+    "build:native": "node scripts/not-yet.mjs build:native 8",
+    "eval": "node scripts/not-yet.mjs eval 6",
+    "icons": "node scripts/make-icons.mjs",
+    "app": "electron-vite build && electron-builder --mac --dir",
+    "postinstall": "install-electron && electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config-prettier": "3.0.1",
+    "@electron-toolkit/eslint-config-ts": "4.0.0",
+    "@electron-toolkit/tsconfig": "2.0.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/chrome": "0.1.43",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "44.8.0",
+    "electron-builder": "26.15.3",
+    "electron-vite": "6.0.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "prettier": "3.9.10",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "vitest": "4.1.12"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
+  }
+}

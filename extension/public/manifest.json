@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Aegis",
+  "short_name": "Aegis",
+  "version": "0.1.0",
+  "description": "Checks links, scam text and downloads with the Aegis app before they reach your Mac.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrAGZvVIr6kiPSKQt7E92VJq0uQ1/nQqz3slnK729vysBz5NruqpTGxRY3kYikBVFRd0gDkKmo8AhrVNPwiC6XqWM1EpbmYSJbrzQTuDzmhtGbY+vzvPh1aSBIHVRjy4yvKxtJicpzDdILAC5MfMyNRLvA8YO5KFUdhjO7q4kK26qVzeAdaqtAo7O0NfwlVACBDuw4o9HBtBwXpg1UrR9MPvPGg3LeyJyHSDORyBN703S1Il1vWI2jzACPiZi2/dmS17d56Ys626AGviqZLNZuazwRI4+qOygpRFKjSJ9/7t8Lg3eONYVqvH8/eJeL74jH2N4RfobLfE6cOyoObzVQIDAQAB",
+  "minimum_chrome_version": "116",
+  "permissions": ["downloads", "notifications", "storage", "scripting", "offscreen", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "Aegis",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

@@ -1,0 +1,302 @@
+/* Aegis app components that exist in the Figma file (figma/built.md) but not in
+   design-system/components: StatusDot, ScanStep, TimelineStep, CodeLine, finding chips, key/value
+   lists. Every value is a token from design-system/tokens.css. */
+
+/* ---- StatusDot: Ok · Degraded · Down (+ Off for not set up) ---------------------------------- */
+.ae-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.ae-dot__mark {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  flex: none;
+  background: var(--ink-subtle);
+}
+.ae-dot--ok .ae-dot__mark {
+  background: var(--success);
+}
+.ae-dot--degraded .ae-dot__mark {
+  background: var(--warning);
+}
+.ae-dot--down .ae-dot__mark {
+  background: var(--danger);
+}
+
+/* ---- ScanStep: Done · Active · Pending --------------------------------------------------------- */
+.ae-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.ae-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 19px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.ae-step__icon {
+  display: flex;
+  color: var(--ink-subtle);
+}
+.ae-step--done .ae-step__icon {
+  color: var(--success);
+}
+.ae-step--active .ae-step__icon {
+  color: var(--accent);
+}
+.ae-step--pending {
+  color: var(--ink-subtle);
+}
+
+/* ---- TimelineStep: Danger · Warning ------------------------------------------------------------ */
+.ae-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ae-tl {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+.ae-tl__num {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.ae-tl--danger .ae-tl__num {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+.ae-tl--warning .ae-tl__num {
+  color: var(--warning);
+  background: var(--warning-bg);
+}
+.ae-tl__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ae-tl__detail {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--ink-muted);
+}
+
+/* ---- CodeLine: Normal · Flagged ---------------------------------------------------------------- */
+.ae-code {
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) 0;
+  overflow-x: auto;
+  user-select: text;
+}
+.ae-code__line {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  border-left: 2px solid transparent;
+}
+.ae-code__num {
+  text-align: right;
+  padding-right: var(--space-3);
+  color: var(--ink-subtle);
+  user-select: none;
+}
+.ae-code__text {
+  white-space: pre;
+  padding-right: var(--space-4);
+}
+.ae-code__line--flagged {
+  background: var(--danger-bg);
+  border-left-color: var(--danger);
+  color: var(--ink);
+}
+.ae-code__line--flagged .ae-code__num {
+  color: var(--danger);
+}
+.ae-code__flag {
+  grid-column: 2;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--danger);
+  padding-bottom: var(--space-1);
+}
+
+/* ---- Finding chips: mono, toned by severity ---------------------------------------------------- */
+.ae-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.ae-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-overlay);
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.ae-chip--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.ae-chip--warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.ae-chip--info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+.ae-chip--accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- Key/value list ---------------------------------------------------------------------------- */
+.ae-kv {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3) var(--space-4);
+  align-items: center;
+  margin: 0;
+}
+.ae-kv dt {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--ink-muted);
+}
+.ae-kv dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  user-select: text;
+}
+
+/* ---- Divided rows (settings policy, checks that ran) ------------------------------------------- */
+.ae-rows {
+  display: flex;
+  flex-direction: column;
+}
+.ae-rows__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border);
+}
+.ae-rows__row:first-child {
+  padding-top: 0;
+}
+.ae-rows__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.ae-rows__label {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ae-rows__hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-subtle);
+}
+
+/* ---- Bar chart drawn from tokens (Downloads › By file type) ------------------------------------ */
+.ae-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-5);
+  height: 160px;
+}
+.ae-bars__col {
+  flex: 1;
+  max-width: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  height: 100%;
+}
+.ae-bars__track {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+.ae-bars__bar {
+  width: 100%;
+  border-radius: 4px;
+  min-height: 3px;
+}
+.ae-bars__label {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-subtle);
+}
+.ae-bars__value {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}

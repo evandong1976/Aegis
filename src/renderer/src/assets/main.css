@@ -1,0 +1,138 @@
+/* Tailwind v4, CSS-first. Design tokens come from design-system/tokens.css (imported first in
+   main.tsx); @theme maps them to utilities, so `bg-surface`, `text-ink-muted`, `font-display`,
+   `rounded-lg` and the 4px spacing grid all resolve to the design system's values. */
+@import 'tailwindcss';
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-brand: var(--brand);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --spacing: 4px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+/* Text a user may want to copy: hashes, URLs, code. */
+.selectable,
+.ae-mono,
+code,
+pre {
+  user-select: text;
+}
+
+/* The mini panel sits on native vibrancy: a translucent ground tint, cards stay solid. */
+html.is-panel,
+html.is-panel body {
+  background: transparent;
+}
+/* Figma "Mini panel — 360×480": ground at ~90% over the vibrancy, surface cards inside. */
+.panel-shell {
+  background: color-mix(in srgb, var(--ground) 90%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--inset-edge);
+}
+.panel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.panel-card .ae-steps {
+  gap: 0;
+}
+
+/* Title bar drag region for the hidden-inset main window. */
+.drag {
+  -webkit-app-region: drag;
+}
+.no-drag,
+.drag button,
+.drag input,
+.drag a {
+  -webkit-app-region: no-drag;
+}
+
+/* Rail and top bar sit below a 40px title-bar strip that holds the traffic lights. */
+.app-shell {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: 0 var(--space-5) var(--space-5);
+  align-items: start;
+}
+.titlebar {
+  height: 40px;
+}
+
+/* NavRail items are buttons in Aegis (in-app routing), so reset the button chrome. */
+button.ae-rail__item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+button.ae-rail__item.is-active {
+  background: var(--accent-soft);
+}
+.ae-rail__item:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Button labels never wrap; the row makes room instead. */
+.ae-btn {
+  white-space: nowrap;
+}
