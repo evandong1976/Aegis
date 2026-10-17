@@ -412,14 +412,15 @@ flowchart TB
 5. **Verdict** (`verdict.ts`). A Safe Browsing or threat-feed match is Malicious outright.
 6. **Mark the page** (content script). Suspicious links get an amber dotted outline, Malicious a red
    dashed one; a scam-text banner if the text check fired.
-7. **Guard the click** (`guard.ts`). Clicking a Suspicious or Malicious link opens the click guard:
-   Back to safety, Continue anyway, Trust this site. (**Inspect in sandbox** is to be hidden while
+7. **Guard the click** (`guard.ts`). Clicking a Suspicious, Malicious or Unknown link opens the
+   click guard: Back to safety, Continue anyway, Trust this site (not offered for shorteners). (**Inspect in sandbox** is to be hidden while
    detonation is dropped; `guard.ts` still shows it, PROGRESS.md › Open issues.)
 8. **Look further without opening it** (`links.ts`, M2). RDAP domain age, DNS records and
    certificate-transparency logs for the domain. A short link or redirect whose destination can't
-   be seen without following it is **Unknown** ("Aegis can't see where this link goes"); whether
-   it is held at the click is an open question (PLAN.md). Link detonation is dropped for now
-   (decision 20).
+   be seen without following it is **Unknown** ("Aegis can't see where this link goes") and is
+   **held at the click** until the user double-checks (PLAN.md decision 26); a redirect wrapper that
+   carries its destination in the URL is unwrapped and the destination checked instead. Link
+   detonation is dropped for now (decision 20).
 9. **Record** (`store.ts`). The link, its verdict and reasons go to the Links screen and the panel's
    "This page" counts.
 
@@ -789,7 +790,8 @@ sequenceDiagram
 ```
 
 A short link whose destination can't be seen comes back **Unknown** ("Aegis can't see where this
-link goes"). Link detonation, which would have shown the landing page and a screenshot, is dropped
+link goes"), and clicking it opens the same guard so the user double-checks (decision 26). Link
+detonation, which would have shown the landing page and a screenshot, is dropped
 for now (PLAN.md decision 20).
 
 ---

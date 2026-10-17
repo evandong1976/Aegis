@@ -1,7 +1,7 @@
-## Handoff (updated 2026-10-17 11:15 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:35 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–25, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–26, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
@@ -9,8 +9,8 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished — branch `docs-update` (local, not merged, not pushed):** the docs now match
-  everything decided on 2026-10-16/17, each change with its tradeoff:
+- **Just finished — branch `docs-update`, merged into `main`; `main` pushed to `origin`:** the docs
+  now match everything decided on 2026-10-16/17, each change with its tradeoff:
   - `docs/PLAN.md`: decisions 20–25, a "Tradeoffs at a glance" table, Chalk and Photon findings
     from their docs, milestones and branches updated, open questions refreshed.
   - `docs/architectural.md`: Worker A is Droid on the Mac working through tools; links judged
@@ -20,8 +20,9 @@ disagree, PLAN.md › Decisions wins.
     tradeoff, where), and §1–§10 edited so nothing contradicts the plan; §10 now records the
     answers found so far.
   - This file and the README's sponsor sections.
+  - **Short links are held at the click as Unknown** and the user double-checks (decision 26).
 - **Earlier on 2026-10-17:**
-  - **Merged into local `main`** (not pushed): `extension-heartbeat` (the offscreen heartbeat
+  - **Merged into `main`**: `extension-heartbeat` (the offscreen heartbeat
     crash Evan found in real Chrome) and `sponsor-check`. `pnpm typecheck && pnpm lint && pnpm
 test` pass on `main`.
   - **Daytona checked live:** `pnpm try:daytona` passes (create 0.8–3.8 s, upload, run, network
@@ -39,16 +40,21 @@ test` pass on `main`.
     Tier 3 question no longer blocks anything.
   - **Photon is in scope** (decision 21), built near the end; **demo materials at the end**
     (decision 22); **one branch per feature** (23); **keys in `.env.local`** (24).
-- **In progress:** nothing.
+- **In progress:** branch `droid-tool-lockdown` (tests that lock Droid's tools down; its own
+  handoff lives on that branch).
 - **Next step:**
-  1. Team: approve merging `docs-update` into `main`.
+  1. **Zach's newer `sponsor-check` work:** three commits on `origin/sponsor-check` (10:13–10:56,
+     after our merge) aren't in `main`: in-app sponsor checks (`src/main/sponsors.ts`), Chalk
+     project files (`chalk.yaml`, `pyproject.toml`, `uv.lock`, `.claude/skills/`, `CLAUDE.md`) and
+     edits to PLAN.md, PROGRESS.md and architectural.md. Merging them into `main` will conflict
+     with the docs update; do it together with Zach.
   2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
      RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
      code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
      `link-checks` or its own branch.
   3. **Zach:** `sandbox-image`, `ui-fixes` and `watcher` have work on `origin` (pushed 01:17) that
-     predates the decisions above; local `main` is 9 commits ahead of `origin/main`. Merge `main`
-     into each before continuing (PLAN.md › Branches), then `sandbox-image` first.
+     predates the decisions above. Merge the latest `main` into each before continuing (PLAN.md ›
+     Branches), then `sandbox-image` first.
   4. In Chrome: reload the Aegis extension and confirm Settings › Connections shows Bridge =
      Connected (closes milestone 1).
   5. Write `scripts/try-chalk` and `scripts/try-photon` (PLAN.md › Sponsor findings); set
@@ -62,12 +68,7 @@ test` pass on `main`.
 - **Uncommitted on purpose:** `.DS_Store` and `logs/2026-10-16-2356/` (left as they are at the
   team's request).
 - **Blocked on / questions for the team:**
-  - Short links whose destination can't be seen (decision 20): hold them at the click as Unknown,
-    or let them through with a warning?
-  - Add tests that lock Droid's tools down (only `ToolSearch` + the sandbox tools; a
-    prompt-injection sample can't lower a verdict) now on a `droid-tool-lockdown` branch, or at M4
-    on `worker-a`?
-  - Push `main` (and the merged branches) to `origin`?
+  - Merge Zach's newer `origin/sponsor-check` commits into `main` (Next step 1)?
 - **How to verify current state:** `pnpm verify` writes a new `logs/<date-time>/` folder with every
   check's output, a bridge smoke test, the app's health report and screenshots; compare with the
   latest `SUMMARY.md` in `logs/`. `pnpm try:daytona` and `pnpm try:droid` re-check the sponsors
@@ -220,6 +221,9 @@ docs and dashboards only; `try-chalk` and `try-photon` are next.
 
 ## Decisions log
 
+- 2026-10-17 11:35: Short links are held at the click as Unknown and the user double-checks
+  (PLAN.md decision 26). Droid lockdown tests go on their own branch, `droid-tool-lockdown`.
+  `docs-update` merged into `main`; `main` pushed to `origin`.
 - 2026-10-17 11:15: Docs brought up to date on branch `docs-update`: PLAN.md decisions 20–25 and a
   tradeoffs table; architectural.md (Worker A option B, no detonation, Photon screenshots);
   MEGA_PROMPT.md §0 "What changed" with each change's tradeoff, and §1–§10 edited to match.

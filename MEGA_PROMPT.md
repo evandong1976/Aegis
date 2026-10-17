@@ -23,6 +23,7 @@ Each change: what it is, why, what it costs, and where the details live.
 | **Worker B: Chalk, standalone, in a Chalk Compute sandbox** | Chalk can host sandboxes (gVisor, its own network policy); it is the independent second opinion | Chalk's sandbox SDK is Python, so the app needs a small Python helper | PLAN.md decision 17, Sponsor findings › Chalk |
 | **Links are judged without opening them; link detonation is dropped for now** | Detonation needs open internet from a sandbox (blocked on this Daytona tier), can use up one-time links, and is slow | No screenshots or landing-page evidence; short links become **Unknown**; the demo loses "Inspect in sandbox" | PLAN.md decision 20 |
 | **Photon: forward a phone screenshot by iMessage, get a verdict back** (was messages, email, alerts, voice) | One focused feature for the Photon track, built near the end | Built under time pressure; Photon's v2 beta API is newer | PLAN.md decisions 18 and 21, `docs/architectural.md` §8 |
+| **Short links are held at the click as Unknown; the user double-checks** | The destination can't be seen without opening the link | An extra click on every short link, harmless ones included | PLAN.md decision 26 |
 | **One Devpost entry enters all four tracks** | Answered by the organisers via the team | — | PLAN.md decision 21 |
 | **Demo materials are built at the end** | Features first | The demo path is tested late; keep the last 3 hours for it | PLAN.md decision 22 |
 | **The fn key is built early, from Klair's add-on** | The panel opens on fn as specified | Needs Input Monitoring; declare the pre-event code on Devpost | PLAN.md decision 14 |
@@ -155,9 +156,9 @@ Aegis/
 - **webmail (Gmail, Outlook web):** when an email is open, also send the sender's display name, address and Reply-To so the app can flag spoofing (display name vs. address, Reply-To mismatch, lookalike sender domain). Read these from the page, not the Gmail API. The desktop Mail app isn't covered by the extension; the `~/Downloads` watcher covers its attachments, and sending Aegis a screenshot by iMessage (§5.5) covers its links.
 
 **Marking and blocking:**
-- links rated **Suspicious** get an amber dotted outline; **Malicious** gets a red dashed outline. Hover shows the reasons. (**Unknown** links, such as short links whose destination can't be seen, get a note on hover; whether they're held at the click is an open question in `docs/PLAN.md`.)
+- links rated **Suspicious** get an amber dotted outline; **Malicious** gets a red dashed outline. Hover shows the reasons. (**Unknown** links, such as short links whose destination can't be seen, get a note on hover and are **held at the click** until the user double-checks; PLAN.md decision 26.)
 - a scam-text verdict shows a small banner at the top of the page (Shadow DOM) with the reasons.
-- **click guard:** clicking a Suspicious or Malicious link is blocked by an overlay (closed Shadow DOM so the page can't style or read it, built in `extension/src/guard.ts`) with: reasons, **Back to safety**, **Continue anyway**, **Trust this site**. *The **Inspect in sandbox** button must be hidden while link detonation is dropped (§0, §5.2); `guard.ts` still shows it today (PROGRESS.md › Open issues).*
+- **click guard:** clicking a Suspicious, Malicious or Unknown link is blocked by an overlay (closed Shadow DOM so the page can't style or read it, built in `extension/src/guard.ts`) with: reasons, **Back to safety**, **Continue anyway**, **Trust this site** (not offered for shortener domains: trusting `bit.ly` would trust every link behind it). *The **Inspect in sandbox** button must be hidden while link detonation is dropped (§0, §5.2); `guard.ts` still shows it today (PROGRESS.md › Open issues).*
 
 **Downloads go through Aegis instead of straight to the Mac.** Chrome can't send a download to another machine, so the extension stops it and gets the bytes another way, in this order:
 
@@ -198,7 +199,7 @@ Aegis/
 **Tier 2, look further without opening the link** (milestone 2, PLAN.md decision 20). Nothing here loads the page:
 - **DNS records** for the domain (no A/AAAA or MX, very fresh records, fast-flux-looking answers)
 - **certificate-transparency logs** (a certificate first issued in the last few days, or certificates for lookalike names)
-- **short links and redirects** whose destination can't be seen without following them are **Unknown**, with the copy "Aegis can't see where this link goes"
+- **short links and redirects** whose destination can't be seen without following them are **Unknown**, with the copy "Aegis can't see where this link goes", and are **held at the click** so the user double-checks (decision 26). A redirect wrapper that carries its destination in the URL (a `url=` / `q=` parameter) is unwrapped and the destination checked instead
 
 *Why not open the link (detonation)?* The first version opened risky links in a Daytona sandbox. It was dropped on 2026-10-17: this account's Daytona tier blocks sandboxes from the open web (PLAN.md › Sponsor findings › Daytona › Live results), opening links in emails can confirm an unsubscribe or use up a one-time login link, and it is slow. **Tradeoff:** no landing-page screenshots or redirect chains as evidence, and short links become Unknown instead of being followed. If time allows later, detonation could return in a Chalk sandbox, with the anti-cloaking rules from the first version (a real-looking browser, and a harmless-looking page never lowers a verdict).
 
@@ -410,7 +411,7 @@ In **warn** mode, nothing is held: files are delivered with the verdict and repo
 
 ## 7. Plan
 
-**The live plan is `docs/PLAN.md`** (milestones, owners, branches, decisions 1–25 and a tradeoffs table); **status is `docs/PROGRESS.md`**. This section is the outline they follow.
+**The live plan is `docs/PLAN.md`** (milestones, owners, branches, decisions 1–26 and a tradeoffs table); **status is `docs/PROGRESS.md`**. This section is the outline they follow.
 
 ### Work split (2 people)
 
