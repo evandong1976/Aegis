@@ -294,13 +294,13 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
 Do this before writing each integration, record the exact calls here, and get
 `scripts/try-<sponsor>` passing first. Never invent SDK method names. Daytona and Droid were
 checked on 2026-10-17 against each SDK's README and installed type definitions (branch
-`sponsor-check`). `pnpm try:daytona` has run with a real key (live results below); `pnpm try:droid` still needs
-`FACTORY_API_KEY` and the droid CLI.
+`sponsor-check`). `pnpm try:daytona` and `pnpm try:droid` have both run and passed with real keys (live results
+below).
 
 | Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                                                                 |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below. `pnpm try:daytona` **passes** (2026-10-17); this account's tier limits network (see Live results) |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)                                       |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19)                              |
 | Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                                                        |
 | Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                                                                                        |
 | Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                                                             |
@@ -408,10 +408,34 @@ What each Aegis need gets on this tier:
   - **B. Droid connected to the sandbox** (BUILD_PROMPT §4.7 item 2, "run inside or connect
     to"). Droid runs in the main process with every built-in tool off. Its only tools are Aegis MCP
     tools that run read-only commands inside the sandbox through `executeCommand`. The sample never
-    leaves the sandbox and the network stays off. `try-droid` tests this setup with a stub tool.
+    leaves the sandbox and the network stays off. `try-droid` tests this setup against a real network-off sandbox (live results below).
   - `try-droid`'s last step tries A: it installs `droid` in a Daytona sandbox (npm `droid@0.232.0`,
     or Factory's installer if there's no npm) and runs `droid exec --output-format json`. If
     `AEGIS_FACTORY_DOMAINS` is set, it first cuts the sandbox's network to those hosts.
+
+#### Live results (2026-10-17, evidence: `logs/2026-10-17-droid/`)
+
+`pnpm try:droid` **passes** (exit 0) with Evan's key and `droid` 0.238.0 (Homebrew cask):
+
+- `run()` with JSON-schema output: valid `{ verdict, summary }` in about 5–7 s.
+- **Option B, end to end (decision 19):** a Daytona sandbox created with `networkBlockAll` (1.0–1.5
+  s), one line of harmless text uploaded, Droid on the Mac with 31 built-in tools switched off and
+  three read-only, argument-free sandbox tools. Droid called all three, reported the file's
+  SHA-256 correctly (only the tools could give it that), and returned a verdict and summary in
+  about 9–10 s. Each tool call is logged with time, tool, exit code and size: the start of Worker
+  A's sandbox log. The sandbox was deleted; the leak check found 0 sandboxes.
+- **Two things the docs didn't say, found by running it:**
+  1. **Protocol mismatch:** the SDK's own `createSdkMcpServer` marks its servers `oauth: false`,
+     which the SDK only allows when the CLI speaks its exact protocol version. SDK 0.9.1 (the
+     latest) speaks 1.201.1; `droid` 0.238.0 speaks 1.257.0, so sessions with SDK tools fail.
+     Fix in `try-droid`: start the tool server ourselves and pass its address and bearer token as
+     a plain HTTP config without that flag. Same server, same token. Keep this until Factory
+     ships an SDK that matches current CLIs.
+  2. **`ToolSearch` can't be disabled.** It only loads other tools' schemas; with every other tool
+     disabled and the permission handler cancelling anything that isn't a sandbox tool, it can't
+     act. `try-droid` allows exactly that one exception.
+- Option A (Droid inside the sandbox) wasn't run: this account's Daytona tier blocks Factory from
+  sandboxes. It's opt-in with `AEGIS_TRY_DROID_INSIDE=1` if the org reaches Tier 3.
 
 ## Open questions
 

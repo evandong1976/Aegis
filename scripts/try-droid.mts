@@ -125,11 +125,18 @@ async function workerA(cwd: string): Promise<void> {
         )
       ]
     })
+    // The SDK marks its own servers `oauth: false`, which it only allows when the droid CLI speaks
+    // the SDK's exact protocol version (SDK 0.9.1 speaks 1.201.1; droid 0.238.0 speaks 1.257.0).
+    // So start the server here and pass its address and bearer token as a plain HTTP config,
+    // without that flag. Same local server, same token; we close it in `finally`.
+    const started = await sandboxTools.start()
+    const { oauth: _sdkOAuthOptOut, ...toolServer } = started
+    void _sdkOAuthOptOut
     const session = await createSession({
       cwd,
       execPath,
       autonomyLevel: AutonomyLevel.Off,
-      mcpServers: [sandboxTools],
+      mcpServers: [toolServer],
       // Allow only our server's tools; cancel everything else.
       permissionHandler: ({ toolUses }) =>
         toolUses.length > 0 &&
@@ -142,14 +149,17 @@ async function workerA(cwd: string): Promise<void> {
     try {
       const builtIn = (await session.listTools()).filter((t) => !t.id.startsWith(SERVER))
       await session.updateSettings({ disabledToolIds: builtIn.map((t) => t.id) })
+      // ToolSearch can't be disabled (droid 0.238.0): it only loads other tools' schemas, every
+      // other tool is disabled, and the permission handler cancels any non-sandbox tool use.
+      const ALWAYS_ON = ['ToolSearch']
       const stillOn = (await session.listTools())
-        .filter((t) => t.allowed && !t.id.startsWith(SERVER))
+        .filter((t) => t.allowed && !t.id.startsWith(SERVER) && !ALWAYS_ON.includes(t.id))
         .map((t) => t.id)
       record(
         'built-in tools off',
         stillOn.length === 0,
         stillOn.length === 0
-          ? `${builtIn.length} switched off`
+          ? `${builtIn.length - ALWAYS_ON.length} switched off; ${ALWAYS_ON.join(', ')} can't be (schema loader only)`
           : `still allowed: ${stillOn.join(', ')}`
       )
 
@@ -199,6 +209,7 @@ async function workerA(cwd: string): Promise<void> {
       console.log('sandbox log:', JSON.stringify(sandboxLog))
     } finally {
       await session.close()
+      await sandboxTools.close()
     }
   } catch (err) {
     record('Worker A (option B)', false, message(err))

@@ -1,9 +1,15 @@
-## Handoff (updated 2026-10-17 11:05 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:00 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **`pnpm try:droid` passes** (option B, end to end): Droid on the Mac, 31 built-in tools off,
+    three read-only tools into a network-off Daytona sandbox; correct SHA-256, verdict and summary
+    in about 10 s; tool calls logged; 0 sandboxes left. Found and worked around an SDK/CLI protocol
+    mismatch, and `ToolSearch` can't be disabled (harmless). PLAN.md › Sponsor findings › Factory
+    Droid › Live results; evidence `logs/2026-10-17-droid/`. droid CLI 0.238.0 installed via
+    Homebrew (plus its dependency ripgrep).
   - **Worker A decided: option B** (PLAN.md decision 19). `try-droid` step 2 now uses a real
     sandbox: network off, one harmless text file, three read-only argument-free tools; Droid must
     report the file's SHA-256, which only the tools can give it. Typechecks; **not run yet** (needs
@@ -37,16 +43,15 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** Install the droid CLI (`brew install --cask droid`; Factory's signed binary,
-  0.238.0, about 252 MB), run `pnpm try:droid`, save its output under `logs/`, record the result
-  in PLAN.md › Sponsor findings › Factory Droid, run the leak check, then merge `sponsor-check`
-  into `main`. Link detonation still needs a home (Tier 3 or Chalk).
+- **Next step:** Merge `sponsor-check` into `main` (its "Done when" is met: both scripts pass, both
+  findings rows filled in, leak check 0). Then `worker-a` can start once M3 and the `WorkerResult`
+  type exist. Still open: where link detonation runs (Tier 3 or Chalk).
 - **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
   fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
   small UI issues open (see "Open issues"; branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
-- **Blocked on / questions for the user:** permission to install the droid CLI. Where link
+- **Blocked on / questions for the user:** OK to merge `sponsor-check` into `main`? Where link
   detonation runs (Tier 3 or Chalk).
 - **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
   every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
@@ -178,8 +183,12 @@ scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 | After                                       | Sandboxes left running                                    |
 | ------------------------------------------- | --------------------------------------------------------- |
 | `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
+| `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
 
 ## Decisions log
+
+- 2026-10-17: `pnpm try:droid` passes with option B. Workaround for the SDK 0.9.1 / droid 0.238.0
+  protocol mismatch recorded in PLAN.md › Sponsor findings › Factory Droid › Live results.
 
 - 2026-10-17: Worker A is option B — Droid on the Mac, narrow read-only tools into a network-off
   sandbox (PLAN.md decision 19).
