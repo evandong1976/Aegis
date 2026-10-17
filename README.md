@@ -165,10 +165,12 @@ Not built yet (milestones 3, 4 and 6); Worker A's approach is proven by `pnpm tr
 ## How Aegis uses Daytona
 
 Not built into the app yet (milestones 3 and 4); checked live by `pnpm try:daytona`. Daytona hosts
-Worker A: one fresh sandbox per risky file, created with `networkBlockAll` (this account's tier
-only allows turning the network off at creation, and then blocks everything), destroyed after every
+Worker A: one fresh sandbox per risky file, created with `networkBlockAll` at creation, which blocks
+everything (on Daytona Tier 3, which this org has, a sandbox without it would have the whole
+internet), destroyed after every
 job in a `finally`; up to 3 at once. Links are not opened in sandboxes: link detonation was dropped
-because this tier keeps sandboxes off the open web (docs/PLAN.md decision 20). Each report shows
+(docs/PLAN.md decision 20), first because the org's tier kept sandboxes off the open web; Tier 3
+now allows it, and the team may revisit it (decision 28). Each report shows
 the sandbox and its log. Calls and evidence: `docs/PLAN.md` › Sponsor findings › Daytona.
 
 ## How Aegis uses Droid

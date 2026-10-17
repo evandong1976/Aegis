@@ -63,15 +63,16 @@ Merged so far (2026-10-17, pushed): `extension-heartbeat` (a fix branch, not in 
 app, Chalk setup) came in through `sponsor-check-sync`, with main's docs kept as the source of
 truth. Evan's next branch is `link-checks` (M2).
 
-| Order | Branch          | Item                                                            | Needs first                                          | Unblocks                                  |
-| ----- | --------------- | --------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
-| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17** | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
-| 2     | `sandbox-image` | 0b                                                              | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
-| 3     | `ui-fixes`      | Open issues from the verification run                           | —                                                    | —                                         |
-| —     | _no branch_     | 3 (joint, not started)                                          | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
-| 4     | `worker-a`      | 4 (option B, decision 19)                                       | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
-| 5     | `detonate`      | 7 — **parked** (decision 20)                                    | —                                                    | —                                         |
-| 6     | `watcher`       | 8 (the fn add-on part is already done)                          | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
+| Order | Branch            | Item                                                                                          | Needs first                                          | Unblocks                                  |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| 1     | `sponsor-check`   | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17**                               | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
+| 2     | `sandbox-image`   | 0b                                                                                            | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
+| 3     | `ui-fixes`        | Open issues from the verification run                                                         | —                                                    | —                                         |
+| —     | `feature/sandbox` | A shell file into a network-off Daytona sandbox, run there (`daytona.ts`, `pnpm try:sandbox`) | `sandbox-image` (merged in)                          | M3's Daytona half, `worker-a`             |
+| —     | _no branch_       | 3 (joint, not started)                                                                        | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
+| 4     | `worker-a`        | 4 (option B, decision 19)                                                                     | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
+| 5     | `detonate`        | 7 — **parked** (decision 20)                                                                  | —                                                    | —                                         |
+| 6     | `watcher`         | 8 (the fn add-on part is already done)                                                        | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
 
 ### 1. `sponsor-check`
 
@@ -120,6 +121,22 @@ truth. Evan's next branch is `link-checks` (M2).
   3. `LinksView.tsx`: with no history, the Awaiting review empty state says links were checked.
 - **Done when:** `pnpm capture` screenshots show all three fixed, and PROGRESS.md › Open issues is
   cleared.
+
+### `feature/sandbox`
+
+- **Holds:** `src/main/daytona.ts` + tests (MEGA_PROMPT §5.3's sandbox steps as one module: create
+  with the network off at creation, upload with a SHA-256 check, run the sample inside under a time
+  limit with `sh -x`, record commands, files written and network attempts, delete in a `finally`)
+  and `pnpm try:sandbox`, which writes a harmless test shell script and runs it in a sandbox.
+  `sandbox-image` is merged in.
+- **Done when:** `pnpm try:sandbox` passes live against Daytona (needs `DAYTONA_API_KEY` in
+  `.env.local`) and the leak check shows 0 sandboxes.
+- **Result (2026-10-17 12:29):** passes live, 0 sandboxes left
+  (`logs/2026-10-17-1229-sandbox-run/`).
+- **12:38:** network check runs its six probes at once: 36.2 s → 8.1 s, still 7/7 live
+  (`logs/2026-10-17-1238-sandbox-run/`).
+- **Then:** M3's `scans.ts` and `workerA.ts` use `withSandbox`; `observe.py` in the image can
+  replace the shell-based observation when the snapshot exists.
 
 ### 4. `worker-a` (milestone 4)
 
@@ -293,6 +310,8 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     `networkBlockAll`. Each tool call is logged as Worker A's sandbox log. The file under test never
     shares a machine with Droid or its key. Decision 17 otherwise stands (two workers, compared);
     option A stays possible if the org reaches Tier 3. `scripts/try-droid.mts` step 2 is the proof.
+    **Tier 3 reached 2026-10-17 15:24 (decision 28):** option A is now possible; this decision stands
+    until the team chooses to revisit it.
 20. **Links are judged without opening them; link detonation is dropped for now** (team decision,
     2026-10-17). Aegis checks the URL itself (Tier 1 rules), its reputation (Safe Browsing,
     threat feeds via Chalk), domain age (RDAP), DNS records and certificate-transparency logs. None
@@ -301,6 +320,8 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     **Inspect in sandbox** button is to be hidden until detonation exists (code still to change:
     PROGRESS.md › Open issues). Differs from MEGA_PROMPT §5.3
     (Tier 2 detonation) and the demo script's step 1. What happens at the click: decision 26.
+    **Tier 3 reached (decision 28):** a Daytona sandbox can now reach the open web, so detonation
+    is technically possible again; this decision stands until the team chooses to revisit it.
 21. **Aegis enters all four prize tracks, including Photon** (team answer, 2026-10-17: one Devpost
     entry may enter all four). Photon is no longer "later": milestone 5 — forward a phone
     screenshot by iMessage, get a verdict back — is built near the end, before submission.
@@ -390,7 +411,7 @@ below).
 
 | Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                               | Findings                                                                                                              |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox     | Below. `pnpm try:daytona` **passes** (2026-10-17); this account's tier limits network (see Live results)              |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox     | Below. `pnpm try:daytona` **passes** (2026-10-17); **Tier 3 since 15:24** (decision 28; see Tier 3 below)             |
 | Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19)                                           |
 | Photon               | iMessage/SMS channels, receiving images (screenshots), setup, env var names                                                         | Below, from docs only (2026-10-17); no `try-photon` yet                                                               |
 | Chalk                | Features, LLM calls, evals, **can Chalk host Worker B's sandbox**, env var names                                                    | Below, from docs, the dashboard and Chalk's generated guide (2026-10-17): network open by default; no `try-chalk` yet |
@@ -409,7 +430,7 @@ below).
   - `networkBlockAll` turns it off.
   - `networkAllowList` takes CIDRs and `domainAllowList` takes domains.
   - `sandbox.updateNetworkSettings({ networkBlockAll })` changes it while the sandbox runs (Tier 3+
-    only: refused on this account, see Live results).
+    only: refused on the old key's org, accepted on Tier 3; not used for analysis, decision 28).
   - `try-daytona` probes example.com with curl, wget and python3 to confirm the network is really off.
 - **Files:** `sandbox.fs.createFolder(path, mode)`, `sandbox.fs.uploadFile(buffer | localPath, remotePath)`
   and `sandbox.fs.downloadFile(remotePath)`.
@@ -424,7 +445,10 @@ below).
   - Start-up time: `try-daytona` logs it.
   - Concurrency limits and hackathon credits: ask Daytona at the event.
 
-#### Live results on this account (2026-10-17, evidence: `logs/2026-10-17-daytona-tier/`)
+#### Live results on the first account, Tier 1/2 (2026-10-17, evidence: `logs/2026-10-17-daytona-tier/`)
+
+_History: the org moved to Tier 3 at 15:24 (below). Kept because decisions 19 and 20 were made on
+these results._
 
 `pnpm try:daytona` passes every step with Evan's key. Sandbox creation took 0.8–3.8 s from this
 Mac (round trip); delete about 0.1 s. Default sandboxes are Debian 13 (x86_64) containers, running
@@ -461,6 +485,35 @@ What each Aegis need gets on this tier:
   `--network none`) was not run; it isn't needed now that create-time `networkBlockAll` works.
 
 **Decided 2026-10-17: option 2** (decision 19). Link detonation still needs Tier 3 or Chalk.
+
+#### Tier 3 (2026-10-17 15:24, evidence: `logs/2026-10-17-1524-daytona-tier3-newkey/`)
+
+Zach's key from the Tier 3 org, `@daytona/sdk` 0.220.0, default snapshot, three throwaway sandboxes
+(each deleted, 0 left). The probe is saved next to its results (`tier3.probe.mjs`). The same probe
+with the earlier key, minutes before, still showed Tier 1/2
+(`logs/2026-10-17-1517-daytona-tier3/`).
+
+| Network setting                                 | Tier 1/2 (before)       | Tier 3 (now)                                                                    |
+| ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
+| Default (no setting)                            | only essential services | **Open internet**: example.com, npm, `app.factory.ai`, `api.factory.ai` all 200 |
+| `updateNetworkSettings({ networkBlockAll })`    | refused                 | **Accepted**; afterwards all four hosts unreachable                             |
+| `domainAllowList` at creation (Factory's hosts) | refused                 | **Accepted**: only Factory reachable (200); example.com and npm blocked         |
+| `networkBlockAll: true` at creation             | blocks everything       | blocks everything (unchanged)                                                   |
+
+`pnpm try:sandbox` passes on Tier 3 too (see PROGRESS.md › Handoff for its latest run).
+
+What it means for Aegis (decision 28):
+
+- **Analysis sandboxes: unchanged, and more important.** `networkBlockAll: true` at creation still
+  blocks everything; without it a sandbox now has the whole internet.
+- **Droid inside the sandbox (option A): now possible.** Create the sandbox with `domainAllowList`
+  for Factory's hosts only. Still open: the `droid` CLI needs Node.js in the image, the Factory key
+  would sit in the sandbox (as a Daytona Secret), and the sample would share a machine with Droid
+  and its key, which option B avoids. `try-droid`'s option A step creates its sandbox with no
+  network setting, so on Tier 3 it has open internet until `AEGIS_FACTORY_DOMAINS` narrows it; it
+  holds no sample.
+- **Link detonation: now possible on Daytona** in a separate, network-on sandbox, never the one
+  that holds a sample.
 
 ### Factory Droid
 
@@ -530,8 +583,9 @@ What each Aegis need gets on this tier:
   the `ToolSearch` exception, the fixed read-only commands, the untrusted fence and the permission
   handler; `droidLockdown.test.ts` has 15 tests; `try-droid` imports it and still passes. M4's
   `workerA.ts` uses the same module.
-- Option A (Droid inside the sandbox) wasn't run: this account's Daytona tier blocks Factory from
-  sandboxes. It's opt-in with `AEGIS_TRY_DROID_INSIDE=1` if the org reaches Tier 3.
+- Option A (Droid inside the sandbox) wasn't run: the first account's Daytona tier blocked Factory
+  from sandboxes. It's opt-in with `AEGIS_TRY_DROID_INSIDE=1`; on Tier 3 (decision 28) it can run,
+  not tried yet.
 
 ### Chalk (from docs and the dashboard, 2026-10-17; not run yet)
 
@@ -609,13 +663,15 @@ providers: [imessage.config()] })`, then `for await (const [space, message] of a
 ## Open questions
 
 - Which public domain hosts the demo phishing page? (needed at the end, decision 22)
-- Ask Daytona at the event: credits or a tier bump. Tier 3 would allow Droid inside the sandbox
-  (option A) and per-sandbox allow-lists; not needed for the current plan.
+- **Now that Daytona is on Tier 3 (decision 28):** move Worker A to Droid inside the sandbox
+  (option A, revisiting decision 19)? Bring back link detonation (revisiting decision 20)? Both stay
+  as decided until the team says otherwise.
+- Ask Daytona at the event: concurrency limits and hackathon credits.
 - Ask Factory: an SDK release matching current `droid` CLIs, so the `oauth: false` workaround in
   `try-droid` can go (Sponsor findings › Factory Droid › Live results).
 - The Factory key was pasted into the team's chat on 2026-10-17; rotate it in Factory's dashboard.
 
-Answered 2026-10-17: one Devpost entry can enter all four tracks, and Aegis enters the Photon track
+Answered 2026-10-17: Daytona Tier 3 reached (decision 28). One Devpost entry can enter all four tracks, and Aegis enters the Photon track
 (decision 21). Demo materials wait until the end (decision 22). Worker A is option B (decision 19).
 Links are judged without opening them (decision 20). Short links are held at the click as Unknown
 and the user double-checks (decision 26). Tests that lock Droid's tools down go on their own branch,

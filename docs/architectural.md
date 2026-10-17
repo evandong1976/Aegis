@@ -42,8 +42,9 @@ the evals that measure how often each worker, and the pair, is right. **Links ar
 being opened** (decision 20): no link detonation in the current plan.
 
 > **Changed on 2026-10-17** (see PLAN.md decisions 19–21): Droid moved from inside the sandbox to
-> the Mac (the account's Daytona tier blocks Factory from sandboxes), link detonation was dropped,
-> and Photon came back into scope.
+> the Mac (the account's Daytona tier blocked Factory from sandboxes), link detonation was dropped,
+> and Photon came back into scope. **Later that day (15:24) the org reached Daytona Tier 3**
+> (decision 28): both choices stand, and both alternatives are now possible if the team revisits them.
 
 ---
 
@@ -167,32 +168,32 @@ decisions itself: every verdict comes from the app through the bridge.
 
 The brain. It owns the bridge, every decision, every outside service, the store and the windows.
 
-| Module                              | Status             | Role                                                                                                                                                                    |
-| ----------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.ts`                          | Built              | Startup order: identity → `.env` → store → bridge → IPC → tray → shortcuts → panel → health loop                                                                        |
-| `bridge.ts`                         | Built (partial)    | HTTP server for the extension. `/status`, `/ping`, `/trust` live; the rest answer 501 until built                                                                       |
-| `store.ts`                          | Built              | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)                                                                                |
-| `status.ts`                         | Built              | Live app status (protection state, health, page snapshot, active scans) and the scan log                                                                                |
-| `health.ts`                         | Built              | Checks every connection at start, every 60 s and on demand; drives "degraded"                                                                                           |
-| `sponsors.ts`                       | Built              | Real Daytona, sandbox-image and Droid checks for `health.ts`: free lookups every 60 s; a tiny live test at start and on Check now only (PLAN.md decision 27)            |
-| `verdict.ts`                        | Built              | Score bands, hard rules, Unknown, "AI can only raise". Every verdict passes through here                                                                                |
-| `settings.ts`, `config.ts`          | Built              | User settings in SQLite; secrets and config from `.env.local`, then `.env`                                                                                              |
-| `ipc.ts`                            | Built              | Handlers for every channel in `src/shared/ipc.ts`                                                                                                                       |
-| `windows.ts`, `panel.ts`, `tray.ts` | Built              | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu                                                                                  |
-| `fnkey.ts`                          | Built              | Loads `native/fn-key`; a clean fn tap toggles the panel                                                                                                                 |
-| `demo.ts`, `devcapture.ts`          | Built (dev)        | `AEGIS_DEMO=1` demo database; headless screenshots for design checks                                                                                                    |
-| `links.ts`                          | Planned (M2)       | Tier 1 link rules, Tranco, allow list, URL secret stripping, RDAP domain age, DNS and certificate-transparency checks — never opens the link (decision 20)              |
-| `chalk.ts`, `text.ts`               | Planned (M6)       | Chalk online features (cached), Chalk prompts for LLM calls; scam-text check                                                                                            |
-| `precheck.ts`                       | Planned (M3)       | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only                                                                                     |
-| `queue.ts`                          | Planned (M3)       | Sandbox job queue: 3 at once, priorities, daily budget                                                                                                                  |
-| `daytona.ts`, `docker.ts`           | Planned (M3, M8)   | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)                                                                               |
-| `scans.ts`                          | Planned (M3)       | The download pipeline and its persisted state machine (`received → … → compared → done`)                                                                                |
-| `workerA.ts` (Daytona + Droid)      | Planned (M4)       | Creates a network-off Daytona sandbox with the file; runs Droid on the Mac with read-only tools into it (decision 19); collects verdict, evidence and the tool-call log |
-| `workerB.ts` (Chalk)                | Planned (M6)       | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log                                                                                 |
-| `compare.ts`                        | Planned (M4, M6)   | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)                                                                              |
-| `detonate.ts`                       | Parked             | Link detonation, dropped for now (decision 20)                                                                                                                          |
-| `watcher.ts`, `quarantine.ts`       | Planned (M8)       | `~/Downloads` watcher; quarantine, restore, delete                                                                                                                      |
-| `photon.ts`                         | Planned (M5, late) | Phone screenshots by iMessage → read the text and links → normal checks → verdict reply (§8)                                                                            |
+| Module                              | Status                                                                  | Role                                                                                                                                                                    |
+| ----------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`                          | Built                                                                   | Startup order: identity → `.env` → store → bridge → IPC → tray → shortcuts → panel → health loop                                                                        |
+| `bridge.ts`                         | Built (partial)                                                         | HTTP server for the extension. `/status`, `/ping`, `/trust` live; the rest answer 501 until built                                                                       |
+| `store.ts`                          | Built                                                                   | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)                                                                                |
+| `status.ts`                         | Built                                                                   | Live app status (protection state, health, page snapshot, active scans) and the scan log                                                                                |
+| `health.ts`                         | Built                                                                   | Checks every connection at start, every 60 s and on demand; drives "degraded"                                                                                           |
+| `sponsors.ts`                       | Built                                                                   | Real Daytona, sandbox-image and Droid checks for `health.ts`: free lookups every 60 s; a tiny live test at start and on Check now only (PLAN.md decision 27)            |
+| `verdict.ts`                        | Built                                                                   | Score bands, hard rules, Unknown, "AI can only raise". Every verdict passes through here                                                                                |
+| `settings.ts`, `config.ts`          | Built                                                                   | User settings in SQLite; secrets and config from `.env.local`, then `.env`                                                                                              |
+| `ipc.ts`                            | Built                                                                   | Handlers for every channel in `src/shared/ipc.ts`                                                                                                                       |
+| `windows.ts`, `panel.ts`, `tray.ts` | Built                                                                   | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu                                                                                  |
+| `fnkey.ts`                          | Built                                                                   | Loads `native/fn-key`; a clean fn tap toggles the panel                                                                                                                 |
+| `demo.ts`, `devcapture.ts`          | Built (dev)                                                             | `AEGIS_DEMO=1` demo database; headless screenshots for design checks                                                                                                    |
+| `links.ts`                          | Planned (M2)                                                            | Tier 1 link rules, Tranco, allow list, URL secret stripping, RDAP domain age, DNS and certificate-transparency checks — never opens the link (decision 20)              |
+| `chalk.ts`, `text.ts`               | Planned (M6)                                                            | Chalk online features (cached), Chalk prompts for LLM calls; scam-text check                                                                                            |
+| `precheck.ts`                       | Planned (M3)                                                            | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only                                                                                     |
+| `queue.ts`                          | Planned (M3)                                                            | Sandbox job queue: 3 at once, priorities, daily budget                                                                                                                  |
+| `daytona.ts`, `docker.ts`           | `daytona.ts` built (branch `feature/sandbox`); `docker.ts` planned (M8) | One interface for sandboxes: create, upload, run, download, destroy (always in `finally`)                                                                               |
+| `scans.ts`                          | Planned (M3)                                                            | The download pipeline and its persisted state machine (`received → … → compared → done`)                                                                                |
+| `workerA.ts` (Daytona + Droid)      | Planned (M4)                                                            | Creates a network-off Daytona sandbox with the file; runs Droid on the Mac with read-only tools into it (decision 19); collects verdict, evidence and the tool-call log |
+| `workerB.ts` (Chalk)                | Planned (M6)                                                            | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log                                                                                 |
+| `compare.ts`                        | Planned (M4, M6)                                                        | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)                                                                              |
+| `detonate.ts`                       | Parked                                                                  | Link detonation, dropped for now (decision 20)                                                                                                                          |
+| `watcher.ts`, `quarantine.ts`       | Planned (M8)                                                            | `~/Downloads` watcher; quarantine, restore, delete                                                                                                                      |
+| `photon.ts`                         | Planned (M5, late)                                                      | Phone screenshots by iMessage → read the text and links → normal checks → verdict reply (§8)                                                                            |
 
 ### 3.4 Preload — `src/preload/` · Built
 
@@ -223,8 +224,9 @@ sandbox and returns a structured result plus a log of everything that happened i
 When both finish (or the time limit ends), `compare.ts` reconciles them.
 
 **How Worker A works (decision 19, proven by `pnpm try:droid`):** `workerA.ts` creates a Daytona
-sandbox with `networkBlockAll: true` **at creation** (the only network setting this account's tier
-accepts; it blocks even Daytona's "essential services"), uploads the file, and starts a Droid
+sandbox with `networkBlockAll: true` **at creation** (it blocks even Daytona's "essential services";
+on Tier 3 a sandbox without it has the whole internet, and turning it off later would leave it on
+during the upload, decision 28), uploads the file, and starts a Droid
 session **on the Mac** with every built-in tool switched off. Droid's only tools are read-only,
 fixed commands that run inside the sandbox through Daytona's API (list the sample, describe it,
 read it; later the `analyze.py` steps). A permission handler cancels any other tool use. Every
@@ -294,8 +296,9 @@ verdict but never lower it. A file that says "this is safe" in its own strings c
 - A test that errors is treated as dangerous, as the team specified. Benign software can also fail
   in a sandbox, so false alarms from this rule are measured in the Chalk evals (Accuracy tab) and
   tuned there.
-- Answered 2026-10-17: Droid **can't** reach Factory from inside a Daytona sandbox on this
-  account's tier, hence decision 19. Chalk **can** host Worker B's sandbox (Chalk Compute).
+- Answered 2026-10-17: Droid **couldn't** reach Factory from inside a Daytona sandbox on the first
+  tier, hence decision 19. On Tier 3 (15:24) it can, with `domainAllowList` for Factory's hosts
+  only; decision 19 stands unless the team revisits it. Chalk **can** host Worker B's sandbox (Chalk Compute).
 - Droid can only do what our tools allow. That is the point (it can't wander off), but each new
   kind of evidence needs a new fixed tool.
 
@@ -570,9 +573,9 @@ Aegis/
 │
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │
-├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, observe.py,
-│                               rules/*.yar, requirements.txt, tests
-│                               (detonate.py parked, decision 20)
+├── sandbox/                    Dockerfile, requirements.txt, fetch_capa_rules.py, selftest.py,
+│                               README.md. Planned: entry.py, analyze.py, observe.py,
+│                               rules/*.yar, tests (detonate.py parked, decision 20)
 ├── scripts/try-*.mts           live sponsor checks: try-daytona, try-droid (pass);
 │                               try-chalk, try-photon still to write
 ├── chalk/                      chalk.yaml, pyproject.toml, uv.lock (chalk init) + README;
