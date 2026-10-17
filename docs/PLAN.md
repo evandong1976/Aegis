@@ -42,8 +42,10 @@ Claim a milestone in PROGRESS.md before starting it.
 
 ## Branches (Zach)
 
-Created 2026-10-17 from `main`, right after the commit that added this section. Local only, not
-pushed. One branch per Zach-owned item, listed in the order they should land on `main`. Each
+Created 2026-10-17 from `main`, right after the commit that added this section. Zach pushed them
+to `origin` (last at 01:17 on 2026-10-17; `sandbox-image`, `ui-fixes` and `watcher` have commits
+there); local `main` has moved on since and isn't pushed, so merge `main` into each before
+continuing. One branch per Zach-owned item, listed in the order they should land on `main`. Each
 starts empty; its context is below.
 
 Not branched:
@@ -242,7 +244,8 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     let the rail slide up under the traffic lights.
 17. **Two analysis workers, compared** (team direction, 2026-10-16). Every file that needs the
     cloud goes to two independent workers at once, each on its own copy, neither seeing the other:
-    **Worker A** is a throwaway Daytona sandbox with Factory Droid living inside it as the analyst;
+    **Worker A** is a throwaway Daytona sandbox with Factory Droid as the analyst (_amended by
+    decision 19_: Droid runs on the Mac and works on the sandbox through tools, not inside it);
     **Worker B** is Chalk's AI doing the same job standalone in its own isolated environment. Each
     examines the file, **tests it inside its sandbox**, and returns a verdict, confidence, summary,
     timeline, evidence and **a log of what happened in its sandbox** (`WorkerResult`, to add to
@@ -290,7 +293,8 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     threat feeds via Chalk), domain age (RDAP), DNS records and certificate-transparency logs. None
     of these load the page. Short links and redirects whose destination can't be seen are
     **Unknown**, with the copy "Aegis can't see where this link goes". The click guard's
-    **Inspect in sandbox** button is hidden until detonation exists. Differs from MEGA_PROMPT §5.3
+    **Inspect in sandbox** button is to be hidden until detonation exists (code still to change:
+    PROGRESS.md › Open issues). Differs from MEGA_PROMPT §5.3
     (Tier 2 detonation) and the demo script's step 1.
 21. **Aegis enters all four prize tracks, including Photon** (team answer, 2026-10-17: one Devpost
     entry may enter all four). Photon is no longer "later": milestone 5 — forward a phone

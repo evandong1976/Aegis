@@ -1,65 +1,77 @@
-## Handoff (updated 2026-10-17 11:10 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:15 EDT, by Claude Code session, Opus 5.5)
 
-- **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
-  click-guard UI only; 8 — fn add-on only
-- **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished:**
-  - **Merged into `main`** (local, not pushed): `extension-heartbeat` (the offscreen heartbeat
-    crash Evan found in Chrome) and `sponsor-check` (Daytona and Droid checked live; Worker A is
-    option B). `pnpm typecheck && pnpm lint && pnpm test` pass on `main`.
-  - **`pnpm try:droid` passes** (option B, end to end): Droid on the Mac, 31 built-in tools off,
-    three read-only tools into a network-off Daytona sandbox; correct SHA-256, verdict and summary
-    in about 10 s; tool calls logged; 0 sandboxes left. Found and worked around an SDK/CLI protocol
-    mismatch, and `ToolSearch` can't be disabled (harmless). PLAN.md › Sponsor findings › Factory
-    Droid › Live results; evidence `logs/2026-10-17-droid/`. droid CLI 0.238.0 installed via
-    Homebrew (plus its dependency ripgrep).
-  - **Worker A decided: option B** (PLAN.md decision 19). `try-droid` step 2 now uses a real
-    sandbox: network off, one harmless text file, three read-only argument-free tools; Droid must
-    report the file's SHA-256, which only the tools can give it. Typechecks; **not run yet** (needs
-    the droid CLI). Option A (step 3) is opt-in with `AEGIS_TRY_DROID_INSIDE=1`.
-  - `extension-heartbeat` merged into `main` (local, not pushed).
-  - **Daytona checked live (10:40)** with Evan's key: `pnpm try:daytona` passes (create 0.8–3.8 s,
-    upload, run, network off, delete). The org is on Tier 1 or 2: `networkBlockAll` at creation
-    works (even npm, an "essential service", is blocked), but allow-lists and changes after
-    creation are refused, and Factory's hosts are unreachable. So **analysis offline works now;
-    Droid inside the sandbox (option A) and link detonation need Tier 3** or the alternatives in
-    `docs/PLAN.md` › Sponsor findings › Daytona › Live results. Evidence:
-    `logs/2026-10-17-daytona-tier/`. Leak check: 0 sandboxes left.
-  - The try scripts and the app now read `.env.local` as well as `.env` (`.env.local` wins);
-    `try-daytona` also probes an essential service, so "network off" is a real test on Tier 1/2.
-  - **Review against the plan (01:20)**: `try-droid` now also runs Droid inside a Daytona sandbox
-    (option A), as PLAN.md › Branches asks. `try-daytona` now uses the 20 s sandbox-start limit
-    with one retry (architectural.md §4.6). New optional env var: `AEGIS_FACTORY_DOMAINS`.
-  - **`sponsor-check` (this branch, not merged into `main`)**: the Daytona and Droid docs check.
-    Findings with the exact calls are in `docs/PLAN.md` › Sponsor findings. The SDKs are pinned
-    (`@daytona/sdk` 0.220.0, `@factory/droid-sdk` 0.9.1). `pnpm try:daytona` and `pnpm try:droid`
-    typecheck, but **have not run**: no keys are set, and the droid CLI isn't installed. Without
-    keys each exits 1 with a clear message.
-  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
-    branch's work is in its own commits, and this file is that branch's handoff. Order,
-    prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
-    empty, waiting on milestone 3 (joint).
-  - **Verified what works** with `pnpm verify` and recorded the evidence in
-    [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
-    commit `35cba97` (see "What works today" below)
-  - Earlier (2026-10-16): Photon deferred to a later mobile feature (PLAN.md decision 18);
-    pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
-    workers designed (decision 17, docs only)
-- **In progress:** nothing
-- **Next step:** Per PLAN.md › Branches, bring the later branches (`sandbox-image`, `ui-fixes`,
-  `worker-a`, `detonate`, `watcher`) up to date with `main`, then continue in order:
-  `sandbox-image`, `ui-fixes`. In Chrome: reload the Aegis extension and confirm Settings ›
-  Connections shows Bridge = Connected (closes milestone 1). Still open: where link detonation
-  runs (Tier 3 or Chalk).
-- **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
-  fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`. Three
-  small UI issues open (see "Open issues"; branch `ui-fixes`).
-- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
-  (PLAN.md › Branches).
-- **Blocked on / questions for the user:** where link detonation runs (Tier 3 or Chalk).
-- **How to verify current state:** `pnpm verify` — writes a new `logs/<date-time>/` folder with
-  every check's output, a bridge smoke test, the app's health report and screenshots. Then compare
-  with the latest `SUMMARY.md` in `logs/`.
+**New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
+1–25, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
+disagree, PLAN.md › Decisions wins.
+
+- **Milestones:** 0 done; 1 built and verified, waiting on a real-Chrome check; 2 — click-guard UI
+  only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
+  Table: "Milestone checklist" below.
+- **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **Just finished — branch `docs-update` (local, not merged, not pushed):** the docs now match
+  everything decided on 2026-10-16/17, each change with its tradeoff:
+  - `docs/PLAN.md`: decisions 20–25, a "Tradeoffs at a glance" table, Chalk and Photon findings
+    from their docs, milestones and branches updated, open questions refreshed.
+  - `docs/architectural.md`: Worker A is Droid on the Mac working through tools; links judged
+    without opening them (no detonation); Photon back in scope as the screenshot feature. All 10
+    Mermaid diagrams render.
+  - `MEGA_PROMPT.md`: a new §0 table of every change since the first version (what, why,
+    tradeoff, where), and §1–§10 edited so nothing contradicts the plan; §10 now records the
+    answers found so far.
+  - This file and the README's sponsor sections.
+- **Earlier on 2026-10-17:**
+  - **Merged into local `main`** (not pushed): `extension-heartbeat` (the offscreen heartbeat
+    crash Evan found in real Chrome) and `sponsor-check`. `pnpm typecheck && pnpm lint && pnpm
+test` pass on `main`.
+  - **Daytona checked live:** `pnpm try:daytona` passes (create 0.8–3.8 s, upload, run, network
+    off, delete). The org is on Tier 1 or 2: `networkBlockAll` **at creation** works and blocks
+    even npm; allow-lists and changes after creation are refused; Factory and ordinary websites are
+    unreachable. Evidence `logs/2026-10-17-daytona-tier/`.
+  - **Worker A decided and proven: option B** (decision 19). `pnpm try:droid` passes: Droid on
+    the Mac, 31 built-in tools off, three read-only argument-free tools into a network-off Daytona
+    sandbox; correct SHA-256, verdict and summary in about 10 s; every tool call logged; 0
+    sandboxes left. Two surprises, both handled: an SDK/CLI protocol mismatch (worked around) and
+    `ToolSearch` can't be disabled (allowed as the one exception; it can only load schemas).
+    Evidence `logs/2026-10-17-droid/`. The `droid` CLI 0.238.0 is installed on Evan's Mac via
+    Homebrew.
+  - **Links are judged without opening them** (decision 20): link detonation is dropped, so the
+    Tier 3 question no longer blocks anything.
+  - **Photon is in scope** (decision 21), built near the end; **demo materials at the end**
+    (decision 22); **one branch per feature** (23); **keys in `.env.local`** (24).
+- **In progress:** nothing.
+- **Next step:**
+  1. Team: approve merging `docs-update` into `main`.
+  2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
+     RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
+     code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
+     `link-checks` or its own branch.
+  3. **Zach:** `sandbox-image`, `ui-fixes` and `watcher` have work on `origin` (pushed 01:17) that
+     predates the decisions above; local `main` is 9 commits ahead of `origin/main`. Merge `main`
+     into each before continuing (PLAN.md › Branches), then `sandbox-image` first.
+  4. In Chrome: reload the Aegis extension and confirm Settings › Connections shows Bridge =
+     Connected (closes milestone 1).
+  5. Write `scripts/try-chalk` and `scripts/try-photon` (PLAN.md › Sponsor findings); set
+     `CHALK_ENVIRONMENT=gswl7f3494e1` in `.env.local`.
+  6. Rotate the Factory key (it was pasted into chat on 2026-10-17).
+- **Broken / failing:** typecheck, lint and tests pass. `store.test.ts` › "computes the overview
+  counts" fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`.
+  Three small UI issues open ("Open issues" below). `src/shared/constants.ts` still carries
+  `detonatePageLoad` / `detonateTotal` from the dropped detonation; remove them when M2 or M4
+  touches that file.
+- **Uncommitted on purpose:** `.DS_Store` and `logs/2026-10-16-2356/` (left as they are at the
+  team's request).
+- **Blocked on / questions for the team:**
+  - Short links whose destination can't be seen (decision 20): hold them at the click as Unknown,
+    or let them through with a warning?
+  - Add tests that lock Droid's tools down (only `ToolSearch` + the sandbox tools; a
+    prompt-injection sample can't lower a verdict) now on a `droid-tool-lockdown` branch, or at M4
+    on `worker-a`?
+  - Push `main` (and the merged branches) to `origin`?
+- **How to verify current state:** `pnpm verify` writes a new `logs/<date-time>/` folder with every
+  check's output, a bridge smoke test, the app's health report and screenshots; compare with the
+  latest `SUMMARY.md` in `logs/`. `pnpm try:daytona` and `pnpm try:droid` re-check the sponsors
+  with the keys in `.env.local` (each deletes its sandbox; check the leak table below).
 
 ---
 
@@ -86,26 +98,41 @@ Everything in this table was checked by `pnpm verify` on 2026-10-16 at 23:39 EDT
 
 ## Not verified yet
 
-| What                                                                | Why not                                                                    |
-| ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| The extension in a real Chrome (load, heartbeat, popup)             | Needs loading by hand; the run simulated the heartbeat with `curl`         |
-| A physical fn tap, ⌃⌥A, Esc / ⌘O / ⌘P, tray menu clicks             | The script can't send keyboard or menu-bar input                           |
-| Pause / resume, settings toggles, Export CSV, search                | No UI clicks in the run                                                    |
-| The click-guard overlay                                             | Checked by eye in the browser pane during development, not in a logged run |
-| The Daylight (light) theme                                          | The Mac was in dark mode                                                   |
-| Packaging `Aegis.app` (`pnpm app`)                                  | Not run                                                                    |
-| Sponsor integrations (Daytona, Droid, Chalk, Safe Browsing lookups) | Not built yet; no keys set                                                 |
+| What                                                                           | Why not                                                                                                                                                                               |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The extension in a real Chrome (load, heartbeat, popup)                        | Needs loading by hand; the run simulated the heartbeat with `curl`                                                                                                                    |
+| A physical fn tap, ⌃⌥A, Esc / ⌘O / ⌘P, tray menu clicks                        | The script can't send keyboard or menu-bar input                                                                                                                                      |
+| Pause / resume, settings toggles, Export CSV, search                           | No UI clicks in the run                                                                                                                                                               |
+| The click-guard overlay                                                        | Checked by eye in the browser pane during development, not in a logged run                                                                                                            |
+| The Daylight (light) theme                                                     | The Mac was in dark mode                                                                                                                                                              |
+| Packaging `Aegis.app` (`pnpm app`)                                             | Not run                                                                                                                                                                               |
+| Sponsor integrations in the app (Daytona, Droid, Chalk, Photon, Safe Browsing) | Not built yet. Daytona and Droid were checked on their own by `pnpm try:daytona` / `pnpm try:droid` (passing, evidence in `logs/2026-10-17-*`); Chalk and Photon only from their docs |
 
 ## Open issues
 
 Found by the verification run (`logs/2026-10-16-2339/SUMMARY.md` › Problems). All three are
 for branch `ui-fixes` (PLAN.md › Branches):
 
-1. Settings › "Text me when Aegis blocks something" still says "Needs Photon (milestone 5)"; Photon
-   is now deferred to the later mobile feature.
+1. Settings › "Text me when Aegis blocks something" still says "Needs Photon (milestone 5)". Photon
+   is back in scope (decision 21), but only as screenshot → verdict; alert texts are not planned,
+   so the setting should be hidden or say "Not planned".
 2. The empty Report's **Back** button uses a forward-pointing arrow.
 3. With no history, Links › Awaiting review says "Every link you clicked came back with a verdict…",
    implying links were checked.
+
+Found while updating the docs (2026-10-17): **the code still assumes link detonation**, which
+decision 20 dropped. Fix on its own branch (e.g. `drop-detonation`) or as part of `link-checks`:
+
+4. `extension/src/guard.ts` still shows **Inspect in sandbox** (hide it).
+5. Settings: the "auto-detonate" toggle (`autoDetonate` in `src/shared/ipc.ts`,
+   `src/main/settings.ts`, `SettingsView.tsx`), the sandbox-budget description ("Automatic
+   detonations stop…") and `PRIVACY_COPY` ("suspicious links are opened in a Daytona sandbox") —
+   use the README's Privacy copy.
+6. Downloads › a tile caption says "opened in a Daytona sandbox today"; the demo data has a
+   "Detonation" check row (`src/main/demo.ts`).
+7. Leftovers to remove or leave for later: the bridge's `POST /inspect` route (501 today),
+   `TIMEOUTS_MS.detonatePageLoad` / `detonateTotal`, and the `detonations` table in `store.ts` (a
+   schema change; its test lists the table).
 
 ---
 
@@ -114,15 +141,15 @@ for branch `ui-fixes` (PLAN.md › Branches):
 | #   | Milestone                                                              | Owner       | Status                                                                                         |
 | --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
 | 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
-| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Not started                                                                                    |
-| 0b  | `demo/` test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`             | Zach        | Not started (branch `sandbox-image`)                                                           |
+| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
+| 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile on branch `sandbox-image` (origin); demo files at the end (decision 22)             |
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
-| 2   | Links                                                                  | Evan        | Click-guard UI built; content script, scoring, wiring not built                                |
+| 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
-| 4   | Worker A (Daytona + Droid) + compare                                   | Zach        | Not started (branch `worker-a`; designed: PLAN.md decision 17)                                 |
-| 5   | Later: mobile via Photon (screenshots → verdict)                       | Evan        | Deferred, not in the current build                                                             |
+| 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3         |
+| 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                     |
 | 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                    |
-| 7   | Detonation                                                             | Zach        | Not started (branch `detonate`)                                                                |
+| 7   | ~~Link detonation~~                                                    | Zach        | Dropped for now (decision 20); branch `detonate` parked                                        |
 | 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`) |
 | 9   | Stretch                                                                | —           | Not started                                                                                    |
 | 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                    |
@@ -142,7 +169,7 @@ behind clicks is not yet covered by a logged run (see "Not verified yet").
 - **Report** (Figma frame): verdict header with risk score, finding chips and actions (disabled
   until milestone 8), timeline, indicators, code evidence with flagged lines, capabilities, checks
   that ran, sandbox / privacy footer.
-- **Messages, Accuracy**: empty states; Messages is a placeholder for the later mobile feature;
+- **Messages, Accuracy**: empty states; Messages will hold the Photon screenshot threads (M5);
   Accuracy reads `evals/results.json` (milestone 6).
 - **Settings**: protection toggles (persisted), connections, API key status, trusted sites, sandbox
   budget, permissions, privacy copy.
@@ -162,7 +189,7 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 | Sandbox image     | pending      | Milestone 3                                             |
 | Docker (fallback) | down         | Docker is installed but not running on Evan's Mac       |
 | Droid             | unconfigured | No key                                                  |
-| Photon            | unconfigured | Deferred feature; optional                              |
+| Photon            | unconfigured | M5, built near the end                                  |
 | Chalk             | unconfigured | No key                                                  |
 | Safe Browsing     | unconfigured | No key; the live check is implemented but not exercised |
 | Downloads folder  | ok           | Granted to Electron under `pnpm dev`                    |
@@ -179,8 +206,10 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 
 ## Sponsor findings
 
-Daytona and Factory Droid: from each SDK's types, 2026-10-17, branch `sponsor-check`. The try
-scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
+All in `docs/PLAN.md` › Sponsor findings. Daytona and Factory Droid: checked against each SDK's
+types, then **run live** on 2026-10-17 (`pnpm try:daytona`, `pnpm try:droid`, both passing;
+evidence `logs/2026-10-17-daytona-tier/`, `logs/2026-10-17-droid/`). Chalk and Photon: from their
+docs and dashboards only; `try-chalk` and `try-photon` are next.
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
@@ -190,6 +219,16 @@ scripts haven't run yet (no keys). See `docs/PLAN.md` › Sponsor findings.
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
 
 ## Decisions log
+
+- 2026-10-17 11:15: Docs brought up to date on branch `docs-update`: PLAN.md decisions 20–25 and a
+  tradeoffs table; architectural.md (Worker A option B, no detonation, Photon screenshots);
+  MEGA_PROMPT.md §0 "What changed" with each change's tradeoff, and §1–§10 edited to match.
+- 2026-10-17: Link detonation dropped; links are judged without opening them (PLAN.md decision
+  20). Short links become Unknown; "Inspect in sandbox" is hidden.
+- 2026-10-17: One Devpost entry enters all four tracks; Photon is back in scope as screenshot →
+  verdict, built near the end (decision 21, supersedes the "deferred" part of 18).
+- 2026-10-17: Demo materials move to the end (decision 22); one branch per feature (23); keys in
+  `.env.local` (24); every "works" claim needs evidence in `logs/` (25).
 
 - 2026-10-17: `extension-heartbeat` and `sponsor-check` merged into `main`.
 

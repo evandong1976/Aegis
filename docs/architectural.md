@@ -413,8 +413,8 @@ flowchart TB
 6. **Mark the page** (content script). Suspicious links get an amber dotted outline, Malicious a red
    dashed one; a scam-text banner if the text check fired.
 7. **Guard the click** (`guard.ts`). Clicking a Suspicious or Malicious link opens the click guard:
-   Back to safety, Continue anyway, Trust this site. (**Inspect in sandbox** is hidden while
-   detonation is dropped.)
+   Back to safety, Continue anyway, Trust this site. (**Inspect in sandbox** is to be hidden while
+   detonation is dropped; `guard.ts` still shows it, PROGRESS.md › Open issues.)
 8. **Look further without opening it** (`links.ts`, M2). RDAP domain age, DNS records and
    certificate-transparency logs for the domain. A short link or redirect whose destination can't
    be seen without following it is **Unknown** ("Aegis can't see where this link goes"); whether
