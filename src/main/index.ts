@@ -234,7 +234,13 @@ app.whenReady().then(async () => {
       },
       download: (bytes, meta) => scans!.fromChrome(bytes, meta),
       downloadQuarantined: (req) =>
-        scans!.fromPath({ path: req.path, source: 'chrome', url: req.url, referrer: req.referrer }),
+        scans!.fromPath({
+          path: req.path,
+          source: 'chrome',
+          url: req.url,
+          referrer: req.referrer,
+          filename: req.filename
+        }),
       scanStatus: (id) => scans?.status(id) ?? null
     })
     status.record(null, `bridge listening host=127.0.0.1 port=${config.bridgePort}`)
@@ -275,9 +281,8 @@ app.whenReady().then(async () => {
   if (process.env.AEGIS_CAPTURE_DIR) {
     // AEGIS_CAPTURE_SCAN picks the scan the report route opens, by file name or URL.
     const pick = process.env.AEGIS_CAPTURE_SCAN
-    const reportId = pick
-      ? store.listScans({ kind: 'any', search: pick, limit: 1 })[0]?.id
-      : undefined
+    const reportId = (): string | undefined =>
+      pick ? store?.listScans({ kind: 'any', search: pick, limit: 1 })[0]?.id : undefined
     openMainWindow('overview')
     showPanel()
     scheduleCapture({ main: getMainWindow, panel: getPanel, reportId })

@@ -162,14 +162,18 @@ export class ScanService {
     source: ScanSource
     url?: string | null
     referrer?: string | null
+    /** The name the user expects, when Chrome saved it under another (`x.pdf.html`, `x.aegis`). */
+    filename?: string
   }): Promise<string | null> {
     const path = await this.insideDownloads(input.path)
     if (!path || this.claimed.has(path)) return null
     this.claimed.add(path)
     try {
       const id = randomUUID()
-      const name = safeName(basename(path).replace(new RegExp(`\\${QUARANTINE_EXTENSION}$`), ''))
-      // Chrome's fallback folder isn't where the user expects the file: restore to ~/Downloads.
+      const name = safeName(
+        input.filename || basename(path).replace(new RegExp(`\\${QUARANTINE_EXTENSION}$`), '')
+      )
+      // Restored (if it's ever restored) to ~/Downloads under the name the user expects.
       const entry = await this.deps.quarantine.add(path, id, {
         originalPath: join(this.deps.downloadsDir, name)
       })
@@ -308,7 +312,11 @@ export class ScanService {
       r.checks.push({
         name: 'Local pre-check',
         state: hard ? 'fail' : pc.documentRisks.length ? 'warn' : 'ok',
-        result: pc.needsCloud ? 'needs the sandbox' : 'cleared on this Mac'
+        result: hard
+          ? (pc.reasons.find((x) => x.hard)?.text ?? 'hard rule')
+          : pc.needsCloud
+            ? 'needs the sandbox'
+            : 'cleared on this Mac'
       })
       this.save(r, pc)
       this.deps.log(

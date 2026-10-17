@@ -1,0 +1,132 @@
+[
+  {
+    "name": "extension loads",
+    "ok": true,
+    "detail": "onljkbhkoinihmjibfofcalimkolemam"
+  },
+  {
+    "name": "extension service worker running",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "aegis-terminal-demo.command: unknown, held",
+    "ok": true,
+    "detail": "unknown / held / chrome / 3064 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 2.2 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "aegis-terminal-demo.command: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "3ea6dd7a-0e13-4a87-a8c7-6a598e9c12f0 network=off destroyed=2026-10-17T22:42:18.044Z"
+  },
+  {
+    "name": "statement.pdf: clean, delivered",
+    "ok": true,
+    "detail": "clean / delivered / chrome / 268 ms; checks: Local pre-check=ok(cleared on this Mac)"
+  },
+  {
+    "name": "statement.pdf: never uploaded",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "photo.jpg: malicious, quarantined",
+    "ok": true,
+    "detail": "malicious / quarantined / chrome / 5802 ms; checks: Local pre-check=fail(named .jpg but is really a Mac program), Daytona sandbox=ok(network off, 3.6 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "photo.jpg: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "6ed84e43-a9b3-4a9c-a8b6-f05700ea1b19 network=off destroyed=2026-10-17T22:42:23.567Z"
+  },
+  {
+    "name": "report.sh: unknown, held",
+    "ok": true,
+    "detail": "unknown / held / chrome / 1525 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 0.9 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "report.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "e4e04bb7-fe05-4e5b-a594-ce864c5993bd network=off destroyed=2026-10-17T22:42:25.683Z"
+  },
+  {
+    "name": "hello.sh: unknown, held",
+    "ok": true,
+    "detail": "unknown / held / chrome / 2023 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 1.0 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "hello.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "16cb8089-956d-436d-92b1-b0f6d4bd81a5 network=off destroyed=2026-10-17T22:42:27.526Z"
+  },
+  {
+    "name": "invoice.pdf: unknown, held",
+    "ok": true,
+    "detail": "unknown / held / chrome / 8572 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 4.0 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "invoice.pdf: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "a6d62170-8a2a-447d-8e5a-14cbc42a1cf6 network=off destroyed=2026-10-17T22:42:36.223Z"
+  },
+  {
+    "name": "notes.sh: unknown, held",
+    "ok": true,
+    "detail": "unknown / held / chrome / 2782 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 0.7 s), Upload check (SHA-256)=ok(matched), Analysis (Worker A)=skipped(not built yet)"
+  },
+  {
+    "name": "notes.sh: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted",
+    "ok": true,
+    "detail": "c4085fcd-2f7c-4ef5-9b45-a2ffbea37162 network=off destroyed=2026-10-17T22:42:39.129Z"
+  },
+  {
+    "name": "aegis-terminal-demo.command: never written to the downloads folder",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "photo.jpg: never written to the downloads folder",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "report.sh: never written to the downloads folder",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "hello.sh: never written to the downloads folder",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "statement.pdf: delivered into the downloads folder",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "logged-in download: Chrome and the in-memory refetch both sent the cookie",
+    "ok": true,
+    "detail": "2 requests: session=ok | session=ok"
+  },
+  {
+    "name": "one-time link: fetched again for the fallback (3 requests)",
+    "ok": true,
+    "detail": "3 requests"
+  },
+  {
+    "name": "watcher: a file dropped into the folder is quarantined and scanned",
+    "ok": true,
+    "detail": "unknown / held after 5298 ms; left the folder at +29021 ms"
+  },
+  {
+    "name": "watcher: an old file that changes is left alone",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "held files are .aegis with mode 600",
+    "ok": true,
+    "detail": "7 files"
+  }
+]

@@ -87,6 +87,10 @@ export const PASS_THROUGH_EXTENSIONS = {
 } as const
 
 export const QUARANTINE_EXTENSION = '.aegis'
+/**
+ * Ignored by the watcher. The extension no longer saves into it: Chrome refuses download paths with
+ * a part that starts with a dot (PLAN.md decision 30); the fallback is `<name>.aegis` instead.
+ */
 export const CHROME_QUARANTINE_DIR = '.aegis-quarantine'
 
 export const SERVICE_NAMES = {

@@ -112,7 +112,8 @@ export const DownloadMetaSchema = z.object({
 export type DownloadMeta = z.infer<typeof DownloadMetaSchema>
 export const DownloadResponseSchema = z.object({ scanId: z.string() })
 
-// POST /download/quarantined — Chrome saved it into .aegis-quarantine, or it finished before cancel.
+// POST /download/quarantined — Chrome saved it as <name>.aegis (the fallback), or it finished before
+// the extension could stop it.
 // The app moves it into its own quarantine at once; `path` must be inside the downloads folder.
 export const QuarantinedRequestSchema = z.object({
   chromeDownloadId: z.number().int(),

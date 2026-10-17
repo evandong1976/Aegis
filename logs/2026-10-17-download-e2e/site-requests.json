@@ -1,0 +1,72 @@
+[
+  {
+    "at": "2026-10-17T22:42:13.723Z",
+    "path": "/",
+    "cookie": null
+  },
+  {
+    "at": "2026-10-17T22:42:13.751Z",
+    "path": "/favicon.ico",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:15.267Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:15.299Z",
+    "path": "/dl/aegis-terminal-demo.command",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:18.320Z",
+    "path": "/dl/statement.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:18.341Z",
+    "path": "/dl/statement.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:18.582Z",
+    "path": "/dl/photo.jpg",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:18.596Z",
+    "path": "/dl/photo.jpg",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:24.386Z",
+    "path": "/private/report.sh",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:24.406Z",
+    "path": "/private/report.sh",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:27.922Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:27.936Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:27.940Z",
+    "path": "/once/invoice.pdf",
+    "cookie": "session=ok"
+  },
+  {
+    "at": "2026-10-17T22:42:39.293Z",
+    "path": "/requests",
+    "cookie": null
+  }
+]

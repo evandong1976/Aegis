@@ -367,7 +367,9 @@ export function openStore(path: string): Store {
           real_type, status, action, verdict, score, reason, summary, reasons, stage1, droid, report, caught_by,
           sandboxed, partial, held_path, duration_ms, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT (id) DO UPDATE SET status = excluded.status, action = excluded.action,
+         ON CONFLICT (id) DO UPDATE SET file_kind = excluded.file_kind,
+          file_category = excluded.file_category, sha256 = excluded.sha256, size = excluded.size,
+          real_type = excluded.real_type, status = excluded.status, action = excluded.action,
           verdict = excluded.verdict, score = excluded.score, reason = excluded.reason,
           summary = excluded.summary, reasons = excluded.reasons, stage1 = excluded.stage1,
           droid = excluded.droid, report = excluded.report, caught_by = excluded.caught_by,

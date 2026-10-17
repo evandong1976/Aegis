@@ -266,6 +266,16 @@ describe('the download pipeline', () => {
     expect(await readFile(join(downloads, 'statement.pdf'))).toEqual(PDF)
   })
 
+  it('keeps the name the user expects when Chrome renamed its copy', async () => {
+    const path = join(downloads, 'invoice.pdf.html')
+    await writeFile(path, '<!doctype html><title>Sign in</title>')
+    const svc = service()
+    const id = await svc.fromPath({ path, source: 'chrome', filename: 'invoice.pdf' })
+    const report = await finished(svc, id!)
+    expect(report).toMatchObject({ filename: 'invoice.pdf', action: 'held' })
+    expect(await readdir(downloads)).toEqual([])
+  })
+
   it('refuses paths outside the downloads folder, and takes a file only once', async () => {
     const outside = join(root, 'secret.txt')
     await writeFile(outside, 'x')

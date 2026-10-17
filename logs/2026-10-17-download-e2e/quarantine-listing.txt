@@ -1,0 +1,7 @@
+600  3344e8fb-465d-444c-87f1-2dae643ff1c8/report.sh.aegis
+600  3a0194c0-92a7-4846-90f6-b3486d97d1de/hello.sh.aegis
+600  563f9925-98c7-4bc8-b94e-40b68f928f63/invoice.pdf.aegis
+600  5fe2ce2c-c298-4811-aa03-3ca4eb8c2cd9/photo.jpg.aegis
+600  9e6d1ab3-6556-4937-b7b3-c8a39ffaffd1/airdrop-tool.command.aegis
+600  d290b6c8-2bc7-4963-89c8-ee9f2236abac/aegis-terminal-demo.command.aegis
+600  e8d620be-b0bd-4892-917c-eedba0de3033/notes.sh.aegis

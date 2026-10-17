@@ -1,0 +1,625 @@
+{
+  "aegis-terminal-demo.command": {
+    "id": "d290b6c8-2bc7-4963-89c8-ee9f2236abac",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "http://127.0.0.1:8766/dl/aegis-terminal-demo.command",
+    "filename": "aegis-terminal-demo.command",
+    "file_kind": "Script",
+    "file_category": "Script",
+    "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+    "size": 524,
+    "real_type": "script",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+        "realType": "script",
+        "claimedType": "command",
+        "signature": null,
+        "size": 524,
+        "firstSeen": "2026-10-17T22:42:15.304Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 2.2 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "3ea6dd7a-0e13-4a87-a8c7-6a598e9c12f0",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 2220,
+          "runMs": 587,
+          "ran": [
+            "ok · create: 3ea6dd7a-0e13-4a87-a8c7-6a598e9c12f0 from the default snapshot, 1 attempt, networkBlockAll=true (2.2 s)",
+            "ok · upload: sample/file + sample/meta.json (0.3 s)",
+            "ok · check upload: exit 0 (0.1 s)",
+            "ok · identify: exit 0 (0.1 s)",
+            "ok · delete: 3ea6dd7a-0e13-4a87-a8c7-6a598e9c12f0 (0.1 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:18.044Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/d290b6c8-2bc7-4963-89c8-ee9f2236abac/aegis-terminal-demo.command.aegis",
+    "user_decision": null,
+    "duration_ms": 2822,
+    "created_at": "2026-10-17T22:42:15.304Z",
+    "updated_at": "2026-10-17T22:42:18.126Z"
+  },
+  "statement.pdf": {
+    "id": "6540b12a-5852-413b-9bc2-4fa7fe2035b9",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "http://127.0.0.1:8766/dl/statement.pdf",
+    "filename": "statement.pdf",
+    "file_kind": "PDF",
+    "file_category": "Document",
+    "sha256": "9aa88369067c834e2c432007ae7765737105cc61ade81c04fed6a9a44587a2af",
+    "size": 64,
+    "real_type": "pdf",
+    "status": "done",
+    "action": "delivered",
+    "verdict": "clean",
+    "score": 0,
+    "reason": "Checked on this Mac",
+    "summary": "No threats found, checked on this Mac. It never left this Mac.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "9aa88369067c834e2c432007ae7765737105cc61ade81c04fed6a9a44587a2af",
+        "realType": "pdf",
+        "claimedType": "pdf",
+        "signature": null,
+        "size": 64,
+        "firstSeen": "2026-10-17T22:42:18.342Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "cleared on this Mac"
+        }
+      ],
+      "sandbox": []
+    },
+    "caught_by": null,
+    "sandboxed": 0,
+    "partial": 0,
+    "held_path": null,
+    "user_decision": null,
+    "duration_ms": 12,
+    "created_at": "2026-10-17T22:42:18.342Z",
+    "updated_at": "2026-10-17T22:42:18.354Z"
+  },
+  "photo.jpg": {
+    "id": "5fe2ce2c-c298-4811-aa03-3ca4eb8c2cd9",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "http://127.0.0.1:8766/dl/photo.jpg",
+    "filename": "photo.jpg",
+    "file_kind": "Executable",
+    "file_category": "Installer",
+    "sha256": "60099fe38a04d587f4c8ff7d71f2166b1b881941a6f651b3be81fc6492453d2b",
+    "size": 4096,
+    "real_type": "macho",
+    "status": "done",
+    "action": "quarantined",
+    "verdict": "malicious",
+    "score": 70,
+    "reason": "named .jpg but is really a Mac program",
+    "summary": "named .jpg but is really a Mac program.",
+    "reasons": [
+      {
+        "code": "type_mismatch",
+        "text": "named .jpg but is really a Mac program",
+        "weight": 70,
+        "hard": true
+      }
+    ],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "60099fe38a04d587f4c8ff7d71f2166b1b881941a6f651b3be81fc6492453d2b",
+        "realType": "macho",
+        "claimedType": "jpg",
+        "signature": null,
+        "size": 4096,
+        "firstSeen": "2026-10-17T22:42:18.598Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "fail",
+          "result": "named .jpg but is really a Mac program"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 3.6 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "6ed84e43-a9b3-4a9c-a8b6-f05700ea1b19",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 3595,
+          "runMs": 2150,
+          "ran": [
+            "ok · create: 6ed84e43-a9b3-4a9c-a8b6-f05700ea1b19 from the default snapshot, 1 attempt, networkBlockAll=true (3.6 s)",
+            "ok · upload: sample/file + sample/meta.json (0.6 s)",
+            "ok · check upload: exit 0 (0.2 s)",
+            "ok · identify: exit 0 (0.5 s)",
+            "ok · delete: 6ed84e43-a9b3-4a9c-a8b6-f05700ea1b19 (0.8 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:23.567Z"
+        }
+      ]
+    },
+    "caught_by": "Local pre-check",
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/5fe2ce2c-c298-4811-aa03-3ca4eb8c2cd9/photo.jpg.aegis",
+    "user_decision": null,
+    "duration_ms": 5756,
+    "created_at": "2026-10-17T22:42:18.598Z",
+    "updated_at": "2026-10-17T22:42:24.354Z"
+  },
+  "report.sh": {
+    "id": "3344e8fb-465d-444c-87f1-2dae643ff1c8",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "http://127.0.0.1:8766/private/report.sh",
+    "filename": "report.sh",
+    "file_kind": "Script",
+    "file_category": "Script",
+    "sha256": "0c8a5649874c54abfc75d49e296c335044184df2889aac68abd4e650193e8967",
+    "size": 25,
+    "real_type": "script",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "0c8a5649874c54abfc75d49e296c335044184df2889aac68abd4e650193e8967",
+        "realType": "script",
+        "claimedType": "sh",
+        "signature": null,
+        "size": 25,
+        "firstSeen": "2026-10-17T22:42:24.407Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 0.9 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "e4e04bb7-fe05-4e5b-a594-ce864c5993bd",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 866,
+          "runMs": 507,
+          "ran": [
+            "ok · create: e4e04bb7-fe05-4e5b-a594-ce864c5993bd from the default snapshot, 1 attempt, networkBlockAll=true (0.9 s)",
+            "ok · upload: sample/file + sample/meta.json (0.2 s)",
+            "ok · check upload: exit 0 (0.1 s)",
+            "ok · identify: exit 0 (0.1 s)",
+            "ok · delete: e4e04bb7-fe05-4e5b-a594-ce864c5993bd (0.1 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:25.683Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/3344e8fb-465d-444c-87f1-2dae643ff1c8/report.sh.aegis",
+    "user_decision": null,
+    "duration_ms": 1384,
+    "created_at": "2026-10-17T22:42:24.407Z",
+    "updated_at": "2026-10-17T22:42:25.791Z"
+  },
+  "hello.sh": {
+    "id": "3a0194c0-92a7-4846-90f6-b3486d97d1de",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "data:text/x-sh;base64,IyEvYmluL3NoCmVjaG8gZGF0YS11cmwK",
+    "filename": "hello.sh",
+    "file_kind": "Script",
+    "file_category": "Script",
+    "sha256": "c58a9ff1548e58ce34de007dd7b25ec454340cda293fe736d9bc563dcacd8e2c",
+    "size": 24,
+    "real_type": "script",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "c58a9ff1548e58ce34de007dd7b25ec454340cda293fe736d9bc563dcacd8e2c",
+        "realType": "script",
+        "claimedType": "sh",
+        "signature": null,
+        "size": 24,
+        "firstSeen": "2026-10-17T22:42:25.919Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 1.0 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "16cb8089-956d-436d-92b1-b0f6d4bd81a5",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 965,
+          "runMs": 981,
+          "ran": [
+            "ok · create: 16cb8089-956d-436d-92b1-b0f6d4bd81a5 from the default snapshot, 1 attempt, networkBlockAll=true (1.0 s)",
+            "ok · upload: sample/file + sample/meta.json (0.5 s)",
+            "ok · check upload: exit 0 (0.1 s)",
+            "ok · identify: exit 0 (0.1 s)",
+            "ok · delete: 16cb8089-956d-436d-92b1-b0f6d4bd81a5 (0.3 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:27.526Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/3a0194c0-92a7-4846-90f6-b3486d97d1de/hello.sh.aegis",
+    "user_decision": null,
+    "duration_ms": 1956,
+    "created_at": "2026-10-17T22:42:25.919Z",
+    "updated_at": "2026-10-17T22:42:27.875Z"
+  },
+  "invoice.pdf": {
+    "id": "563f9925-98c7-4bc8-b94e-40b68f928f63",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "http://127.0.0.1:8766/once/invoice.pdf",
+    "filename": "invoice.pdf",
+    "file_kind": "PDF",
+    "file_category": "Document",
+    "sha256": "b8024ef7da45471991f8f73f3e73ded5fb9ce600d76a15f2baafeaeca5ed40c5",
+    "size": 80,
+    "real_type": "html",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "b8024ef7da45471991f8f73f3e73ded5fb9ce600d76a15f2baafeaeca5ed40c5",
+        "realType": "html",
+        "claimedType": "pdf",
+        "signature": null,
+        "size": 80,
+        "firstSeen": "2026-10-17T22:42:29.400Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 4.0 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "a6d62170-8a2a-447d-8e5a-14cbc42a1cf6",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 4002,
+          "runMs": 2902,
+          "ran": [
+            "ok · create: a6d62170-8a2a-447d-8e5a-14cbc42a1cf6 from the default snapshot, 1 attempt, networkBlockAll=true (4.0 s)",
+            "ok · upload: sample/file + sample/meta.json (2.5 s)",
+            "ok · check upload: exit 0 (0.1 s)",
+            "ok · identify: exit 0 (0.2 s)",
+            "ok · delete: a6d62170-8a2a-447d-8e5a-14cbc42a1cf6 (0.1 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:36.223Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/563f9925-98c7-4bc8-b94e-40b68f928f63/invoice.pdf.aegis",
+    "user_decision": null,
+    "duration_ms": 6912,
+    "created_at": "2026-10-17T22:42:29.400Z",
+    "updated_at": "2026-10-17T22:42:36.312Z"
+  },
+  "notes.sh": {
+    "id": "e8d620be-b0bd-4892-917c-eedba0de3033",
+    "kind": "download",
+    "source": "chrome",
+    "seen_in": "Chrome",
+    "url": "blob:http://127.0.0.1:8766/5d1a52d0-6aa1-4f66-ba6e-f0ea19430aa9",
+    "filename": "notes.sh",
+    "file_kind": "Script",
+    "file_category": "Script",
+    "sha256": "930fb6b785039b201e77fef7f748552dd6729ed9b2de9bb4508bedecc6e69648",
+    "size": 24,
+    "real_type": "script",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "930fb6b785039b201e77fef7f748552dd6729ed9b2de9bb4508bedecc6e69648",
+        "realType": "script",
+        "claimedType": "sh",
+        "signature": null,
+        "size": 24,
+        "firstSeen": "2026-10-17T22:42:37.334Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 0.7 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "c4085fcd-2f7c-4ef5-9b45-a2ffbea37162",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 724,
+          "runMs": 1194,
+          "ran": [
+            "ok · create: c4085fcd-2f7c-4ef5-9b45-a2ffbea37162 from the default snapshot, 1 attempt, networkBlockAll=true (0.7 s)",
+            "ok · upload: sample/file + sample/meta.json (0.7 s)",
+            "ok · check upload: exit 0 (0.3 s)",
+            "ok · identify: exit 0 (0.1 s)",
+            "ok · delete: c4085fcd-2f7c-4ef5-9b45-a2ffbea37162 (0.1 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:39.129Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/e8d620be-b0bd-4892-917c-eedba0de3033/notes.sh.aegis",
+    "user_decision": null,
+    "duration_ms": 1927,
+    "created_at": "2026-10-17T22:42:37.334Z",
+    "updated_at": "2026-10-17T22:42:39.261Z"
+  },
+  "airdrop-tool.command": {
+    "id": "9e6d1ab3-6556-4937-b7b3-c8a39ffaffd1",
+    "kind": "quarantine",
+    "source": "watcher",
+    "seen_in": "~/Downloads",
+    "url": null,
+    "filename": "airdrop-tool.command",
+    "file_kind": "Script",
+    "file_category": "Script",
+    "sha256": "35dd879f78d94ba4169bcd0ca4103741601a8efdc30559ea4f9fb2a8abe41725",
+    "size": 32,
+    "real_type": "script",
+    "status": "done",
+    "action": "held",
+    "verdict": "unknown",
+    "score": 0,
+    "reason": "Not analysed yet",
+    "summary": "Sent to a network-off Daytona sandbox and verified there. Nothing has analysed it yet, so Aegis can't call it clean.",
+    "reasons": [],
+    "stage1": null,
+    "droid": null,
+    "report": {
+      "indicators": {
+        "sha256": "35dd879f78d94ba4169bcd0ca4103741601a8efdc30559ea4f9fb2a8abe41725",
+        "realType": "script",
+        "claimedType": "command",
+        "signature": null,
+        "size": 32,
+        "firstSeen": "2026-10-17T22:42:41.405Z"
+      },
+      "code": [],
+      "checks": [
+        {
+          "name": "Local pre-check",
+          "state": "ok",
+          "result": "needs the sandbox"
+        },
+        {
+          "name": "Daytona sandbox",
+          "state": "ok",
+          "result": "network off, 1.9 s"
+        },
+        {
+          "name": "Upload check (SHA-256)",
+          "state": "ok",
+          "result": "matched"
+        },
+        {
+          "name": "Analysis (Worker A)",
+          "state": "skipped",
+          "result": "not built yet"
+        }
+      ],
+      "sandbox": [
+        {
+          "provider": "daytona",
+          "sandboxId": "bf1a8436-6877-4d6f-a9b5-5849872855fe",
+          "image": "Daytona default",
+          "network": "off",
+          "startupMs": 1876,
+          "runMs": 1113,
+          "ran": [
+            "ok · create: bf1a8436-6877-4d6f-a9b5-5849872855fe from the default snapshot, 1 attempt, networkBlockAll=true (1.9 s)",
+            "ok · upload: sample/file + sample/meta.json (0.3 s)",
+            "ok · check upload: exit 0 (0.3 s)",
+            "ok · identify: exit 0 (0.3 s)",
+            "ok · delete: bf1a8436-6877-4d6f-a9b5-5849872855fe (0.1 s)"
+          ],
+          "destroyedAt": "2026-10-17T22:42:44.317Z"
+        }
+      ]
+    },
+    "caught_by": null,
+    "sandboxed": 1,
+    "partial": 1,
+    "held_path": "/private/tmp/claude-501/-Users-evandong--claude-spares-spare-tL5rHF/75648946-21f1-4b3b-af1d-55b2fc78e685/scratchpad/dl-run/app/quarantine/9e6d1ab3-6556-4937-b7b3-c8a39ffaffd1/airdrop-tool.command.aegis",
+    "user_decision": null,
+    "duration_ms": 2999,
+    "created_at": "2026-10-17T22:42:41.405Z",
+    "updated_at": "2026-10-17T22:42:44.404Z"
+  }
+}
