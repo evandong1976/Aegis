@@ -28,7 +28,8 @@
     "postinstall": "install-electron && electron-builder install-app-deps",
     "tokens": "node design-system/build-tokens.mjs",
     "capture": "sh scripts/capture.sh",
-    "dev:demo": "AEGIS_DEMO=1 electron-vite dev"
+    "dev:demo": "AEGIS_DEMO=1 electron-vite dev",
+    "verify": "sh scripts/verify.sh"
   },
   "dependencies": {
     "zod": "4.6.7"

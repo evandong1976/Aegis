@@ -11,10 +11,10 @@ AEGIS_DEMO=1 AEGIS_USER_DATA="$PROFILE" AEGIS_BRIDGE_PORT=47399 AEGIS_CAPTURE_DI
   AEGIS_CAPTURE_ROUTES="$ROUTES" AEGIS_CAPTURE_SCAN=invoice_oct AEGIS_CAPTURE_SCROLL="${AEGIS_CAPTURE_SCROLL:-}" \
   ./node_modules/.bin/electron-vite dev > "$OUT/dev.log" 2>&1 &
 PID=$!
-LAST=$(echo "$ROUTES" | tr ',' '\n' | tail -1)
-if [ -n "${AEGIS_CAPTURE_SCROLL:-}" ]; then LAST="$LAST-scrolled"; fi
+# The capture hook writes status.json after the last screenshot.
 i=0
-while [ ! -f "$OUT/$LAST.png" ] && [ $i -lt 120 ]; do sleep 1; i=$((i + 1)); done
+while [ ! -f "$OUT/status.json" ] && [ $i -lt 150 ]; do sleep 1; i=$((i + 1)); done
+sleep 1
 pkill -P "$PID" 2>/dev/null || true
 kill "$PID" 2>/dev/null || true
 ls "$OUT"

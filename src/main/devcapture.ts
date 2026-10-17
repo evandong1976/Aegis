@@ -1,11 +1,14 @@
 // Dev aid: with AEGIS_CAPTURE_DIR set, saves PNGs of the main window (one per route in
 // AEGIS_CAPTURE_ROUTES, comma-separated) and of the panel, so a headless session can check the UI
-// against the Figma references. Does nothing otherwise.
+// against the Figma references. At the end it also writes status.json (live status, including every
+// health check) and log.json (the scan log), as evidence for scripts/verify.sh. Does nothing
+// otherwise.
 
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
 import type { BrowserWindow } from 'electron'
 import type { MainRoute } from '@shared/ipc'
+import { status } from './status'
 
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
@@ -51,5 +54,8 @@ export function scheduleCapture(opts: {
         await save(dir, `${route}-scrolled`, opts.main())
       }
     }
+    await writeFile(join(dir, 'status.json'), JSON.stringify(status.get(), null, 2))
+    await writeFile(join(dir, 'log.json'), JSON.stringify(status.recent(200), null, 2))
+    console.log('[capture] wrote status.json, log.json')
   })()
 }

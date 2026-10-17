@@ -10,3 +10,7 @@ extension/dist
 !.env.example
 evals/.cache
 native/fn-key/build
+# Verification evidence is committed (scripts/verify.sh); the throwaway app profiles are not.
+!logs/**/*.log
+logs/**/profile/
+logs/**/profile-*/
