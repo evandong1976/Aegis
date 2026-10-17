@@ -4,6 +4,7 @@
 # Usage: sh scripts/capture.sh [out-dir] [routes]
 set -eu
 OUT="${1:-/tmp/aegis-capture}"
+case "$OUT" in /*) ;; *) OUT="$(pwd)/$OUT" ;; esac
 ROUTES="${2:-overview,links,downloads,report,settings,accuracy,messages}"
 mkdir -p "$OUT"
 PROFILE="$OUT/profile"

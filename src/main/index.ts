@@ -3,7 +3,7 @@
 
 import { app, BrowserWindow, dialog, globalShortcut } from 'electron'
 import { rmSync } from 'fs'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import type { Server } from 'http'
 import { APP_ID, HEALTH_INTERVAL_MS } from '@shared/constants'
 import { startBridge } from './bridge'
@@ -23,7 +23,7 @@ import { startFnKey, stopFnKey } from './fnkey'
 app.setName('Aegis')
 app.setAppUserModelId(APP_ID)
 // Dev only: a separate profile (own database, own single-instance lock) for headless captures.
-if (process.env.AEGIS_USER_DATA) app.setPath('userData', process.env.AEGIS_USER_DATA)
+if (process.env.AEGIS_USER_DATA) app.setPath('userData', resolve(process.env.AEGIS_USER_DATA))
 
 if (!app.requestSingleInstanceLock()) app.quit()
 

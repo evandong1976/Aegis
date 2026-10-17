@@ -10,7 +10,7 @@ set -u
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 STAMP=$(date +%Y-%m-%d-%H%M)
-OUT="logs/$STAMP"
+OUT="$ROOT/logs/$STAMP"
 mkdir -p "$OUT/screens"
 RESULTS="$OUT/results.tsv"
 printf 'check\texit\texpected\tlog\n' > "$RESULTS"
@@ -84,7 +84,8 @@ check() {
   want=$2
   shift 2
   got=$(curl -s -o "$OUT/.body" -w '%{http_code}' "$@")
-  body=$(head -c 160 "$OUT/.body")
+  body=$(head -c 160 "$OUT/.body" 2>/dev/null)
+  rm -f "$OUT/.body"
   if [ "$got" = "$want" ]; then r=PASS; pass=$((pass + 1)); else r=FAIL; fail=$((fail + 1)); fi
   printf '%s  expected %s got %s  %s\n      body: %s\n' "$r" "$want" "$got" "$desc" "$body" >> "$SMOKE"
 }
@@ -119,17 +120,24 @@ while [ ! -f "$REAL/status.json" ] && [ $i -lt 150 ]; do sleep 1; i=$((i + 1)); 
 sleep 1
 pkill -P "$APP" 2>/dev/null
 kill "$APP" 2>/dev/null
-grep -E "\[renderer (error|warning)\]" "$OUT/app-real.log" > "$OUT/renderer-errors.log"
+# A launch that never rendered must not pass: count screenshots and require status.json.
+shots=$(ls "$REAL"/*.png 2>/dev/null | wc -l | tr -d ' ')
+printf 'real mode: app launched, %s screenshots\t%s\t8\tapp-real.log\n' "$shots" "$shots" >> "$RESULTS"
+if [ -f "$REAL/status.json" ]; then st=0; else st=1; fi
+printf 'real mode: live status + health written\t%s\t0\tscreens/real/status.json\n' "$st" >> "$RESULTS"
+grep -E "\[renderer (error|warning)\]|App threw an error" "$OUT/app-real.log" > "$OUT/renderer-errors.log"
 errs=$(wc -l < "$OUT/renderer-errors.log" | tr -d ' ')
-printf 'renderer console errors (real mode)\t%s\t0\trenderer-errors.log\n' "$errs" >> "$RESULTS"
+printf 'real mode: renderer and main errors\t%s\t0\trenderer-errors.log\n' "$errs" >> "$RESULTS"
 
 # 4. Demo mode screenshots (separate profile and port via capture.sh)
 sh scripts/capture.sh "$OUT/screens/demo" overview,links,downloads,report,accuracy,messages,settings > /dev/null
 cp "$OUT/screens/demo/dev.log" "$OUT/app-demo.log" 2>/dev/null
 rm -f "$OUT/screens/demo/dev.log"
-grep -E "\[renderer (error|warning)\]" "$OUT/app-demo.log" > "$OUT/renderer-errors-demo.log"
+shots=$(ls "$OUT"/screens/demo/*.png 2>/dev/null | wc -l | tr -d ' ')
+printf 'demo mode: app launched, %s screenshots\t%s\t8\tapp-demo.log\n' "$shots" "$shots" >> "$RESULTS"
+grep -E "\[renderer (error|warning)\]|App threw an error" "$OUT/app-demo.log" > "$OUT/renderer-errors-demo.log"
 errs=$(wc -l < "$OUT/renderer-errors-demo.log" | tr -d ' ')
-printf 'renderer console errors (demo mode)\t%s\t0\trenderer-errors-demo.log\n' "$errs" >> "$RESULTS"
+printf 'demo mode: renderer and main errors\t%s\t0\trenderer-errors-demo.log\n' "$errs" >> "$RESULTS"
 
 # Shrink screenshots so the evidence stays small in git.
 for f in "$OUT"/screens/*/*.png; do sips -Z 1400 "$f" > /dev/null 2>&1; done
