@@ -36,6 +36,11 @@ export interface QuarantineEntry {
 export interface Quarantine {
   /** Moves `src` into quarantine as `id`. `originalPath` overrides where `restore` puts it back. */
   add(src: string, id: string, opts?: { originalPath?: string }): Promise<QuarantineEntry>
+  /**
+   * Writes bytes that were never on disk (a download fetched in memory) straight into quarantine
+   * as `id`. `originalPath` is where `restore` puts them: ~/Downloads under their original name.
+   */
+  addBytes(bytes: Buffer, id: string, opts: { originalPath: string }): Promise<QuarantineEntry>
   get(id: string): Promise<QuarantineEntry | null>
   list(): Promise<QuarantineEntry[]>
   /** Moves it back with its permissions, to `to` or its original path, never over another file. */
@@ -90,6 +95,29 @@ export function createQuarantine(root: string): Quarantine {
         size,
         sha256,
         modes,
+        quarantinedAt: new Date().toISOString()
+      }
+      await writeFile(join(dir, SIDECAR), JSON.stringify(entry, null, 2), { mode: 0o600 })
+      return entry
+    },
+
+    async addBytes(bytes, id, { originalPath }) {
+      const dir = folder(id)
+      const name = basename(originalPath)
+      await mkdir(root, { recursive: true, mode: 0o700 })
+      await mkdir(dir, { mode: 0o700 })
+      const dest = join(dir, withQuarantineExtension(name))
+      await writeFile(dest, bytes, { mode: 0o600, flag: 'wx' })
+      const entry: QuarantineEntry = {
+        id,
+        originalPath,
+        name,
+        path: dest,
+        kind: 'file',
+        size: bytes.length,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+        // Restored as an ordinary download: readable and writable, never executable.
+        modes: { '': 0o644 },
         quarantinedAt: new Date().toISOString()
       }
       await writeFile(join(dir, SIDECAR), JSON.stringify(entry, null, 2), { mode: 0o600 })

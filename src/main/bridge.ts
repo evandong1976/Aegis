@@ -3,17 +3,23 @@
 
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'http'
 import type { ZodType } from 'zod'
-import { BRIDGE_HOST, EXTENSION_ORIGIN } from '@shared/constants'
+import { BRIDGE_HOST, EXTENSION_ORIGIN, IN_MEMORY_DOWNLOAD_LIMIT_BYTES } from '@shared/constants'
 import {
   BRIDGE_ROUTES,
   ClickRequestSchema,
+  DOWNLOAD_META_HEADER,
   PageRequestSchema,
   PingRequestSchema,
+  QuarantinedRequestSchema,
   TrustRequestSchema,
+  decodeDownloadMeta,
   type BridgeError,
   type ClickRequest,
+  type DownloadMeta,
   type PageRequest,
   type PageResponse,
+  type QuarantinedRequest,
+  type ScanStatusResponse,
   type StatusResponse
 } from '@shared/bridge'
 
@@ -37,6 +43,30 @@ export interface BridgeDeps {
   click(req: ClickRequest): Promise<void>
   /** Adds a trusted site; returns the registered domain trusted. Throws to refuse (400). */
   trust(domain: string): string
+  /** A download's bytes, fetched in memory by the extension. Returns the scan ID. */
+  download?(bytes: Buffer, meta: DownloadMeta): string
+  /** A download Chrome wrote to disk anyway. Returns the scan ID, or null if nothing was taken. */
+  downloadQuarantined?(req: QuarantinedRequest): Promise<string | null>
+  scanStatus?(id: string): ScanStatusResponse | null
+  /** Largest body POST /download accepts. */
+  downloadLimitBytes?: number
+}
+
+class TooLarge extends Error {}
+
+async function readBytes(req: IncomingMessage, limit: number): Promise<Buffer> {
+  const declared = Number(req.headers['content-length'] ?? NaN)
+  if (declared > limit) throw new TooLarge()
+  const chunks: Buffer[] = []
+  let size = 0
+  // Past the limit, keep reading but drop the bytes: leaving the loop would destroy the socket
+  // before the 413 goes out.
+  for await (const chunk of req) {
+    size += (chunk as Buffer).length
+    if (size <= limit) chunks.push(chunk as Buffer)
+  }
+  if (size > limit) throw new TooLarge()
+  return Buffer.concat(chunks, size)
 }
 
 function send(res: ServerResponse, code: number, body: unknown): void {
@@ -109,7 +139,36 @@ export function handleRequest(deps: BridgeDeps) {
         send(res, 200, { ok: true, domain: deps.trust(domain) })
         return
       }
-      // Milestones 3 and 7 fill these in; the contract is already in src/shared/bridge.ts.
+      if (route === `POST ${BRIDGE_ROUTES.download.path}` && deps.download) {
+        const header = req.headers[DOWNLOAD_META_HEADER]
+        const meta = decodeDownloadMeta(typeof header === 'string' ? header : '')
+        const limit = deps.downloadLimitBytes ?? IN_MEMORY_DOWNLOAD_LIMIT_BYTES
+        let bytes: Buffer
+        try {
+          bytes = await readBytes(req, limit)
+        } catch (err) {
+          if (!(err instanceof TooLarge)) throw err
+          // The extension falls back to the quarantine path.
+          fail(res, 413, `Larger than ${limit} bytes`)
+          return
+        }
+        if (bytes.length === 0) throw new Error('Empty download')
+        send(res, 200, { scanId: deps.download(bytes, meta) })
+        return
+      }
+      if (route === `POST ${BRIDGE_ROUTES.downloadQuarantined.path}` && deps.downloadQuarantined) {
+        const body = await readJson(req, QuarantinedRequestSchema)
+        send(res, 200, { scanId: await deps.downloadQuarantined(body) })
+        return
+      }
+      const scan = /^POST \/scan\/([^/]+)$/.exec(route)
+      if (scan && deps.scanStatus) {
+        const found = deps.scanStatus(decodeURIComponent(scan[1]))
+        if (found) send(res, 200, found)
+        else fail(res, 404, 'No such scan')
+        return
+      }
+      // Link detonation is parked (decision 20); the contract stays in src/shared/bridge.ts.
       const pending = [
         BRIDGE_ROUTES.download,
         BRIDGE_ROUTES.downloadQuarantined,

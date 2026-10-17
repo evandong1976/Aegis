@@ -92,8 +92,15 @@ export const ClickRequestSchema = z.object({
 })
 export type ClickRequest = z.infer<typeof ClickRequestSchema>
 
-// POST /download — metadata in headers, streamed bytes in the body
+// POST /download — metadata in a header, the file's bytes as the body (at most
+// IN_MEMORY_DOWNLOAD_LIMIT_BYTES; larger files take the quarantine path). The bytes were fetched in
+// memory by the offscreen document and never written to disk.
 export const DOWNLOAD_META_HEADER = 'x-aegis-download'
+/** Header values must be ASCII; file names often aren't. */
+export const encodeDownloadMeta = (meta: DownloadMeta): string =>
+  encodeURIComponent(JSON.stringify(meta))
+export const decodeDownloadMeta = (value: string): DownloadMeta =>
+  DownloadMetaSchema.parse(JSON.parse(decodeURIComponent(value)))
 export const DownloadMetaSchema = z.object({
   chromeDownloadId: z.number().int(),
   url: z.string(),
@@ -105,15 +112,19 @@ export const DownloadMetaSchema = z.object({
 export type DownloadMeta = z.infer<typeof DownloadMetaSchema>
 export const DownloadResponseSchema = z.object({ scanId: z.string() })
 
-// POST /download/quarantined — Chrome saved it into .aegis-quarantine, or it finished before cancel
+// POST /download/quarantined — Chrome saved it into .aegis-quarantine, or it finished before cancel.
+// The app moves it into its own quarantine at once; `path` must be inside the downloads folder.
 export const QuarantinedRequestSchema = z.object({
   chromeDownloadId: z.number().int(),
   url: z.string(),
+  referrer: z.string().optional(),
   path: z.string(),
   filename: z.string(),
   reason: z.enum(['fetch_failed', 'already_finished', 'too_large'])
 })
 export type QuarantinedRequest = z.infer<typeof QuarantinedRequestSchema>
+/** scanId is null when the file was gone or already being scanned (the watcher got it first). */
+export const QuarantinedResponseSchema = z.object({ scanId: z.string().nullable() })
 
 // POST /inspect — detonate one link in a sandbox (the full URL, only on user request)
 export const InspectRequestSchema = z.object({

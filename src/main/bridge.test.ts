@@ -2,6 +2,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { Server } from 'http'
 import type { AddressInfo } from 'net'
 import { EXTENSION_ORIGIN } from '@shared/constants'
+import {
+  DOWNLOAD_META_HEADER,
+  encodeDownloadMeta,
+  type DownloadMeta,
+  type QuarantinedRequest
+} from '@shared/bridge'
 import { isAllowedHost, isAllowedOrigin, startBridge } from './bridge'
 
 describe('origin check', () => {
@@ -24,6 +30,8 @@ describe('bridge server', () => {
   let port = 0
   let pings = 0
   const trusted: string[] = []
+  const downloads: Array<{ bytes: Buffer; meta: DownloadMeta }> = []
+  const quarantined: QuarantinedRequest[] = []
 
   beforeAll(async () => {
     // Port 0 picks a free port; the Host check needs the real one, so start, read it, restart.
@@ -45,7 +53,20 @@ describe('bridge server', () => {
         return d.toLowerCase()
       },
       page: async () => ({ paused: false, links: [], scamText: null, sender: null }),
-      click: async () => {}
+      click: async () => {},
+      download: (bytes, meta) => {
+        downloads.push({ bytes, meta })
+        return 'scan-1'
+      },
+      downloadQuarantined: async (req) => {
+        quarantined.push(req)
+        return null
+      },
+      scanStatus: (id) =>
+        id === 'scan-1'
+          ? { scanId: id, status: 'done', verdict: 'unknown', summary: 'Held.', held: true }
+          : null,
+      downloadLimitBytes: 1024
     }
   }
 
@@ -95,6 +116,70 @@ describe('bridge server', () => {
       body: JSON.stringify({ domain: '' })
     })
     expect(res.status).toBe(400)
+  })
+
+  it('takes a download as bytes with its metadata in a header', async () => {
+    const meta: DownloadMeta = {
+      chromeDownloadId: 7,
+      url: 'https://example.com/f',
+      filename: 'résumé (final).sh'
+    }
+    const res = await fetch(url('/download'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN, [DOWNLOAD_META_HEADER]: encodeDownloadMeta(meta) },
+      body: new Uint8Array([1, 2, 3, 0, 255])
+    })
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ scanId: 'scan-1' })
+    expect(downloads.at(-1)?.meta).toEqual(meta)
+    expect([...downloads.at(-1)!.bytes]).toEqual([1, 2, 3, 0, 255])
+  })
+
+  it('refuses a download over the limit (413) or without metadata (400)', async () => {
+    const before = downloads.length
+    const big = await fetch(url('/download'), {
+      method: 'POST',
+      headers: {
+        origin: EXTENSION_ORIGIN,
+        [DOWNLOAD_META_HEADER]: encodeDownloadMeta({ chromeDownloadId: 1, url: 'u', filename: 'f' })
+      },
+      body: new Uint8Array(2048)
+    })
+    expect(big.status).toBe(413)
+    const bare = await fetch(url('/download'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN },
+      body: new Uint8Array(4)
+    })
+    expect(bare.status).toBe(400)
+    expect(downloads.length).toBe(before)
+  })
+
+  it('takes quarantined downloads and answers scan status', async () => {
+    const res = await fetch(url('/download/quarantined'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        chromeDownloadId: 3,
+        url: 'https://example.com/a.sh',
+        path: '/Users/x/Downloads/.aegis-quarantine/a.sh.aegis',
+        filename: 'a.sh',
+        reason: 'fetch_failed'
+      })
+    })
+    expect(await res.json()).toEqual({ scanId: null })
+    expect(quarantined.at(-1)?.reason).toBe('fetch_failed')
+
+    const scan = await fetch(url('/scan/scan-1'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN }
+    })
+    expect(await scan.json()).toMatchObject({ verdict: 'unknown', held: true })
+    const missing = await fetch(url('/scan/nope'), {
+      method: 'POST',
+      headers: { origin: EXTENSION_ORIGIN }
+    })
+    expect(missing.status).toBe(404)
   })
 
   it('marks routes from later milestones as not implemented', async () => {

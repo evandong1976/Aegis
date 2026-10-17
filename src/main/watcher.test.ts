@@ -194,6 +194,16 @@ describe('the watcher', () => {
     expect(seen.map((f) => f.name)).toEqual(['changed.pdf'])
   })
 
+  it("doesn't report an old file that changes", async () => {
+    const path = join(dir, 'old-notes.sh')
+    await writeFile(path, '#!/bin/sh\n')
+    await new Promise((r) => setTimeout(r, 2100))
+    start()
+    await appendFile(path, 'echo edited\n')
+    await new Promise((r) => setTimeout(r, 300))
+    expect(seen).toEqual([])
+  })
+
   it('at start, picks up only what arrived since the given time', async () => {
     await writeFile(join(dir, 'old.zip'), 'PK')
     await new Promise((r) => setTimeout(r, 50))

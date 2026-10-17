@@ -34,7 +34,11 @@ export interface WatcherOptions {
   onFile: (file: SettledFile) => void | Promise<void>
   /** Files Aegis put there itself (delivered or restored), so they aren't scanned twice. */
   delivered?: DeliveredLedger
-  /** At start, also report items added after this time (ms since epoch), e.g. while Aegis was closed. */
+  /**
+   * At start, also report items added after this time (ms since epoch), e.g. while Aegis was
+   * closed. Items created before it (or before the watcher started) are never reported, even when
+   * they change: editing an old file in ~/Downloads isn't a new download.
+   */
   since?: number
   /** How long an item must stay the same size before it counts as finished. */
   settleMs?: number
@@ -59,6 +63,8 @@ export function startWatcher(opts: WatcherOptions): Watcher {
   const settleMs = opts.settleMs ?? 2000
   const pollMs = opts.pollMs ?? 500
   const onError = opts.onError ?? (() => {})
+  // A little slack for a download that was being written as the watcher started.
+  const createdFloor = opts.since ?? Date.now() - 2000
   const tracking = new Map<
     string,
     { size: number; mtimeMs: number; since: number; first: number }
@@ -112,6 +118,10 @@ export function startWatcher(opts: WatcherOptions): Watcher {
         }
         const kind = itemKind(path, info.isDirectory(), info.isFile())
         if (!kind) {
+          tracking.delete(path)
+          continue
+        }
+        if (createdAt(info) < createdFloor) {
           tracking.delete(path)
           continue
         }
