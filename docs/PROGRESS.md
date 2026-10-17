@@ -1,9 +1,14 @@
-## Handoff (updated 2026-10-17 00:00 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 00:45 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **`sandbox-image` (this branch, not merged into `main`)**: the image half of milestone 0b.
+    `sandbox/Dockerfile` builds, and `sandbox/selftest.py` passes 7 / 7 with the network off, both
+    plain and with the Docker fallback's hardening. Evidence:
+    [`logs/2026-10-17-0043-sandbox-image/`](../logs/2026-10-17-0043-sandbox-image/SUMMARY.md). The
+    `demo/` test files are the other half: Zach is writing those by hand.
   - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
     `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
     commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
@@ -22,8 +27,10 @@
   `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
   start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
   milestone 3 (joint) is underway.
-- **Broken / failing:** nothing failing. Three small UI issues open (see "Open issues"; branch
-  `ui-fixes`).
+- **Broken / failing:** typecheck and lint pass. `store.test.ts` › "computes the overview counts"
+  fails between midnight and about 1:35 AM because of its demo timestamps, not this branch's
+  changes; the fix is on `ui-fixes` (`73c1997`). Three small UI issues open (see "Open issues";
+  branch `ui-fixes`).
 - **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
   (PLAN.md › Branches).
 - **Blocked on / questions for the user:** deferred by the team: four-track eligibility (and whether
@@ -87,7 +94,7 @@ for branch `ui-fixes` (PLAN.md › Branches):
 | --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
 | 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
 | 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Not started                                                                                    |
-| 0b  | `demo/` test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`             | Zach        | Not started (branch `sandbox-image`)                                                           |
+| 0b  | `demo/` test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`             | Zach        | Dockerfile built and checked (branch `sandbox-image`); `demo/` files: Zach, by hand            |
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
 | 2   | Links                                                                  | Evan        | Click-guard UI built; content script, scoring, wiring not built                                |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
@@ -161,6 +168,10 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 
 ## Decisions log
 
+- 2026-10-17 00:45: `sandbox-image`: `sandbox/Dockerfile` (Python 3.12.14 pinned by digest; capa 9.4.0
+  with matching rules checked by SHA-256; Playwright 1.63.0 Chromium; every version at least two
+  weeks old), `selftest.py` and `sandbox/README.md`. The image holds tools only: the scripts come
+  with M3 and M7, and the `demo/` test files are Zach's to write by hand.
 - 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
   `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
   prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and
