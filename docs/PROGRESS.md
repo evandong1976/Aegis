@@ -1,9 +1,14 @@
-## Handoff (updated 2026-10-17 00:55 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 01:25 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Review against the plan (01:25)**: matches PLAN.md › Branches › `watcher` ("can start before
+    M3") and MEGA_PROMPT §5.7 for everything these two modules own. Not built, as planned:
+    `docker.ts` and the §5.9 rows. Known limit: the start-up `since` scan uses each file's creation
+    time, so a file moved into ~/Downloads from elsewhere on the same disk while Aegis was closed
+    is missed (live moves are seen).
   - **`watcher` (this branch, not merged into `main`)**: the milestone 8 groundwork that can be
     built before milestone 3 (MEGA_PROMPT §5.7), with 22 tests.
     - `src/main/quarantine.ts`: moves an item into its own quarantine folder with `.aegis` added,
@@ -19,10 +24,10 @@
       - at start, picks up items added since a given time.
     - **Not wired in:** nothing starts the watcher, and the Report actions stay disabled
       (decision 12) until milestone 3's pipeline exists.
-  - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
-    `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
-    commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
-    Branches. Joint items (0, 3, 10) have no branch and aren't started.
+  - **Branches for Zach's items**: six local branches cut from `main`, not pushed. Each
+    branch's work is in its own commits, and this file is that branch's handoff. Order,
+    prerequisites and contents: `docs/PLAN.md` › Branches. `worker-a` and `detonate` are still
+    empty, waiting on milestone 3 (joint).
   - **Verified what works** with `pnpm verify` and recorded the evidence in
     [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
     commit `35cba97` (see "What works today" below)
@@ -30,13 +35,18 @@
     pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
     workers designed (decision 17, docs only)
 - **In progress:** nothing
-- **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows
-  Bridge = Connected within 30 s (closes milestone 1; the verification only simulated the
-  heartbeat with `curl`). Then split: Evan starts milestone 2 (content script → `/page` → wire
-  `showClickGuard`) and the `demo/` phishing page. Zach claims and starts `sponsor-check` and
-  `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
-  start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
-  milestone 3 (joint) is underway.
+- **Next step:** On this branch, wait for milestone 3's pipeline, then wire it in (MEGA_PROMPT
+  §5.7):
+  1. In `index.ts`, start the watcher on `~/Downloads` when Settings › "Quarantine files from other
+     apps" is on, with `since` set to the last time it ran (persist that time).
+  2. For each item with `needsScan`: `quarantine.add` into `userData/quarantine`, show the "Moved
+     _name_ to quarantine for scanning" notification, then hand it to the pipeline.
+  3. Clean: `quarantine.restore`, and record the path + SHA-256 in the delivered ledger first.
+  4. Turn on the Report actions (decision 12): Delete → `remove`, Restore anyway → `restore`.
+  5. Then `docker.ts` and the §5.9 rows.
+
+  Outside this branch, still open: load `extension/dist` in Chrome to close milestone 1.
+
 - **Broken / failing:** typecheck and lint pass. 44 / 45 tests pass. The failure is
   `store.test.ts` › "computes the overview counts", which fails between midnight and about 1:35 AM
   because of its demo timestamps; the fix is on `ui-fixes`. Three small UI issues open (see "Open
