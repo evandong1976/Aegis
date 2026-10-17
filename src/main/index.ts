@@ -30,7 +30,15 @@ if (!app.requestSingleInstanceLock()) app.quit()
 let store: Store | null = null
 let bridge: Server | null = null
 
-async function refreshHealth(): Promise<void> {
+// Health refreshes run one at a time, so each compares against the previous result. (Startup and
+// the extension's first ping used to overlap and log every service twice.)
+let healthChain: Promise<void> = Promise.resolve()
+function refreshHealth(): Promise<void> {
+  healthChain = healthChain.then(runHealthOnce, runHealthOnce)
+  return healthChain
+}
+
+async function runHealthOnce(): Promise<void> {
   const before = new Map(status.health.map((h) => [h.key, h.state]))
   status.health = await runHealthChecks({
     bridgeListening: bridge?.listening ?? false,
