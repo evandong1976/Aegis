@@ -31,6 +31,10 @@ export const VERDICT_THRESHOLDS = { suspicious: 30, malicious: 70 } as const
 export const TIMEOUTS_MS = {
   tier1Local: 300,
   chalk: 1500,
+  /** A page's links wait this long for lookups (RDAP, DNS, certificate logs, Safe Browsing). */
+  linkLookups: 1500,
+  /** At a click on a link whose lookups were still running: wait this much more. */
+  linkAtClick: 4000,
   sandboxStart: 20_000,
   analyze: 60_000,
   capa: 90_000,

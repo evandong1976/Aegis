@@ -1,0 +1,132 @@
+[
+  {
+    "name": "extension loads",
+    "ok": true,
+    "detail": "onljkbhkoinihmjibfofcalimkolemam"
+  },
+  {
+    "name": "phishing link outlined malicious",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Safe Browsing test URL outlined malicious",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "URLhaus-listed link outlined malicious",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "mismatch link outlined suspicious",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "short link marked unknown (no outline, held at the click)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "redirect wrapper judged by its destination",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "clean link not marked",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "javascript:void(0) not marked",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "link added later (MutationObserver) gets a verdict",
+    "ok": true,
+    "detail": "suspicious"
+  },
+  {
+    "name": "outline styles: malicious dashed, suspicious dotted",
+    "ok": true,
+    "detail": "dashed / dotted"
+  },
+  {
+    "name": "hover note appears on an outlined link",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "malicious click opens the guard",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "guard shows link text vs destination",
+    "ok": true,
+    "detail": "Malicious | Aegis stopped this click | This link doesn’t go where it says it does. | The link said | accounts.google.com | It actually goes to"
+  },
+  {
+    "name": "guard has no Inspect in sandbox",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "guard offers Trust this site for a normal domain",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "guard URL has the session token stripped",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Back to safety closes the guard and stays on the page",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "short link click opens the guard",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "short link guard has no Trust this site",
+    "ok": true,
+    "detail": "Back to safety, Continue anyway"
+  },
+  {
+    "name": "short link guard explains it can’t see the destination",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "clean link opens normally",
+    "ok": true,
+    "detail": "https://github.com/chalk-ai/examples"
+  },
+  {
+    "name": "suspicious click opens the guard",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Continue anyway opens the link",
+    "ok": true,
+    "detail": "https://example.com/"
+  },
+  {
+    "name": "Trust this site opens the link",
+    "ok": true,
+    "detail": "https://example.com/"
+  },
+  {
+    "name": "trusted site no longer outlined after reload",
+    "ok": true,
+    "detail": "null"
+  }
+]

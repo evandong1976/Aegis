@@ -1,0 +1,115 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "degraded",
+      "detail": "Extension not connected. Run pnpm build:extension and load extension/dist in chrome://extensions."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "API reachable and the key works. Live test 2 min ago: sandbox started in 0.9 s, ran a command and was deleted.",
+      "latencyMs": 65
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); Docker not running, so no local image."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "down",
+      "detail": "Docker is not running. It is only the fallback when Daytona is down."
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "Key works (60 models) through /opt/homebrew/bin/droid. Live test 2 min ago: Droid answered a test prompt in 5.3 s.",
+      "latencyMs": 1996
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "pending",
+      "detail": "Key set. The live Photon check arrives with milestone 5."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "pending",
+      "detail": "Key set. The live Chalk check arrives with milestone 6."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "Test URL matched as expected.",
+      "latencyMs": 42
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-17T16:50:18.121Z",
+      "state": "ok",
+      "detail": "Tap fn to open and close the panel."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": null,
+  "demo": false,
+  "page": {
+    "url": "https://mail.google.com/mail/u/0/",
+    "counts": {
+      "clean": 2,
+      "unknown": 1,
+      "suspicious": 3,
+      "malicious": 3
+    },
+    "top": {
+      "domain": "login-northwlnd-io.sbs",
+      "reason": "link says google.com but goes to login-northwlnd-io.sbs",
+      "verdict": "malicious"
+    }
+  }
+}

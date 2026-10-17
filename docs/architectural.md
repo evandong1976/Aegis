@@ -158,9 +158,9 @@ decisions itself: every verdict comes from the app through the bridge.
 | `src/background.ts`           | Built (partial) | Service worker: keeps the offscreen document alive, toolbar badge. Download interception lands in M3    |
 | `src/offscreen.ts`            | Built (partial) | Long-lived document: bridge heartbeat today; in-memory download fetch and streaming in M3               |
 | `src/popup.ts`                | Built           | App status, page counts, recent verdicts                                                                |
-| `src/guard.ts`                | Built (UI)      | Click guard in a closed Shadow DOM (Figma frame). Wired to real verdicts in M2                          |
+| `src/guard.ts`                | Built           | Click guard in a closed Shadow DOM (Figma frame): Back to safety, Continue anyway, Trust this site      |
 | `src/bridge.ts`, `src/dom.ts` | Built           | Bridge client (zod-validated) and DOM helpers using the design system's classes                         |
-| `src/content.ts`              | Planned (M2)    | Collects links, visible text and webmail sender; draws outlines; scam-text banner; opens the guard      |
+| `src/content.ts`              | Built (links)   | Collects links and plain-text URLs, outlines, hover notes, holds risky clicks. Text and sender: M6      |
 | `build.mjs`                   | Built           | Builds each entry as a classic script with Vite; copies the design-system CSS and fonts into `dist/ds/` |
 
 ### 3.3 Electron main process — `src/main/`
@@ -170,7 +170,7 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | Module                              | Status             | Role                                                                                                                                                                    |
 | ----------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `index.ts`                          | Built              | Startup order: identity → `.env` → store → bridge → IPC → tray → shortcuts → panel → health loop                                                                        |
-| `bridge.ts`                         | Built (partial)    | HTTP server for the extension. `/status`, `/ping`, `/trust` live; the rest answer 501 until built                                                                       |
+| `bridge.ts`                         | Built (partial)    | HTTP server for the extension. `/status`, `/ping`, `/page`, `/click`, `/trust` live; the download routes answer 501 until M3                                            |
 | `store.ts`                          | Built              | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)                                                                                |
 | `status.ts`                         | Built              | Live app status (protection state, health, page snapshot, active scans) and the scan log                                                                                |
 | `health.ts`                         | Built              | Checks every connection at start, every 60 s and on demand; drives "degraded"                                                                                           |
@@ -181,7 +181,9 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `windows.ts`, `panel.ts`, `tray.ts` | Built              | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu                                                                                  |
 | `fnkey.ts`                          | Built              | Loads `native/fn-key`; a clean fn tap toggles the panel                                                                                                                 |
 | `demo.ts`, `devcapture.ts`          | Built (dev)        | `AEGIS_DEMO=1` demo database; headless screenshots for design checks                                                                                                    |
-| `links.ts`                          | Planned (M2)       | Tier 1 link rules, Tranco, allow list, URL secret stripping, RDAP domain age, DNS and certificate-transparency checks — never opens the link (decision 20)              |
+| `links.ts`, `linkLists.ts`          | Built (M2)         | Tier 1 rules, lookalikes, redirect unwrapping, URL secret stripping and the link verdict; small brand / known-domain / shortener lists (Tranco arrives with M6)         |
+| `linkData.ts`                       | Built (M2)         | The lookups, each cached an hour: Safe Browsing (stripped URLs), URLhaus + OpenPhish (downloaded, matched on the Mac), RDAP via IANA, DNS, Cert Spotter (domain only)   |
+| `linkService.ts`                    | Built (M2)         | `/page` → verdicts within 1.5 s (4 s at a click), per-tab "This page" counts, `/click` → a Links entry. Never opens the link (decision 20)                              |
 | `chalk.ts`, `text.ts`               | Planned (M6)       | Chalk online features (cached), Chalk prompts for LLM calls; scam-text check                                                                                            |
 | `precheck.ts`                       | Planned (M3)       | Magic bytes, SHA-256, size, macro / script / PDF-action detection. Reads bytes only                                                                                     |
 | `queue.ts`                          | Planned (M3)       | Sandbox job queue: 3 at once, priorities, daily budget                                                                                                                  |
@@ -416,8 +418,8 @@ flowchart TB
 6. **Mark the page** (content script). Suspicious links get an amber dotted outline, Malicious a red
    dashed one; a scam-text banner if the text check fired.
 7. **Guard the click** (`guard.ts`). Clicking a Suspicious, Malicious or Unknown link opens the
-   click guard: Back to safety, Continue anyway, Trust this site (not offered for shorteners). (**Inspect in sandbox** is to be hidden while
-   detonation is dropped; `guard.ts` still shows it, PROGRESS.md › Open issues.)
+   click guard: Back to safety, Continue anyway, Trust this site (not offered for shorteners).
+   There is no **Inspect in sandbox** while detonation is dropped.
 8. **Look further without opening it** (`links.ts`, M2). RDAP domain age, DNS records and
    certificate-transparency logs for the domain. A short link or redirect whose destination can't
    be seen without following it is **Unknown** ("Aegis can't see where this link goes") and is
@@ -544,7 +546,8 @@ Aegis/
 │   │   ├── settings.ts, config.ts, ipc.ts
 │   │   ├── windows.ts, panel.ts, tray.ts, fnkey.ts
 │   │   ├── demo.ts, devcapture.ts            dev only
-│   │   └── links.ts, chalk.ts, text.ts, precheck.ts, queue.ts, daytona.ts, docker.ts,
+│   │   ├── links.ts, linkLists.ts, linkData.ts, linkService.ts   link checks (M2) + tests
+│   │   └── chalk.ts, text.ts, precheck.ts, queue.ts, daytona.ts, docker.ts,
 │   │       scans.ts, workerA.ts, workerB.ts, compare.ts, watcher.ts, quarantine.ts,
 │   │       photon.ts (M5, late)                                                   Planned
 │   │       detonate.ts                                                Parked (decision 20)
@@ -565,8 +568,8 @@ Aegis/
 │   ├── build.mjs               Vite builds per entry → dist/
 │   ├── public/                 manifest.json, popup.html/css, offscreen.html, guard.css,
 │   │                           guard-preview.html, icons/
-│   └── src/                    background, offscreen, popup, guard, guard-preview, bridge, dom
-│                               content.ts, overlay wiring                          Planned (M2)
+│   └── src/                    background, offscreen, popup, guard, guard-preview, bridge, dom,
+│                               content (links, outlines, click guard), messages
 │
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │

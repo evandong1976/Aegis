@@ -9,7 +9,7 @@ import { build } from 'vite'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 const dist = resolve(here, 'dist')
-const entries = ['background', 'offscreen', 'popup', 'guard-preview']
+const entries = ['background', 'offscreen', 'popup', 'content', 'guard-preview']
 // Offscreen documents can only use chrome.runtime messaging, not getManifest(), so the version is
 // baked in at build time for every entry.
 const version = JSON.parse(readFileSync(resolve(here, 'public/manifest.json'), 'utf8')).version

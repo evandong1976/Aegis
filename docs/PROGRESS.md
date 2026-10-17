@@ -1,15 +1,30 @@
-## Handoff (updated 2026-10-17 12:20 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 13:10 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–29, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
-- **Milestones:** 0 done; 1 built and verified, waiting on a real-Chrome check; 2 — click-guard UI
-  only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
+- **Milestones:** 0 done; 1 built and verified, waiting on a real-Chrome check; 2 — built on
+  branch `link-checks` (not merged), verified end to end in headless Chrome; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
-- **Just finished — branch `extension-status`, merged into `main` (not pushed):** the milestone-1 Chrome check
+- **Just finished — branch `link-checks` (committed, not merged or pushed): milestone 2.** Links
+  are judged without opening them (decision 20); every choice and its cost is decision 29.
+  - Main: `links.ts` (Tier 1 rules, lookalikes incl. digit swaps and Cyrillic, redirect
+    unwrapping, URL secret stripping, the verdict), `linkData.ts` (Safe Browsing with stripped
+    URLs; URLhaus + OpenPhish downloaded hourly and matched on the Mac; RDAP via IANA; DNS incl.
+    fast flux; Cert Spotter), `linkService.ts` (`/page` within 1.5 s, `/click` → Links entries,
+    per-tab "This page" counts), `tldts` for registered domains. Trust refuses shorteners and
+    stores the registered domain. The Report lists every reason for a link.
+  - Extension: `content.ts` (links + plain-text URLs, MutationObserver, Gmail-style URL changes,
+    outlines, hover notes, click guard with Back / Continue / Trust), service-worker relay,
+    per-tab badge with the risky-link count, popup page counts and recent verdicts. **Inspect in
+    sandbox** is gone (open issue 4).
+  - Evidence `logs/2026-10-17-link-checks/` (SUMMARY.md): 106 unit tests; the real app + built
+    extension in headless Chrome, 26 / 26 browser checks, live Safe Browsing and feeds; five bugs
+    found by that run and fixed.
+- **Earlier — branch `extension-status`, merged into `main` (not pushed):** the milestone-1 Chrome check
   found that the app said Connected but the extension's badge and popup stayed on "Not
   connected". Chrome leaves `Origin` off an extension's GET requests, so the bridge answered
   `GET /status` with 403 (only `POST /ping` passed). `/status` and `/scan/:id` are now POST
@@ -77,10 +92,10 @@ test` pass on `main`.
      decision 19 is now 27, and `chalk.yaml` & co. are in `chalk/` (run Chalk commands from there).
      An untracked `hello_chalk.py` (Chalk's hello-world sandbox) appeared in the repo root at 11:46;
      it belongs in `chalk/` if kept.
-  2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
-     RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
-     code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
-     `link-checks` or its own branch.
+  2. **Evan:** merge `link-checks` into `main` once reviewed. Then check it in real Chrome on
+     Gmail: restart Aegis, `pnpm build:extension`, reload the extension, reload Gmail, open a
+     message with links. Open issues 5–7 (detonation leftovers in Settings, Downloads copy, the
+     `/inspect` route and `detonations` table) are still to do, on their own branch.
   3. **Zach:** `sandbox-image`, `ui-fixes` and `watcher` have work on `origin` (pushed 01:17) that
      predates the decisions above. Merge the latest `main` into each before continuing (PLAN.md ›
      Branches), then `sandbox-image` first.
@@ -155,7 +170,7 @@ for branch `ui-fixes` (PLAN.md › Branches):
 Found while updating the docs (2026-10-17): **the code still assumes link detonation**, which
 decision 20 dropped. Fix on its own branch (e.g. `drop-detonation`) or as part of `link-checks`:
 
-4. `extension/src/guard.ts` still shows **Inspect in sandbox** (hide it).
+4. ~~`extension/src/guard.ts` still shows **Inspect in sandbox**~~ — removed on `link-checks`.
 5. Settings: the "auto-detonate" toggle (`autoDetonate` in `src/shared/ipc.ts`,
    `src/main/settings.ts`, `SettingsView.tsx`), the sandbox-budget description ("Automatic
    detonations stop…") and `PRIVACY_COPY` ("suspicious links are opened in a Daytona sandbox") —
@@ -182,7 +197,7 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 | 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
 | 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile on branch `sandbox-image` (origin); demo files at the end (decision 22)             |
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified; real-Chrome check found the GET/Origin bug, fixed on `extension-status`    |
-| 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
+| 2   | Links, judged without opening them (decision 20)                       | Evan        | Built on `link-checks`, verified in headless Chrome (`logs/2026-10-17-link-checks/`)           |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
 | 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3         |
 | 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                     |

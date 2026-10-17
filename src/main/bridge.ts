@@ -6,9 +6,14 @@ import type { ZodType } from 'zod'
 import { BRIDGE_HOST, EXTENSION_ORIGIN } from '@shared/constants'
 import {
   BRIDGE_ROUTES,
+  ClickRequestSchema,
+  PageRequestSchema,
   PingRequestSchema,
   TrustRequestSchema,
   type BridgeError,
+  type ClickRequest,
+  type PageRequest,
+  type PageResponse,
   type StatusResponse
 } from '@shared/bridge'
 
@@ -28,7 +33,10 @@ export interface BridgeDeps {
   version: string
   getStatus(): Pick<StatusResponse, 'protection' | 'mode'>
   onPing(): void
-  trust(domain: string): void
+  page(req: PageRequest): Promise<PageResponse>
+  click(req: ClickRequest): Promise<void>
+  /** Adds a trusted site; returns the registered domain trusted. Throws to refuse (400). */
+  trust(domain: string): string
 }
 
 function send(res: ServerResponse, code: number, body: unknown): void {
@@ -87,15 +95,22 @@ export function handleRequest(deps: BridgeDeps) {
         send(res, 200, { ok: true })
         return
       }
-      if (route === `POST ${BRIDGE_ROUTES.trust.path}`) {
-        const { domain } = await readJson(req, TrustRequestSchema)
-        deps.trust(domain)
-        send(res, 200, { ok: true, domain: domain.toLowerCase() })
+      if (route === `POST ${BRIDGE_ROUTES.page.path}`) {
+        send(res, 200, await deps.page(await readJson(req, PageRequestSchema)))
         return
       }
-      // Milestones 2, 3 and 7 fill these in; the contract is already in src/shared/bridge.ts.
+      if (route === `POST ${BRIDGE_ROUTES.click.path}`) {
+        await deps.click(await readJson(req, ClickRequestSchema))
+        send(res, 200, { ok: true })
+        return
+      }
+      if (route === `POST ${BRIDGE_ROUTES.trust.path}`) {
+        const { domain } = await readJson(req, TrustRequestSchema)
+        send(res, 200, { ok: true, domain: deps.trust(domain) })
+        return
+      }
+      // Milestones 3 and 7 fill these in; the contract is already in src/shared/bridge.ts.
       const pending = [
-        BRIDGE_ROUTES.page,
         BRIDGE_ROUTES.download,
         BRIDGE_ROUTES.downloadQuarantined,
         BRIDGE_ROUTES.inspect

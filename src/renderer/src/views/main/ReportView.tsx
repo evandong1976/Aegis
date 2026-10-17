@@ -3,7 +3,7 @@
 // capabilities and the checks that ran; the sandbox / privacy footer.
 
 import { useEffect, useState } from 'react'
-import type { ScanReport } from '@shared/types'
+import type { ScanReport, Severity } from '@shared/types'
 import { VERDICT_SENTENCE } from '@shared/verdicts'
 import {
   Chip,
@@ -116,7 +116,20 @@ export default function ReportView({
   if (report === undefined) return <div className="ae-card h-40" aria-busy="true" />
 
   const r = report
-  const findings = r.stage1?.findings ?? []
+  // A link has reasons, not file findings: shown as chips weighted the way the click guard does.
+  const findings =
+    r.kind === 'link'
+      ? r.reasons
+          .filter((x) => x.weight > 0 || x.code === 'hidden_destination')
+          .map((x) => ({
+            title: x.text[0].toUpperCase() + x.text.slice(1),
+            severity: (x.hard || x.weight >= 30
+              ? 'critical'
+              : x.weight >= 10
+                ? 'high'
+                : 'medium') as Severity
+          }))
+      : (r.stage1?.findings ?? [])
   const timeline = r.droid?.timeline ?? []
   const capabilities = r.stage1?.capabilities ?? []
   const isFile = r.kind !== 'link'
@@ -198,7 +211,9 @@ export default function ReportView({
               <p className="m-0 text-[13px] leading-[19px] text-ink-muted">
                 {r.verdict === 'clean'
                   ? 'Nothing harmful found to describe.'
-                  : 'No step-by-step review for this scan. Droid reviews risky files after the first verdict.'}
+                  : !isFile
+                    ? 'Aegis judges links without opening them, so there is no replay of the page. The reasons above and the checks on the right are what it found.'
+                    : 'No step-by-step review for this scan. Droid reviews risky files after the first verdict.'}
               </p>
             )}
             {r.droid?.unknowns.length ? (

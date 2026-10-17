@@ -1,7 +1,8 @@
 // The click guard (Figma frame "Click guard — blocked link", MEGA_PROMPT §5.1): an overlay in a
 // closed Shadow DOM, so the page can neither style nor script it. It shows what the link said
-// against where it actually goes, the reasons, and Back to safety / Inspect in sandbox /
-// Continue anyway / Trust this site. The content script wires it to real verdicts in milestone 2.
+// against where it actually goes, the reasons, and Back to safety / Continue anyway / Trust this
+// site. Opened by content.ts for Suspicious, Malicious and Unknown links. There is no "Inspect in
+// sandbox": links are judged without opening them (PLAN.md decision 20).
 
 import type { LinkVerdict } from '@shared/types'
 import { VERDICTS } from '@shared/verdicts'
@@ -9,7 +10,6 @@ import { badge, button, el } from './dom'
 
 export interface GuardChoice {
   back(): void
-  inspect(): void
   proceed(): void
   trust(): void
 }
@@ -21,13 +21,15 @@ export interface GuardInput {
   /** The plain-English headline, e.g. "This link is not the sign-in page it claims to be." */
   headline: string
   checkedMs: number
+  /** False for shorteners (trusting bit.ly would trust every link behind it) and data: links. */
+  canTrust: boolean
 }
 
 const HOST_ID = 'aegis-click-guard'
 
 let fontsLoaded = false
 /** @font-face doesn't apply inside a shadow root, so the three families are added to the page. */
-function loadFonts(base: string): void {
+export function loadFonts(asset: (path: string) => string): void {
   if (fontsLoaded) return
   fontsLoaded = true
   const faces: Array<[string, string, string]> = [
@@ -36,7 +38,7 @@ function loadFonts(base: string): void {
     ['JetBrains Mono', 'JetBrainsMono-Variable.woff2', '100 800']
   ]
   for (const [family, file, weight] of faces) {
-    const face = new FontFace(family, `url(${base}ds/fonts/${file})`, { weight })
+    const face = new FontFace(family, `url(${asset(`ds/fonts/${file}`)})`, { weight })
     void face
       .load()
       .then((f) => document.fonts.add(f))
@@ -51,12 +53,17 @@ function chipTone(weight: number, hard: boolean): string {
 }
 
 /**
- * Shows the guard over the page. `base` is where ds/ lives: chrome.runtime.getURL('') in the
- * content script, or './' on the preview page. Returns a function that removes it.
+ * Shows the guard over the page. `asset` turns a packaged path into a URL: chrome.runtime.getURL
+ * in the content script (per file: ds/ is only reachable at its dynamic URL, which getURL('')
+ * doesn't give), or `./path` on the preview page. Returns a function that removes it.
  */
-export function showClickGuard(input: GuardInput, choice: GuardChoice, base: string): () => void {
+export function showClickGuard(
+  input: GuardInput,
+  choice: GuardChoice,
+  asset: (path: string) => string
+): () => void {
   document.getElementById(HOST_ID)?.remove()
-  loadFonts(base)
+  loadFonts(asset)
 
   const host = el('div', { id: HOST_ID })
   Object.assign(host.style, { position: 'fixed', inset: '0', zIndex: '2147483647' })
@@ -64,6 +71,7 @@ export function showClickGuard(input: GuardInput, choice: GuardChoice, base: str
 
   const v = input.verdict
   const meta = VERDICTS[v.verdict]
+  const hidden = v.reasons.some((r) => r.code === 'hidden_destination')
   const close = (): void => {
     host.remove()
     document.removeEventListener('keydown', onKey, true)
@@ -81,7 +89,7 @@ export function showClickGuard(input: GuardInput, choice: GuardChoice, base: str
 
   const dialog = el(
     'div',
-    { className: 'guard', role: 'alertdialog' },
+    { className: `guard guard--${v.verdict}`, role: 'alertdialog' },
     el(
       'div',
       { className: 'guard__top' },
@@ -94,11 +102,17 @@ export function showClickGuard(input: GuardInput, choice: GuardChoice, base: str
       { className: 'guard__compare' },
       el('p', { className: 'ae-label' }, 'The link said'),
       el('p', { className: 'guard__mono' }, input.linkText || '(no text)'),
-      el('p', { className: 'ae-label guard__gap' }, 'It actually goes to'),
+      el(
+        'p',
+        { className: 'ae-label guard__gap' },
+        hidden ? 'It goes through a short link to' : 'It actually goes to'
+      ),
       el(
         'p',
         { className: `guard__mono guard__mono--${meta.level}` },
-        v.urlStripped.replace(/^[a-z]+:\/\//i, '')
+        hidden
+          ? `${v.urlStripped.replace(/^[a-z]+:\/\//i, '')} → somewhere Aegis can’t see`
+          : v.urlStripped.replace(/^[a-z]+:\/\//i, '')
       )
     ),
     el(
@@ -112,14 +126,13 @@ export function showClickGuard(input: GuardInput, choice: GuardChoice, base: str
       'div',
       { className: 'guard__actions' },
       button('primary', 'Back to safety', pick(choice.back), { size: 'sm' }),
-      button('secondary', 'Inspect in sandbox', pick(choice.inspect), { size: 'sm' }),
       button('ghost', 'Continue anyway', pick(choice.proceed), { size: 'sm' }),
-      button('ghost', 'Trust this site', pick(choice.trust), { size: 'sm' })
+      input.canTrust ? button('ghost', 'Trust this site', pick(choice.trust), { size: 'sm' }) : null
     ),
     el(
       'p',
       { className: 'guard__foot' },
-      `Checked in ${(input.checkedMs / 1000).toFixed(1)} s · nothing was sent to the site · fn opens Aegis`
+      `Checked in ${(input.checkedMs / 1000).toFixed(1)} s · the link was not opened · fn opens Aegis`
     )
   )
   dialog.setAttribute('aria-modal', 'true')
@@ -127,9 +140,9 @@ export function showClickGuard(input: GuardInput, choice: GuardChoice, base: str
 
   const theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
   root.append(
-    el('link', { rel: 'stylesheet', href: `${base}ds/tokens.css` }),
-    el('link', { rel: 'stylesheet', href: `${base}ds/bundle.css` }),
-    el('link', { rel: 'stylesheet', href: `${base}guard.css` }),
+    el('link', { rel: 'stylesheet', href: asset('ds/tokens.css') }),
+    el('link', { rel: 'stylesheet', href: asset('ds/bundle.css') }),
+    el('link', { rel: 'stylesheet', href: asset('guard.css') }),
     el('div', { className: 'scrim', dataset: { theme } }, dialog)
   )
   document.addEventListener('keydown', onKey, true)

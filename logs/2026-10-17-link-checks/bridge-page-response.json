@@ -1,0 +1,291 @@
+{
+    "paused": false,
+    "links": [
+        {
+            "url": "https://github.com/chalk-ai/examples",
+            "urlStripped": "https://github.com/chalk-ai/examples",
+            "domain": "github.com",
+            "verdict": "clean",
+            "score": 0,
+            "reasons": [],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "skipped",
+                "dns": "skipped",
+                "certLogs": "skipped",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "https://login-northwlnd-io.sbs/sso?session=8f2c1a9e77aa",
+            "urlStripped": "https://login-northwlnd-io.sbs/sso",
+            "domain": "login-northwlnd-io.sbs",
+            "verdict": "malicious",
+            "score": 100,
+            "reasons": [
+                {
+                    "code": "text_mismatch",
+                    "text": "link says google.com but goes to login-northwlnd-io.sbs",
+                    "weight": 40,
+                    "hard": false
+                },
+                {
+                    "code": "lookalike_brand",
+                    "text": "looks like \u201cnorthwind\u201d but isn\u2019t",
+                    "weight": 40,
+                    "hard": false
+                },
+                {
+                    "code": "risky_tld",
+                    "text": ".sbs is often used for scams",
+                    "weight": 15,
+                    "hard": false
+                },
+                {
+                    "code": "dns_missing",
+                    "text": "the domain doesn\u2019t resolve",
+                    "weight": 10,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "ok",
+                "dns": "ok",
+                "certLogs": "error",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "https://example.com/",
+            "urlStripped": "https://example.com/",
+            "domain": "example.com",
+            "verdict": "clean",
+            "score": 0,
+            "reasons": [],
+            "trusted": true,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "skipped",
+                "dns": "skipped",
+                "certLogs": "skipped",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "https://bit.ly/aegis-test-xyz",
+            "urlStripped": "https://bit.ly/aegis-test-xyz",
+            "domain": "bit.ly",
+            "verdict": "unknown",
+            "score": 0,
+            "reasons": [
+                {
+                    "code": "hidden_destination",
+                    "text": "short link: Aegis can\u2019t see where it goes",
+                    "weight": 0,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "skipped",
+                "dns": "skipped",
+                "certLogs": "skipped",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "http://malware.testing.google.test/testing/malware/",
+            "urlStripped": "http://malware.testing.google.test/testing/malware/",
+            "domain": "google.test",
+            "verdict": "malicious",
+            "score": 100,
+            "reasons": [
+                {
+                    "code": "safe_browsing",
+                    "text": "Google Safe Browsing lists it as malware",
+                    "weight": 100,
+                    "hard": true
+                },
+                {
+                    "code": "lookalike_brand",
+                    "text": "looks like \u201cgoogle\u201d but isn\u2019t",
+                    "weight": 40,
+                    "hard": false
+                },
+                {
+                    "code": "dns_missing",
+                    "text": "the domain doesn\u2019t resolve",
+                    "weight": 10,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "ok",
+                "dns": "ok",
+                "certLogs": "error",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "https://www.google.com/url?q=https://paypa1-secure.top/verify&sa=D",
+            "urlStripped": "https://paypa1-secure.top/verify",
+            "domain": "paypa1-secure.top",
+            "verdict": "suspicious",
+            "score": 65,
+            "reasons": [
+                {
+                    "code": "lookalike_brand",
+                    "text": "looks like \u201cpaypal\u201d but isn\u2019t",
+                    "weight": 40,
+                    "hard": false
+                },
+                {
+                    "code": "risky_tld",
+                    "text": ".top is often used for scams",
+                    "weight": 15,
+                    "hard": false
+                },
+                {
+                    "code": "dns_missing",
+                    "text": "the domain doesn\u2019t resolve",
+                    "weight": 10,
+                    "hard": false
+                },
+                {
+                    "code": "redirect",
+                    "text": "passes through google.com to paypa1-secure.top",
+                    "weight": 0,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "ok",
+                "dns": "ok",
+                "certLogs": "ok",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "data:text/html;base64,PGgxPmhpPC9oMT4=",
+            "urlStripped": "data:\u2026",
+            "domain": "",
+            "verdict": "suspicious",
+            "score": 50,
+            "reasons": [
+                {
+                    "code": "data_url",
+                    "text": "opens a page hidden inside the link",
+                    "weight": 50,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "http://61.53.153.148:38141/bin.sh",
+            "urlStripped": "http://61.53.153.148:38141/bin.sh",
+            "domain": "61.53.153.148",
+            "verdict": "malicious",
+            "score": 100,
+            "reasons": [
+                {
+                    "code": "threat_feed",
+                    "text": "listed by URLhaus",
+                    "weight": 100,
+                    "hard": true
+                },
+                {
+                    "code": "raw_ip",
+                    "text": "goes to a bare IP address",
+                    "weight": 25,
+                    "hard": false
+                },
+                {
+                    "code": "executable",
+                    "text": "downloads a .sh file",
+                    "weight": 15,
+                    "hard": false
+                },
+                {
+                    "code": "odd_port",
+                    "text": "uses port 38141",
+                    "weight": 10,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "skipped",
+                "dns": "skipped",
+                "certLogs": "skipped",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        },
+        {
+            "url": "https://paypal-account-verify.xyz/login",
+            "urlStripped": "https://paypal-account-verify.xyz/login",
+            "domain": "paypal-account-verify.xyz",
+            "verdict": "suspicious",
+            "score": 65,
+            "reasons": [
+                {
+                    "code": "lookalike_brand",
+                    "text": "looks like \u201cpaypal\u201d but isn\u2019t",
+                    "weight": 40,
+                    "hard": false
+                },
+                {
+                    "code": "risky_tld",
+                    "text": ".xyz is often used for scams",
+                    "weight": 15,
+                    "hard": false
+                },
+                {
+                    "code": "dns_missing",
+                    "text": "the domain doesn\u2019t resolve",
+                    "weight": 10,
+                    "hard": false
+                }
+            ],
+            "trusted": false,
+            "checks": {
+                "safeBrowsing": "ok",
+                "threatFeeds": "ok",
+                "rdap": "ok",
+                "dns": "ok",
+                "certLogs": "error",
+                "tier1": "ok"
+            },
+            "checkedMs": 656
+        }
+    ],
+    "scamText": null,
+    "sender": null
+}

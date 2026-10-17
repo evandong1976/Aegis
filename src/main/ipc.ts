@@ -31,7 +31,9 @@ async function readEvalResults(): Promise<EvalResults | null> {
 
 export function registerIpc(
   store: Store,
-  refreshHealth: (live?: LiveTrigger) => Promise<void>
+  refreshHealth: (live?: LiveTrigger) => Promise<void>,
+  /** A trusted site was removed: cached link verdicts for it are stale. */
+  onUntrust: (domain: string) => void = () => {}
 ): void {
   handle('status:get', () => status.get())
   // Check now: also runs the Daytona and Droid live tests (sponsors.ts).
@@ -53,6 +55,7 @@ export function registerIpc(
   handle('trusted:list', () => store.listTrusted())
   handle('trusted:remove', (domain) => {
     store.removeTrusted(domain)
+    onUntrust(domain.toLowerCase())
     return store.listTrusted()
   })
   handle('evals:get', () => readEvalResults())
