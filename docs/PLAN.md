@@ -493,6 +493,11 @@ What each Aegis need gets on this tier:
   2. **`ToolSearch` can't be disabled.** It only loads other tools' schemas; with every other tool
      disabled and the permission handler cancelling anything that isn't a sandbox tool, it can't
      act. `try-droid` allows exactly that one exception.
+- **The lockdown is shared, tested code** (branch `droid-tool-lockdown`, evidence
+  `logs/2026-10-17-droid-lockdown/`): `src/main/droidLockdown.ts` holds the sandbox server name,
+  the `ToolSearch` exception, the fixed read-only commands, the untrusted fence and the permission
+  handler; `droidLockdown.test.ts` has 15 tests; `try-droid` imports it and still passes. M4's
+  `workerA.ts` uses the same module.
 - Option A (Droid inside the sandbox) wasn't run: this account's Daytona tier blocks Factory from
   sandboxes. It's opt-in with `AEGIS_TRY_DROID_INSIDE=1` if the org reaches Tier 3.
 

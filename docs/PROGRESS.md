@@ -40,8 +40,12 @@ test` pass on `main`.
     Tier 3 question no longer blocks anything.
   - **Photon is in scope** (decision 21), built near the end; **demo materials at the end**
     (decision 22); **one branch per feature** (23); **keys in `.env.local`** (24).
-- **In progress:** branch `droid-tool-lockdown` (tests that lock Droid's tools down; its own
-  handoff lives on that branch).
+- **In progress:** nothing. **Done on branch `droid-tool-lockdown`** (not merged): Worker A's
+  lockdown rules moved from `scripts/try-droid.mts` into `src/main/droidLockdown.ts` with 15 unit
+  tests (permission handler, disabled tools, read-only commands, untrusted fence, prompt
+  injection); `try-droid` imports the same module and still passes live. Evidence
+  `logs/2026-10-17-droid-lockdown/`. `tsconfig.node.json` now allows `.ts` import extensions so
+  the script can import from `src/main/` under Node.
 - **Next step:**
   1. **Zach's newer `sponsor-check` work:** three commits on `origin/sponsor-check` (10:13–10:56,
      after our merge) aren't in `main`: in-app sponsor checks (`src/main/sponsors.ts`), Chalk
@@ -218,9 +222,12 @@ docs and dashboards only; `try-chalk` and `try-photon` are next.
 | ------------------------------------------- | --------------------------------------------------------- |
 | `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
+| `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
 
 ## Decisions log
 
+- 2026-10-17 11:27: `droid-tool-lockdown`: the lockdown rules are shared code with tests
+  (`src/main/droidLockdown.ts`); `workerA.ts` must use them at milestone 4.
 - 2026-10-17 11:35: Short links are held at the click as Unknown and the user double-checks
   (PLAN.md decision 26). Droid lockdown tests go on their own branch, `droid-tool-lockdown`.
   `docs-update` merged into `main`; `main` pushed to `origin`.
