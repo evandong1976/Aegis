@@ -1,4 +1,4 @@
-## Handoff (updated 2026-10-17 11:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 12:25 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
 1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
@@ -9,6 +9,25 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **In progress — branch `feature/sandbox` (Zach), not merged:** a shell file goes into a Daytona
+  sandbox and runs there, never on the Mac.
+  - Based on `main` with `sandbox-image` merged in (the analysis Dockerfile and its self-test).
+  - `src/main/daytona.ts` (+ 12 tests in `daytona.test.ts`): network off **at creation** and
+    checked on the result (a sandbox that comes back online is deleted and refused), 20 s start
+    with one retry, upload with a SHA-256 check inside the sandbox, a network probe, `runSample`
+    (scratch `$HOME`, empty environment, `AEGIS_SANDBOX=1`, `sh -x`, 30 s limit) that records the
+    commands run, files written and network attempts, and `withSandbox`, which deletes the sandbox
+    in a `finally`. Every step goes into a sandbox log. M3 and `workerA.ts` build on this.
+  - `pnpm try:sandbox` (`scripts/try-sandbox.mts`): writes a harmless test script that only looks
+    malicious (`curl | sh`, a LaunchAgent, Chrome passwords, keychain, base64 into `sh`, sending
+    data home), mode 644, prints it, then uploads and runs it in a network-off sandbox and writes
+    `logs/<date-time>-sandbox-run/` (the sample and `run.json`). The sample does nothing unless
+    `AEGIS_SANDBOX=1`, and every host it names is `.invalid`.
+  - **Verified:** the same run command in the local Docker fallback (`aegis-sandbox:dev`,
+    `--network none --read-only --cap-drop ALL`): 14 commands, the LaunchAgent write and both
+    download attempts recorded, exit 0. Evidence `logs/2026-10-17-1219-sandbox-docker/`.
+  - **Not verified yet: the live Daytona run.** This Mac has no `DAYTONA_API_KEY` (no `.env.local`;
+    `.env` lacks it). Add it to `.env.local`, then `pnpm try:sandbox`.
 - **Just finished — branch `sponsor-check-sync`, merged into `main` and pushed:** Zach's later
   `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
   - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
@@ -166,21 +185,21 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 
 ## Milestone checklist
 
-| #   | Milestone                                                              | Owner       | Status                                                                                         |
-| --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
-| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
+| #   | Milestone                                                              | Owner       | Status                                                                                                                         |
+| --- | ---------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                                                           |
+| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                                                 |
 | 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile built and self-tested (`logs/2026-10-17-0043-sandbox-image/`), merged into `feature/sandbox`; demo files at the end |
-| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
-| 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
-| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
-| 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3         |
-| 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                     |
-| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                    |
-| 7   | ~~Link detonation~~                                                    | Zach        | Dropped for now (decision 20); branch `detonate` parked                                        |
-| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`) |
-| 9   | Stretch                                                                | —           | Not started                                                                                    |
-| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                    |
+| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                                                      |
+| 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`                                             |
+| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                                                    |
+| 4   | Worker A (Droid on the Mac + Daytona sandbox) + compare                | Zach        | Approach proven by `pnpm try:droid` (decision 19); build on branch `worker-a` after M3                                         |
+| 5   | Photon: phone screenshot by iMessage → verdict                         | Evan        | In scope (decision 21); built near the end                                                                                     |
+| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                                                    |
+| 7   | ~~Link detonation~~                                                    | Zach        | Dropped for now (decision 20); branch `detonate` parked                                                                        |
+| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`)                                 |
+| 9   | Stretch                                                                | —           | Not started                                                                                                                    |
+| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                                                    |
 
 ### What exists, screen by screen
 

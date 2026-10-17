@@ -1,0 +1,1 @@
+docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp -v <sample>:/work/sample:ro -w /work aegis-sandbox:dev sh -c "$(observeCommand(30))"

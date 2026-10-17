@@ -63,15 +63,16 @@ Merged so far (2026-10-17, pushed): `extension-heartbeat` (a fix branch, not in 
 app, Chalk setup) came in through `sponsor-check-sync`, with main's docs kept as the source of
 truth. Evan's next branch is `link-checks` (M2).
 
-| Order | Branch          | Item                                                            | Needs first                                          | Unblocks                                  |
-| ----- | --------------- | --------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
-| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17** | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
-| 2     | `sandbox-image` | 0b                                                              | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
-| 3     | `ui-fixes`      | Open issues from the verification run                           | —                                                    | —                                         |
-| —     | _no branch_     | 3 (joint, not started)                                          | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
-| 4     | `worker-a`      | 4 (option B, decision 19)                                       | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
-| 5     | `detonate`      | 7 — **parked** (decision 20)                                    | —                                                    | —                                         |
-| 6     | `watcher`       | 8 (the fn add-on part is already done)                          | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
+| Order | Branch            | Item                                                                                          | Needs first                                          | Unblocks                                  |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| 1     | `sponsor-check`   | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17**                               | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
+| 2     | `sandbox-image`   | 0b                                                                                            | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
+| 3     | `ui-fixes`        | Open issues from the verification run                                                         | —                                                    | —                                         |
+| —     | `feature/sandbox` | A shell file into a network-off Daytona sandbox, run there (`daytona.ts`, `pnpm try:sandbox`) | `sandbox-image` (merged in)                          | M3's Daytona half, `worker-a`             |
+| —     | _no branch_       | 3 (joint, not started)                                                                        | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
+| 4     | `worker-a`        | 4 (option B, decision 19)                                                                     | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
+| 5     | `detonate`        | 7 — **parked** (decision 20)                                                                  | —                                                    | —                                         |
+| 6     | `watcher`         | 8 (the fn add-on part is already done)                                                        | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
 
 ### 1. `sponsor-check`
 
@@ -120,6 +121,18 @@ truth. Evan's next branch is `link-checks` (M2).
   3. `LinksView.tsx`: with no history, the Awaiting review empty state says links were checked.
 - **Done when:** `pnpm capture` screenshots show all three fixed, and PROGRESS.md › Open issues is
   cleared.
+
+### `feature/sandbox`
+
+- **Holds:** `src/main/daytona.ts` + tests (MEGA_PROMPT §5.3's sandbox steps as one module: create
+  with the network off at creation, upload with a SHA-256 check, run the sample inside under a time
+  limit with `sh -x`, record commands, files written and network attempts, delete in a `finally`)
+  and `pnpm try:sandbox`, which writes a harmless test shell script and runs it in a sandbox.
+  `sandbox-image` is merged in.
+- **Done when:** `pnpm try:sandbox` passes live against Daytona (needs `DAYTONA_API_KEY` in
+  `.env.local`) and the leak check shows 0 sandboxes.
+- **Then:** M3's `scans.ts` and `workerA.ts` use `withSandbox`; `observe.py` in the image can
+  replace the shell-based observation when the snapshot exists.
 
 ### 4. `worker-a` (milestone 4)
 
