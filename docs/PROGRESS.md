@@ -1,7 +1,7 @@
-## Handoff (updated 2026-10-17 11:35 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 11:45 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–26, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–27, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
@@ -9,6 +9,24 @@ disagree, PLAN.md › Decisions wins.
   only; 4 — approach proven (`pnpm try:droid`); 8 — fn add-on only. Everything else not started.
   Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **Just finished — branch `sponsor-check-sync` (not merged, not pushed):** Zach's later
+  `sponsor-check` work, brought into `main`'s line with `main`'s docs as the source of truth:
+  - **Live sponsor checks in the app** (`src/main/sponsors.ts`, Zach; now PLAN.md decision 27):
+    free lookups every 60 s, a tiny live test at start and on Check now. Zach tested it against
+    mocks only; it has now **run against the real services** with the keys in `.env.local`:
+    Daytona ok (sandbox started in 1.4 s, ran a command, deleted), Droid ok (60 models; test prompt
+    answered in 5.5 s), Sandbox image pending (no snapshot yet, Docker not running); a second Check
+    now within 30 s reused the result; 0 sandboxes left. Evidence `logs/2026-10-17-sponsor-sync/`.
+  - Adapted to the plan: setup messages say `.env.local`; `.env.example`'s Photon and Chalk notes
+    match decisions 21 and 24 and the Chalk findings.
+  - **Chalk project files moved into `chalk/`** (with a README): at the root, `chalk apply` would
+    upload the whole repo and Chalk's 593-line agent guide would load into every coding session.
+  - **Correction from Chalk's guide:** Chalk sandboxes allow outbound network **by default**. Our
+    docs said "no allow-list, so no network", which would have left Worker B online. Fixed in
+    PLAN.md, MEGA_PROMPT §5.3, §5.6 and §6 rule 2, and architectural.md §3.6: Worker B passes a
+    `NetworkPolicy` that allows no hosts, and `try-chalk` must prove it.
+  - Also from Zach: two Chalk credentials (a service token for the app, `chalk login` for
+    developers); Chalk's LLM router is the "Model Gateway"; `chalkcompute` has Evaluations.
 - **Just finished — branch `docs-update`, merged into `main`; `main` pushed to `origin`:** the docs
   now match everything decided on 2026-10-16/17, each change with its tradeoff:
   - `docs/PLAN.md`: decisions 20–25, a "Tradeoffs at a glance" table, Chalk and Photon findings
@@ -43,11 +61,9 @@ test` pass on `main`.
 - **In progress:** branch `droid-tool-lockdown` (tests that lock Droid's tools down; its own
   handoff lives on that branch).
 - **Next step:**
-  1. **Zach's newer `sponsor-check` work:** three commits on `origin/sponsor-check` (10:13–10:56,
-     after our merge) aren't in `main`: in-app sponsor checks (`src/main/sponsors.ts`), Chalk
-     project files (`chalk.yaml`, `pyproject.toml`, `uv.lock`, `.claude/skills/`, `CLAUDE.md`) and
-     edits to PLAN.md, PROGRESS.md and architectural.md. Merging them into `main` will conflict
-     with the docs update; do it together with Zach.
+  1. Team: approve merging `sponsor-check-sync` and `droid-tool-lockdown` into `main`. Zach:
+     your `sponsor-check` commits are in `sponsor-check-sync`; your decision 19 is now 27, and
+     `chalk.yaml` & co. are in `chalk/` (run Chalk commands from there).
   2. **Evan:** branch `link-checks` from `main` (M2): content script, Tier 1 rules, Safe Browsing,
      RDAP, DNS and certificate-log checks, wiring the click guard — no link is ever opened. The
      code still assumes detonation in a few places (Open issues 4–7); clean that up first, on
@@ -57,8 +73,8 @@ test` pass on `main`.
      Branches), then `sandbox-image` first.
   4. In Chrome: reload the Aegis extension and confirm Settings › Connections shows Bridge =
      Connected (closes milestone 1).
-  5. Write `scripts/try-chalk` and `scripts/try-photon` (PLAN.md › Sponsor findings); set
-     `CHALK_ENVIRONMENT=gswl7f3494e1` in `.env.local`.
+  5. Write `scripts/try-chalk` (it must prove Worker B's network is off, PLAN.md › Sponsor findings
+     › Chalk) and `scripts/try-photon`. `CHALK_ENVIRONMENT` is already set in `.env.local`.
   6. Rotate the Factory key (it was pasted into chat on 2026-10-17).
 - **Broken / failing:** typecheck, lint and tests pass. `store.test.ts` › "computes the overview
   counts" fails between midnight and about 1:35 AM (demo timestamps); the fix is on `ui-fixes`.
@@ -135,6 +151,12 @@ decision 20 dropped. Fix on its own branch (e.g. `drop-detonation`) or as part o
    `TIMEOUTS_MS.detonatePageLoad` / `detonateTotal`, and the `detonations` table in `store.ts` (a
    schema change; its test lists the table).
 
+Found while merging Zach's `sponsor-check` work (2026-10-17):
+
+8. The seven Chalk skills in `.claude/skills/` point to `references/*.md` and `scripts/` files
+   that weren't committed by `chalk init`; re-copy them from Chalk's skill package or drop the
+   skills.
+
 ---
 
 ## Milestone checklist
@@ -196,6 +218,10 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 | Downloads folder  | ok           | Granted to Electron under `pnpm dev`                    |
 | fn key            | ok           | Add-on built; Input Monitoring granted to Electron      |
 
+With keys (2026-10-17 11:38, `sponsors.ts` called directly, not through the app window): Daytona
+**ok**, Droid **ok**, Sandbox image **pending** (`logs/2026-10-17-sponsor-sync/sponsors-live.json`).
+Not yet seen in a running app's Settings › Connections.
+
 ## Stubs and simulations
 
 - Demo data only under `AEGIS_DEMO=1`, in its own database, with a "Demo data" chip in the UI.
@@ -210,7 +236,8 @@ From `logs/2026-10-16-2339/screens/real/status.json`:
 All in `docs/PLAN.md` › Sponsor findings. Daytona and Factory Droid: checked against each SDK's
 types, then **run live** on 2026-10-17 (`pnpm try:daytona`, `pnpm try:droid`, both passing;
 evidence `logs/2026-10-17-daytona-tier/`, `logs/2026-10-17-droid/`). Chalk and Photon: from their
-docs and dashboards only; `try-chalk` and `try-photon` are next.
+docs and dashboards only; `try-chalk` and `try-photon` are next. The app's own Daytona and Droid
+checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-sponsor-sync/`).
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
@@ -218,9 +245,14 @@ docs and dashboards only; `try-chalk` and `try-photon` are next.
 | ------------------------------------------- | --------------------------------------------------------- |
 | `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
 | `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
+| `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
 
 ## Decisions log
 
+- 2026-10-17 11:45: `sponsor-check-sync`: Zach's live sponsor checks (decision 27, was his 19),
+  Chalk credentials and `chalk init` files merged with `main`'s docs as the source of truth; Chalk
+  files moved to `chalk/`; Worker B must turn its network off (Chalk sandboxes are open by
+  default).
 - 2026-10-17 11:35: Short links are held at the click as Unknown and the user double-checks
   (PLAN.md decision 26). Droid lockdown tests go on their own branch, `droid-tool-lockdown`.
   `docs-update` merged into `main`; `main` pushed to `origin`.

@@ -24,6 +24,8 @@ Each change: what it is, why, what it costs, and where the details live.
 | **Links are judged without opening them; link detonation is dropped for now** | Detonation needs open internet from a sandbox (blocked on this Daytona tier), can use up one-time links, and is slow | No screenshots or landing-page evidence; short links become **Unknown**; the demo loses "Inspect in sandbox" | PLAN.md decision 20 |
 | **Photon: forward a phone screenshot by iMessage, get a verdict back** (was messages, email, alerts, voice) | One focused feature for the Photon track, built near the end | Built under time pressure; Photon's v2 beta API is newer | PLAN.md decisions 18 and 21, `docs/architectural.md` §8 |
 | **Short links are held at the click as Unknown; the user double-checks** | The destination can't be seen without opening the link | An extra click on every short link, harmless ones included | PLAN.md decision 26 |
+| **Sponsor checks: free lookups every 60 s, live tests only at start and on Check now** (Zach) | Shows whether Daytona and Droid really work, without spending credits every minute | One tiny sandbox and Droid prompt per start (at most every 15 min) | PLAN.md decision 27 |
+| **Chalk's project lives in `chalk/`; two Chalk credentials** (Zach's `chalk init`, moved) | `chalk apply` uploads the folder with `chalk.yaml`; a leaked `.env.local` can't change the Chalk project | Run Chalk commands from `chalk/` | PLAN.md › Sponsor findings › Chalk, `chalk/README.md` |
 | **One Devpost entry enters all four tracks** | Answered by the organisers via the team | — | PLAN.md decision 21 |
 | **Demo materials are built at the end** | Features first | The demo path is tested late; keep the last 3 hours for it | PLAN.md decision 22 |
 | **The fn key is built early, from Klair's add-on** | The panel opens on fn as specified | Needs Input Monitoring; declare the pre-event code on Devpost | PLAN.md decision 14 |
@@ -118,7 +120,7 @@ Aegis/
   src/main/        index.ts, bridge.ts, scans.ts, queue.ts, precheck.ts, verdict.ts, links.ts,
                    text.ts, watcher.ts, quarantine.ts, daytona.ts, docker.ts, workerA.ts (Droid),
                    workerB.ts (Chalk), compare.ts, photon.ts, chalk.ts, store.ts, settings.ts,
-                   health.ts, fnkey.ts, panel.ts
+                   health.ts, sponsors.ts (built), fnkey.ts, panel.ts
   src/preload/     index.ts
   src/renderer/    React app: Panel (#/panel), Overview, Links, Downloads, Messages, Accuracy,
                    Settings, Report; components/ds/ (typed port of design-system/)
@@ -126,7 +128,8 @@ Aegis/
   extension/       manifest.json, background.ts, offscreen.ts, content.ts, guard.ts, popup/
   sandbox/         Dockerfile, entry.py, analyze.py, observe.py, rules/*.yar, requirements.txt
   scripts/         try-daytona.mts, try-droid.mts (try-chalk, try-photon next), verify.sh, capture.sh
-  chalk/           feature and resolver definitions, eval config
+  chalk/           chalk.yaml, pyproject.toml (from chalk init); features, resolvers, the Worker B
+                   helper, eval config
   evals/           labeled URLs and files (benign + malicious), scoring script
   demo/            fake phishing site, harmless test installer + scripts, scam texts, fake invoice email
   docs/            PLAN.md, PROGRESS.md, architectural.md
@@ -226,7 +229,7 @@ Aegis/
 1. **Pre-check** on the Mac (above).
 2. **Both workers at once** (120 s per worker, sandbox start included):
    - **Worker A:** `daytona.create({ snapshot, networkBlockAll: true, ephemeral: true, autoStopInterval: 5, labels })`. **Set `networkBlockAll` at creation**: this account's tier refuses network changes after creation and refuses allow-lists, and create-time `networkBlockAll` blocks even Daytona's "essential services" (verified, `logs/2026-10-17-daytona-tier/`). Upload the bytes to `sample/file` with `meta.json` (original URL, referrer, filename, content type, SHA-256). Droid then works through the tools (§5.4).
-   - **Worker B:** a Chalk Compute sandbox with no outbound network, the same file and the same analysis scripts, with Chalk's model as the analyst.
+   - **Worker B:** a Chalk Compute sandbox with its network turned off by a `NetworkPolicy` that allows no hosts (Chalk sandboxes allow outbound traffic **by default**; proven off by `try-chalk` before any sample goes in), the same file and the same analysis scripts, with Chalk's model as the analyst.
    - Each worker returns a `WorkerResult`: verdict, confidence, summary, timeline, evidence and **its sandbox log** (what ran, files touched, network attempts, errors, how the run ended).
 3. **Compare** (`compare.ts`): agreement → that verdict; disagreement → the **more severe** one, both shown; a test that errors or shows harmful behaviour → **Malicious**; one worker missing → the other's answer, marked partial; both missing → the pre-check only, never better than **Unknown**.
 4. **Verdict** (`verdict.ts`, below), then the file is delivered, held or quarantined (§5.1 Delivery).
@@ -312,10 +315,10 @@ Aegis on the phone: **send Aegis a screenshot of something suspicious by iMessag
 
 Chalk is Worker B, powers the data behind link verdicts, and **proves** Aegis works. (Checked against Chalk's docs and the dashboard on 2026-10-17; `try-chalk` not written yet. Details: PLAN.md › Sponsor findings › Chalk.)
 
-- **Worker B (§5.3):** a Chalk **Compute** sandbox — a gVisor-hardened container with its own filesystem, network namespace, resource limits and an outbound allow-list (left empty, so no network). The SDK is Python (`chalkcompute`: `Sandbox(...)`, `sandbox.exec(...)`, `sandbox.fs`, `sandbox.terminate()`), so the main process calls a small Python helper. Chalk's model is the analyst; it returns a `WorkerResult` with its own sandbox log, independent of Worker A. Environment ID `gswl7f3494e1` (`CHALK_ENVIRONMENT`).
+- **Worker B (§5.3):** a Chalk **Compute** sandbox — a gVisor-hardened container with its own filesystem, network namespace and resource limits. **Outbound network is open by default**, so Worker B passes a `NetworkPolicy` that allows no hosts, and `try-chalk` proves it's off. The SDK is Python (`chalkcompute`: `Sandbox(...)`, `sandbox.exec(...)`, `sandbox.fs`, `sandbox.terminate()`), so the main process calls a small Python helper. Chalk's model is the analyst; it returns a `WorkerResult` with its own sandbox log, independent of Worker A. Environment ID `gswl7f3494e1` (`CHALK_ENVIRONMENT`).
 
 - **Features and resolvers** (in `chalk/`) on `Domain` and `Url` entities: `domain_age_days`, `safe_browsing_match`, `urlhaus_match`, `phishtank_match`, `lookalike_brand`, `lookalike_distance`, `tld_risk`, `is_shortener`, `tranco_rank`, `cert_first_seen_days`, etc. Resolvers join the public threat feeds (URLhaus, PhishTank) with Safe Browsing, RDAP, DNS and certificate-transparency results. The app's link scorer asks Chalk for these with an online query through the TypeScript client (`@chalk-ai/client`: `new ChalkClient({ clientId, clientSecret, environment })`, `client.query({ inputs, outputs })`), cached per domain.
-- **LLM calls through Chalk prompts:** the scam-text check, reading Photon screenshots (image input), the link classifier for borderline cases and Worker B's analyst use `P.completion(...)` with structured output, so they are logged and comparable. *(The first version said "AI Gateway" and "Federated Queries"; those aren't Chalk product names in its current docs, and named prompts / `run_prompt` are no longer supported.)*
+- **LLM calls through Chalk prompts:** the scam-text check, reading Photon screenshots (image input), the link classifier for borderline cases and Worker B's analyst use `P.completion(...)` with structured output, so they are logged and comparable. *(The first version said "AI Gateway" and "Federated Queries". Chalk's LLM router is the **Model Gateway** (OpenAI-compatible), an option for direct calls; "Federated Queries" isn't a Chalk product, features and resolvers do that job; named prompts / `run_prompt` are no longer supported.)*
 - **Agent Evals (judges weight "rigor of agent evaluation"):**
   - **Link set:** ~500 known phishing URLs (PhishTank/URLhaus, recent) + ~500 legit URLs (Tranco top sites, including real login pages and some young but legitimate sites).
   - **Text set:** ~200 scam messages (public smishing/phishing datasets) + ~200 normal messages (shipping updates, real bank alerts, 2FA codes).
@@ -370,7 +373,7 @@ A small floating panel in the **top-right corner** of the screen gives a quick l
 
 ### 5.9 When a service is down
 
-`health.ts` checks each service every 60 s and on failure; the tray and panel show which one is down. Behaviour with the default **block** mode:
+`health.ts` checks each service every 60 s and on failure; the tray and panel show which one is down. Daytona, the sandbox image and Droid are checked for real by `sponsors.ts` (built): free lookups every 60 s, and a tiny live test (a network-off sandbox, a one-line Droid prompt) at start and on Check now only, to save credits (PLAN.md decision 27). Behaviour with the default **block** mode:
 
 | Down | What Aegis does |
 |---|---|
@@ -390,7 +393,7 @@ In **warn** mode, nothing is held: files are delivered with the verdict and repo
 
 **Safety**
 1. **Never run a sample or open a suspicious link on the user's Mac.** Samples are analysed and tested only in sandboxes (Daytona or Chalk Compute, or local Docker as the fallback). Links aren't opened anywhere: they're judged from the URL, its reputation, RDAP, DNS and certificate logs (§5.2). The browser may fetch a download's bytes into memory and the app may hold or quarantine them, but nothing on the Mac opens or runs them. The local pre-check only reads bytes.
-2. **Every sandbox runs with no network.** On Daytona, create it with `networkBlockAll: true` **at creation** (this tier refuses changing it later); on Chalk, give it no outbound allow-list. No sandbox needs the network now that `fetch.py` and `detonate.py` aren't built. Droid's own calls to Factory happen on the Mac, never from the sandbox.
+2. **Every sandbox runs with no network.** On Daytona, create it with `networkBlockAll: true` **at creation** (this tier refuses changing it later); on Chalk, pass a `NetworkPolicy` that allows no hosts — Chalk sandboxes are **open by default**, so leaving the policy out would mean full network. `try-chalk` proves it with the same probes as `try-daytona`. No sandbox needs the network now that `fetch.py` and `detonate.py` aren't built. Droid's own calls to Factory happen on the Mac, never from the sandbox.
 3. Delete each sandbox after its job, in a `finally`. Don't keep samples after a scan unless they're held for the user's decision or the user asks.
 4. Extraction limits: depth 2, 50 files, 500 MB total, timeouts on every step.
 5. The bridge listens on `127.0.0.1` only and accepts only our extension's fixed ID.
@@ -496,5 +499,5 @@ Answered items point to `docs/PLAN.md` › Sponsor findings, where the exact SDK
 - **Daytona — answered by running `pnpm try:daytona`:** snapshots are built with `Image.fromDockerfile` (`linux/amd64`); a sandbox starts in 0.8–3.8 s from the Mac; this org is on **Tier 1/2**, where network can be turned off per sandbox **only at creation** (`networkBlockAll: true`), changes after creation and allow-lists are refused, and sandboxes can't reach Factory or ordinary websites. *Still open:* concurrency limits and hackathon credits, and whether Daytona will grant Tier 3 (ask at the event; not needed for the current plan).
 - **Factory Droid SDK — answered by running `pnpm try:droid`:** TypeScript (`@factory/droid-sdk` 0.9.1) driving the `droid` CLI; it can't run inside a Daytona sandbox on this tier, so it connects to one through in-process MCP tools (option B); runs take about 5–10 s for the probe; built-in tools can be disabled except `ToolSearch`; the SDK and CLI protocol versions don't match, worked around in `try-droid`. *Still open:* ask Factory for an SDK that matches current CLIs; MCP for REA (stretch).
 - **Photon — from docs, not run yet:** `spectrum-ts`, v2 beta for this project; the iMessage provider receives attachments (`getAttachment(guid)`), which covers screenshots. Email and voice are out of scope. *Next:* `scripts/try-photon` (receive one message, reply once).
-- **Chalk — from docs and the dashboard, not run yet:** Compute sandboxes (Python `chalkcompute`) can host Worker B; features through `@chalk-ai/client`; LLM calls through `P.completion` (images supported); evals through `prompt_evaluation`. "AI Gateway" and "Federated Queries" aren't current Chalk product names. *Next:* `scripts/try-chalk`, and set `CHALK_ENVIRONMENT=gswl7f3494e1`.
+- **Chalk — from docs and the dashboard, not run yet:** Compute sandboxes (Python `chalkcompute`) can host Worker B; features through `@chalk-ai/client`; LLM calls through `P.completion` (images supported); evals through `prompt_evaluation`. Chalk's LLM router is called the Model Gateway; "Federated Queries" isn't a Chalk product. Sandboxes allow outbound network by default, so Worker B must turn it off. Two credentials: a service token for the app, `chalk login` for developers. *Next:* `scripts/try-chalk`, and set `CHALK_ENVIRONMENT=gswl7f3494e1`.
 - **Chrome — still to verify:** that the offscreen in-memory fetch works for Gmail attachments and Google Drive downloads (the quarantine fallback covers it if not). The offscreen heartbeat itself works after a fix found in real Chrome (`chrome.runtime.getManifest` isn't available in offscreen documents; the version is now baked in at build time).

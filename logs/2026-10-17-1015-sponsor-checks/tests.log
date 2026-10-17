@@ -1,0 +1,13 @@
+
+> aegis@0.1.0 test /Users/zach/Desktop/Aegis
+> vitest run
+
+
+ RUN  v4.1.12 /Users/zach/Desktop/Aegis
+
+
+ Test Files  4 passed (4)
+      Tests  43 passed (43)
+   Start at  10:12:19
+   Duration  258ms (transform 249ms, setup 0ms, import 357ms, tests 72ms, environment 0ms)
+

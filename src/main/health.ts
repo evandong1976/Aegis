@@ -1,6 +1,8 @@
 // Checks every connection at startup, every 60 s and on demand (BUILD_PROMPT §4.1).
-// Checks that need a sponsor SDK report `unconfigured` (no key) or `pending` (key set, live check
-// not built yet) until their milestone lands. Never report `ok` for something that wasn't checked.
+// Daytona, the sandbox image and Droid are checked live by sponsors.ts: free lookups every time, and
+// live tests that use credits only at start and on Check now (`ctx.live`). Photon and Chalk report
+// `unconfigured` (no key) or `pending` (key set, live check not built yet) until their milestone
+// lands. Never report `ok` for something that wasn't checked.
 
 import { execFile } from 'child_process'
 import { readdir } from 'fs/promises'
@@ -10,6 +12,13 @@ import { EXTENSION_PING_TTL_MS, SERVICE_NAMES } from '@shared/constants'
 import type { ServiceHealth, ServiceKey, ServiceState } from '@shared/types'
 import { config } from './config'
 import { fnKeyStatus } from './fnkey'
+import {
+  checkDaytona,
+  checkDroid,
+  checkSandboxImage,
+  type LiveMemory,
+  type LiveTrigger
+} from './sponsors'
 
 const REQUIRED: ServiceKey[] = ['bridge', 'sqlite', 'daytona', 'droid', 'chalk', 'safeBrowsing']
 
@@ -20,6 +29,10 @@ export interface HealthContext {
   bridgeListening: boolean
   extensionLastSeen: number | null
   storeOpen: boolean
+  /** Set at app start and on Check now: Daytona and Droid also run their live tests. */
+  live?: LiveTrigger
+  /** Keeps live-test results between launches. */
+  memory?: LiveMemory
 }
 
 type Check = Omit<ServiceHealth, 'key' | 'name' | 'required' | 'checkedAt'>
@@ -131,13 +144,10 @@ export async function runHealthChecks(ctx: HealthContext): Promise<ServiceHealth
     sqlite: ctx.storeOpen
       ? result('ok', 'Opened and migrated.')
       : result('down', 'The local store failed to open.'),
-    daytona: keyed(['DAYTONA_API_KEY'], 3, 'Daytona'),
-    sandboxImage: result(
-      'pending',
-      'The Aegis snapshot is built with pnpm build:sandbox (milestone 3).'
-    ),
+    daytona: checkDaytona(ctx.live, ctx.memory),
+    sandboxImage: checkSandboxImage(),
     docker: checkDocker(),
-    droid: keyed(['FACTORY_API_KEY'], 4, 'Droid'),
+    droid: checkDroid(ctx.live, ctx.memory),
     photon: keyed('PHOTON_', 5, 'Photon'),
     chalk: keyed('CHALK_', 6, 'Chalk'),
     safeBrowsing: checkSafeBrowsing(),

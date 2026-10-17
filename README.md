@@ -123,8 +123,15 @@ Rules that are not negotiable (from the design system):
 
 ## Privacy
 
-What leaves this Mac today: **only the health check's Safe Browsing lookup of Google's public test
-URL**, and only when `SAFE_BROWSING_KEY` is set.
+What leaves this Mac today, all from the health check and only when the matching key is set:
+
+- a Safe Browsing lookup of Google's public test URL;
+- Daytona: a list of your sandboxes every 60 s, and at start and on Check now a tiny sandbox with
+  the network off that runs `echo` and is deleted;
+- Factory: a list of models every 60 s, and at start and on Check now a one-line test prompt
+  ("Reply with the single word OK.").
+
+No file, link or page text is sent anywhere yet.
 
 When the full pipeline lands, this copy (also in Settings) must stay true:
 
@@ -188,5 +195,5 @@ Not built yet (milestone 6). Chalk is Worker B, a standalone second analyst that
 each risky file in its own Chalk Compute sandbox and returns a result and sandbox log to compare
 with Droid's. It also supplies threat-intel features for link scoring, runs the LLM calls (the
 scam-text check, reading Photon screenshots) as Chalk prompts, and runs the evals behind the
-Accuracy tab, measuring each worker alone and the pair together. Details: `docs/PLAN.md` › Sponsor
-findings › Chalk.
+Accuracy tab, measuring each worker alone and the pair together. The Chalk project is in
+[`chalk/`](chalk/README.md). Details: `docs/PLAN.md` › Sponsor findings › Chalk.

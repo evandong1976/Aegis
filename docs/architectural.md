@@ -174,8 +174,9 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `store.ts`                          | Built              | SQLite schema, migrations, queries behind every screen (`node:sqlite`, no native module)                                                                                |
 | `status.ts`                         | Built              | Live app status (protection state, health, page snapshot, active scans) and the scan log                                                                                |
 | `health.ts`                         | Built              | Checks every connection at start, every 60 s and on demand; drives "degraded"                                                                                           |
+| `sponsors.ts`                       | Built              | Real Daytona, sandbox-image and Droid checks for `health.ts`: free lookups every 60 s; a tiny live test at start and on Check now only (PLAN.md decision 27)            |
 | `verdict.ts`                        | Built              | Score bands, hard rules, Unknown, "AI can only raise". Every verdict passes through here                                                                                |
-| `settings.ts`, `config.ts`          | Built              | User settings in SQLite; secrets and config from `.env`                                                                                                                 |
+| `settings.ts`, `config.ts`          | Built              | User settings in SQLite; secrets and config from `.env.local`, then `.env`                                                                                              |
 | `ipc.ts`                            | Built              | Handlers for every channel in `src/shared/ipc.ts`                                                                                                                       |
 | `windows.ts`, `panel.ts`, `tray.ts` | Built              | Main window, the fn/⌃⌥A mini panel (top-right, no focus steal), menu bar icon and menu                                                                                  |
 | `fnkey.ts`                          | Built              | Loads `native/fn-key`; a clean fn tap toggles the panel                                                                                                                 |
@@ -232,6 +233,8 @@ never shares a machine with Droid or its Factory key.
 
 **How Worker B works (planned, M6):** a Chalk Compute sandbox (gVisor, its own network policy),
 driven from a small Python helper using `chalkcompute`, with an LLM analyst reached through Chalk.
+Chalk sandboxes allow outbound network **by default**, so Worker B passes a `NetworkPolicy` that
+allows no hosts, and `try-chalk` proves it's off before any sample goes in.
 Details in PLAN.md › Sponsor findings › Chalk.
 
 ```mermaid
@@ -537,6 +540,7 @@ Aegis/
 │   │   ├── verdict.ts          verdict rules             + verdict.test.ts
 │   │   ├── status.ts           live status + scan log
 │   │   ├── health.ts           connection checks
+│   │   ├── sponsors.ts         live Daytona / image / Droid checks + sponsors.test.ts
 │   │   ├── settings.ts, config.ts, ipc.ts
 │   │   ├── windows.ts, panel.ts, tray.ts, fnkey.ts
 │   │   ├── demo.ts, devcapture.ts            dev only
@@ -571,7 +575,8 @@ Aegis/
 │                               (detonate.py parked, decision 20)
 ├── scripts/try-*.mts           live sponsor checks: try-daytona, try-droid (pass);
 │                               try-chalk, try-photon still to write
-├── chalk/                      Planned (M6): features, resolvers, eval config
+├── chalk/                      chalk.yaml, pyproject.toml, uv.lock (chalk init) + README;
+│                               Planned (M6): features, resolvers, Worker B helper, evals
 ├── evals/                      Planned (M6): labeled links, texts, files; results.json
 ├── demo/                       Planned (M0a/b): phishing page, scam texts, invoice email,
 │                               harmless test .pkg, EICAR

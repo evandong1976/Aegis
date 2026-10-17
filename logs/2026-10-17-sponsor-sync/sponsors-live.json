@@ -1,0 +1,57 @@
+{
+  "lookupOnly": {
+    "at": "2026-10-17T15:38:34.462Z",
+    "daytona": {
+      "state": "ok",
+      "detail": "API reachable and the key works. The live test runs at start and on Check now.",
+      "latencyMs": 174
+    },
+    "droid": {
+      "state": "ok",
+      "detail": "Key works (60 models) through /opt/homebrew/bin/droid. The live test runs at start and on Check now.",
+      "latencyMs": 2058
+    },
+    "sandboxImage": {
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); Docker not running, so no local image."
+    }
+  },
+  "liveManual": {
+    "at": "2026-10-17T15:38:37.111Z",
+    "daytona": {
+      "state": "ok",
+      "detail": "API reachable and the key works. Live test just now: sandbox started in 1.4 s, ran a command and was deleted.",
+      "latencyMs": 40
+    },
+    "droid": {
+      "state": "ok",
+      "detail": "Key works (60 models) through /opt/homebrew/bin/droid. Live test just now: Droid answered a test prompt in 5.5 s.",
+      "latencyMs": 1987
+    }
+  },
+  "manualAgainWithin30s": {
+    "at": "2026-10-17T15:38:46.518Z",
+    "daytona": {
+      "state": "ok",
+      "detail": "API reachable and the key works. Live test just now: sandbox started in 1.4 s, ran a command and was deleted.",
+      "latencyMs": 88
+    },
+    "droid": {
+      "state": "ok",
+      "detail": "Key works (60 models) through /opt/homebrew/bin/droid. Live test just now: Droid answered a test prompt in 5.5 s.",
+      "latencyMs": 1963
+    }
+  },
+  "appLog": [
+    {
+      "at": "2026-10-17T15:38:39.007Z",
+      "level": "allow",
+      "text": "daytona live test sandbox=535b19b0-173e-4002-b94a-4bd4808696f3 startup_ms=1379"
+    },
+    {
+      "at": "2026-10-17T15:38:46.517Z",
+      "level": "allow",
+      "text": "droid live test ms=5470"
+    }
+  ]
+}
