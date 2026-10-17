@@ -1,7 +1,7 @@
 // Builds the MV3 extension into extension/dist. Every script is a classic IIFE (content scripts
 // can't be modules), so each entry is its own Vite library build.
 
-import { cpSync, mkdirSync, rmSync } from 'fs'
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { build } from 'vite'
@@ -9,7 +9,7 @@ import { build } from 'vite'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 const dist = resolve(here, 'dist')
-const entries = ['background', 'offscreen', 'popup']
+const entries = ['background', 'offscreen', 'popup', 'guard-preview']
 
 rmSync(dist, { recursive: true, force: true })
 
@@ -27,7 +27,7 @@ for (const [i, name] of entries.entries()) {
       lib: {
         entry: resolve(here, 'src', `${name}.ts`),
         formats: ['iife'],
-        name: `aegis_${name}`,
+        name: `aegis_${name.replace(/\W/g, '_')}`,
         fileName: () => `${name}.js`
       }
     }
@@ -36,7 +36,15 @@ for (const [i, name] of entries.entries()) {
 
 // Same tokens, fonts and component styles as the app (design-system/).
 mkdirSync(resolve(dist, 'ds'), { recursive: true })
-cpSync(resolve(root, 'design-system/tokens.css'), resolve(dist, 'ds/tokens.css'))
+// The guard renders in a shadow root, where :root never matches: let the [data-theme] wrapper
+// carry the theme-independent tokens (spacing, radii, fonts) too.
+writeFileSync(
+  resolve(dist, 'ds/tokens.css'),
+  readFileSync(resolve(root, 'design-system/tokens.css'), 'utf8').replace(
+    /^:root \{/m,
+    ':root, [data-theme] {'
+  )
+)
 cpSync(resolve(root, 'design-system/components/bundle.css'), resolve(dist, 'ds/bundle.css'))
 cpSync(resolve(root, 'design-system/fonts'), resolve(dist, 'ds/fonts'), { recursive: true })
 

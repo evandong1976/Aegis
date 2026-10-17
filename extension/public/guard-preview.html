@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Aegis click guard preview</title>
+    <style>
+      /* A stand-in webmail page behind the guard, for design checks only. */
+      body {
+        margin: 0;
+        font:
+          14px/1.5 -apple-system,
+          system-ui,
+          sans-serif;
+        background: #f6f8fc;
+        color: #202124;
+      }
+      header {
+        height: 56px;
+        background: #fff;
+        border-bottom: 1px solid #e0e3e7;
+      }
+      main {
+        max-width: 720px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 32px;
+        border-radius: 8px;
+      }
+      a {
+        color: #1a73e8;
+      }
+    </style>
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <h2>Unusual sign-in attempt</h2>
+      <p>
+        We blocked a sign-in to your account. Review it within 24 hours or your account will be
+        suspended.
+      </p>
+      <p>
+        <a id="bad" href="https://login-northwlnd-io.sbs/sso?session=8f2c1a9e77"
+          >accounts.google.com</a
+        >
+      </p>
+    </main>
+    <script src="guard-preview.js"></script>
+  </body>
+</html>

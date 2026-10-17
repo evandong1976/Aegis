@@ -1,0 +1,100 @@
+/* Click guard layout (Figma "Click guard — blocked link"). Colours, type and components come from
+   ds/tokens.css and ds/bundle.css; tokens are applied to the [data-theme] wrapper in the shadow root. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--scrim);
+  font-family: var(--font-sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+.guard {
+  width: min(520px, calc(100vw - 32px));
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elev-card), var(--inset-edge);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.guard p {
+  margin: 0;
+}
+.guard__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.guard__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.guard__compare {
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+.guard__gap {
+  margin-top: var(--space-3) !important;
+}
+.guard__mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  word-break: break-all;
+}
+.guard__mono--critical {
+  color: var(--danger);
+}
+.guard__mono--high {
+  color: var(--warning);
+}
+.guard__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-overlay);
+  color: var(--ink-muted);
+}
+.chip--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.chip--warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.guard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.guard__foot {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-subtle);
+}

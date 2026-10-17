@@ -12,7 +12,7 @@
     "start": "electron-vite preview",
     "build": "pnpm typecheck && electron-vite build",
     "format": "prettier --write .",
-    "lint": "eslint --cache .",
+    "lint": "eslint --cache . && node design-system/build-tokens.mjs --check",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck:extension": "tsc --noEmit -p extension/tsconfig.json",
@@ -25,7 +25,10 @@
     "eval": "node scripts/not-yet.mjs eval 6",
     "icons": "node scripts/make-icons.mjs",
     "app": "electron-vite build && electron-builder --mac --dir",
-    "postinstall": "install-electron && electron-builder install-app-deps"
+    "postinstall": "install-electron && electron-builder install-app-deps",
+    "tokens": "node design-system/build-tokens.mjs",
+    "capture": "sh scripts/capture.sh",
+    "dev:demo": "AEGIS_DEMO=1 electron-vite dev"
   },
   "dependencies": {
     "zod": "4.6.7"
