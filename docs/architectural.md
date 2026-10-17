@@ -570,9 +570,9 @@ Aegis/
 │
 ├── native/fn-key/              binding.gyp, src/fn_key.c → build/Release/fn_key.node (gitignored)
 │
-├── sandbox/                    Planned: Dockerfile, entry.py, analyze.py, observe.py,
-│                               rules/*.yar, requirements.txt, tests
-│                               (detonate.py parked, decision 20)
+├── sandbox/                    Dockerfile, requirements.txt, fetch_capa_rules.py, selftest.py,
+│                               README.md. Planned: entry.py, analyze.py, observe.py,
+│                               rules/*.yar, tests (detonate.py parked, decision 20)
 ├── scripts/try-*.mts           live sponsor checks: try-daytona, try-droid (pass);
 │                               try-chalk, try-photon still to write
 ├── chalk/                      chalk.yaml, pyproject.toml, uv.lock (chalk init) + README;

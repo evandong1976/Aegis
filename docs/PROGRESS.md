@@ -170,7 +170,7 @@ Found while merging Zach's `sponsor-check` work (2026-10-17):
 | --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
 | 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
 | 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Moved to the end (decision 22)                                                                 |
-| 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile on branch `sandbox-image` (origin); demo files at the end (decision 22)             |
+| 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg` + scripts, EICAR at end  | Zach        | Dockerfile built and self-tested (`logs/2026-10-17-0043-sandbox-image/`), merged into `feature/sandbox`; demo files at the end |
 | 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
 | 2   | Links, judged without opening them (decision 20)                       | Evan        | Click-guard UI built; content script, scoring, wiring next on branch `link-checks`             |
 | 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
@@ -294,6 +294,10 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
   haven't run yet (no keys). New optional env vars: `AEGIS_DAYTONA_SNAPSHOT`, `DROID_PATH`,
   `DAYTONA_API_URL` / `DAYTONA_TARGET`. Open choice for Worker A: Droid inside the sandbox (A) or
   connected to it through MCP tools (B).
+- 2026-10-17 00:45: `sandbox-image`: `sandbox/Dockerfile` (Python 3.12.14 pinned by digest; capa 9.4.0
+  with matching rules checked by SHA-256; Playwright 1.63.0 Chromium; every version at least two
+  weeks old), `selftest.py` and `sandbox/README.md`. The image holds tools only: the scripts come
+  with M3 and M7, and the `demo/` test files are Zach's to write by hand.
 - 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
   `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
   prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and
