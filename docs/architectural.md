@@ -184,7 +184,7 @@ The brain. It owns the bridge, every decision, every outside service, the store 
 | `workerB.ts` (Chalk)                | Planned (M6)     | Runs the same job through Chalk's standalone worker, collects verdict, evidence and log           |
 | `compare.ts`                        | Planned (M4, M6) | Compares the two workers' answers and produces one result for `verdict.ts` (rules in §3.6)        |
 | `detonate.ts`                       | Planned (M7)     | Decides when to detonate a link, queues it, rescans the final URL                                 |
-| `watcher.ts`, `quarantine.ts`       | Planned (M8)     | `~/Downloads` watcher; quarantine, restore, delete                                                |
+| `watcher.ts`, `quarantine.ts`       | Groundwork (M8)  | `~/Downloads` watcher; quarantine, restore, delete. Built and tested, not wired in yet            |
 | `photon.ts`                         | Later (§8)       | Mobile: screenshots forwarded from a phone → checks → verdict reply. Not in the current build     |
 
 ### 3.4 Preload — `src/preload/` · Built
