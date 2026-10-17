@@ -1,25 +1,31 @@
-## Handoff (updated 2026-10-16 23:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-17 00:00 EDT, by Claude Code session, Opus 5.5)
 
 - **Milestone:** 0 (scaffold) done; 1 (shell + bridge) built, waiting on a real-Chrome check; 2 —
   click-guard UI only; 8 — fn add-on only
 - **Owner:** Evan + Zach. Evan = Person A (browser and data), Zach = Person B (app and sandbox)
 - **Just finished:**
+  - **Branches for Zach's items**: six local branches cut from `main`: `sponsor-check`,
+    `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. They aren't pushed and have no
+    commits of their own yet. The order, prerequisites and what each holds are in `docs/PLAN.md` ›
+    Branches. Joint items (0, 3, 10) have no branch and aren't started.
   - **Verified what works** with `pnpm verify` and recorded the evidence in
     [`logs/2026-10-16-2339/`](../logs/2026-10-16-2339/SUMMARY.md): all 16 checks as expected at
     commit `35cba97` (see "What works today" below)
-  - The verification found and fixed two bugs (a relative profile path crashed the app on launch;
-    health checks were logged twice) and left three small UI issues open (below)
-  - Earlier today: Photon deferred to a later mobile feature (PLAN.md decision 18); pipeline drafted
-    in `docs/architectural.md` §4, awaiting the team's review; two analysis workers designed
-    (decision 17, docs only)
+  - Earlier (2026-10-16): Photon deferred to a later mobile feature (PLAN.md decision 18);
+    pipeline drafted in `docs/architectural.md` §4, awaiting the team's review; two analysis
+    workers designed (decision 17, docs only)
 - **In progress:** nothing
 - **Next step:** Load `extension/dist` unpacked in Chrome and confirm Settings › Connections shows
   Bridge = Connected within 30 s (closes milestone 1; the verification only simulated the
   heartbeat with `curl`). Then split: Evan starts milestone 2 (content script → `/page` → wire
-  `showClickGuard`) and the `demo/` phishing page; Zach starts `sandbox/Dockerfile`, the `demo/`
-  test `.pkg` and the Daytona docs check.
-- **Broken / failing:** nothing failing. Three small UI issues open (see "Open issues").
-- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18.
+  `showClickGuard`) and the `demo/` phishing page. Zach claims and starts `sponsor-check` and
+  `sandbox-image` (they're independent of each other); `ui-fixes` can go in at any time. Don't
+  start `worker-a`, `detonate` or `watcher` past their "can start before M3" parts until
+  milestone 3 (joint) is underway.
+- **Broken / failing:** nothing failing. Three small UI issues open (see "Open issues"; branch
+  `ui-fixes`).
+- **Decisions made this session:** all in `docs/PLAN.md` › Decisions 1–18, plus the branch plan
+  (PLAN.md › Branches).
 - **Blocked on / questions for the user:** deferred by the team: four-track eligibility (and whether
   to keep the Photon track now that Photon is deferred), demo domain. Before M4/M6: verify Droid
   can run inside a Daytona sandbox and Chalk can host its own sandbox.
@@ -64,7 +70,8 @@ Everything in this table was checked by `pnpm verify` on 2026-10-16 at 23:39 EDT
 
 ## Open issues
 
-Found by the verification run (`logs/2026-10-16-2339/SUMMARY.md` › Problems):
+Found by the verification run (`logs/2026-10-16-2339/SUMMARY.md` › Problems). All three are
+for branch `ui-fixes` (PLAN.md › Branches):
 
 1. Settings › "Text me when Aegis blocks something" still says "Needs Photon (milestone 5)"; Photon
    is now deferred to the later mobile feature.
@@ -76,21 +83,21 @@ Found by the verification run (`logs/2026-10-16-2339/SUMMARY.md` › Problems):
 
 ## Milestone checklist
 
-| #   | Milestone                                                              | Owner       | Status                                                                      |
-| --- | ---------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------- |
-| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                        |
-| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Not started                                                                 |
-| 0b  | `demo/` test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`             | Zach        | Not started                                                                 |
-| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                   |
-| 2   | Links                                                                  | Evan        | Click-guard UI built; content script, scoring, wiring not built             |
-| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                 |
-| 4   | Worker A (Daytona + Droid) + compare                                   | Zach        | Not started (designed: PLAN.md decision 17)                                 |
-| 5   | Later: mobile via Photon (screenshots → verdict)                       | Evan        | Deferred, not in the current build                                          |
-| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                 |
-| 7   | Detonation                                                             | Zach        | Not started                                                                 |
-| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built |
-| 9   | Stretch                                                                | —           | Not started                                                                 |
-| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                 |
+| #   | Milestone                                                              | Owner       | Status                                                                                         |
+| --- | ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| 0   | Scaffold, shared types, bridge contract, PLAN/PROGRESS, `.env.example` | Evan + Zach | Done                                                                                           |
+| 0a  | `demo/` phishing page, scam texts, invoice email                       | Evan        | Not started                                                                                    |
+| 0b  | `demo/` test `.pkg` + scripts, EICAR; `sandbox/Dockerfile`             | Zach        | Not started (branch `sandbox-image`)                                                           |
+| 1   | Shell + bridge (Zach); extension skeleton (Evan)                       | Zach / Evan | Built and verified (above); real-Chrome check outstanding                                      |
+| 2   | Links                                                                  | Evan        | Click-guard UI built; content script, scoring, wiring not built                                |
+| 3   | Downloads (core demo)                                                  | Evan + Zach | Not started                                                                                    |
+| 4   | Worker A (Daytona + Droid) + compare                                   | Zach        | Not started (branch `worker-a`; designed: PLAN.md decision 17)                                 |
+| 5   | Later: mobile via Photon (screenshots → verdict)                       | Evan        | Deferred, not in the current build                                                             |
+| 6   | Chalk: Worker B + link data + evals                                    | Evan        | Not started                                                                                    |
+| 7   | Detonation                                                             | Zach        | Not started (branch `detonate`)                                                                |
+| 8   | Watcher + resilience + fn add-on                                       | Zach        | fn add-on built and loading; watcher, quarantine, Docker fallback not built (branch `watcher`) |
+| 9   | Stretch                                                                | —           | Not started                                                                                    |
+| 10  | Prove it and submit                                                    | Evan + Zach | Not started                                                                                    |
 
 ### What exists, screen by screen
 
@@ -154,6 +161,10 @@ None yet; see `docs/PLAN.md` › Sponsor findings.
 
 ## Decisions log
 
+- 2026-10-17 00:00: Six local branches cut from `main` for Zach's items, in landing order:
+  `sponsor-check`, `sandbox-image`, `ui-fixes`, `worker-a`, `detonate`, `watcher`. Context and
+  prerequisites are in PLAN.md › Branches. Not pushed. Joint items (0, 3, 10) have no branch and
+  aren't started.
 - 2026-10-16 23:39: First logged verification (`logs/2026-10-16-2339/`); fixed a launch crash on
   relative profile paths and duplicate health logging; three UI issues open.
 - 2026-10-16: Photon deferred to a later mobile feature (forward a phone screenshot, get a
