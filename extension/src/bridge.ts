@@ -25,7 +25,9 @@ export async function fetchStatus(timeoutMs = 2000): Promise<StatusResponse | nu
 
 export async function ping(): Promise<boolean> {
   const body: PingRequest = {
-    extensionVersion: chrome.runtime.getManifest().version,
+    // Not chrome.runtime.getManifest(): the offscreen document, which sends the heartbeat, can't
+    // call it. The build bakes the manifest version in.
+    extensionVersion: __AEGIS_EXTENSION_VERSION__,
     at: new Date().toISOString()
   }
   try {

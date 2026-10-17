@@ -10,6 +10,9 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 const dist = resolve(here, 'dist')
 const entries = ['background', 'offscreen', 'popup', 'guard-preview']
+// Offscreen documents can only use chrome.runtime messaging, not getManifest(), so the version is
+// baked in at build time for every entry.
+const version = JSON.parse(readFileSync(resolve(here, 'public/manifest.json'), 'utf8')).version
 
 rmSync(dist, { recursive: true, force: true })
 
@@ -19,6 +22,7 @@ for (const [i, name] of entries.entries()) {
     logLevel: 'warn',
     publicDir: i === 0 ? resolve(here, 'public') : false,
     resolve: { alias: { '@shared': resolve(root, 'src/shared') } },
+    define: { __AEGIS_EXTENSION_VERSION__: JSON.stringify(version) },
     build: {
       outDir: dist,
       emptyOutDir: false,
