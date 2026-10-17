@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-10-17T19:52:15.247Z",
+  "trials": [
+    {
+      "name": "allow-list api+prem",
+      "installed": "0.238.0",
+      "dns": [
+        "8.8.8.8 reply from 8.8.8.8 rcode 3 answers 0 []",
+        "1.1.1.1 reply from 1.1.1.1 rcode 3 answers 0 []",
+        "9.9.9.9 reply from 9.9.9.9 rcode 3 answers 0 []"
+      ],
+      "execMs": 5807,
+      "exitCode": 0,
+      "result": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":2883,\"num_turns\":1,\"result\":\"This check worked.\",\"session_id\":\"147117a3-8008-4692-8c1a-e76b7be8fea1\",\"usage\":{\"input_tokens\":3,\"output_tokens\":8,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":6622,\"factory_credits\":6657,\"",
+      "deleted": true
+    },
+    {
+      "name": "networkBlockAll",
+      "dns": [
+        "8.8.8.8 no reply: TimeoutError",
+        "1.1.1.1 no reply: TimeoutError",
+        "9.9.9.9 no reply: TimeoutError"
+      ],
+      "deleted": true
+    }
+  ],
+  "leftInOrg": [],
+  "finishedAt": "2026-10-17T19:52:51.736Z"
+}

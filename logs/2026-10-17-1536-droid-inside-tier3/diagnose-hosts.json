@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-10-17T19:49:52.186Z",
+  "trials": [
+    {
+      "allow": "app.factory.ai,api.factory.ai,relay.factory.ai",
+      "installed": "0.238.0",
+      "proxyEnv": "HTTPS_PROXY=http://172.20.0.1:18080\nno_proxy=localhost,127.0.0.1,::1\nNO_PROXY=localhost,127.0.0.1,::1\nhttps_proxy=http://172.20.0.1:18080\nhttp_proxy=http://172.20.0.1:18080\nHTTP_PROXY=http://172.20.0.1:18080",
+      "reach": {
+        "api.factory.ai": "http=200 connect=200",
+        "relay.factory.ai": "http=404 connect=200",
+        "telemetry.factory.ai": "http=000 connect=403",
+        "example.com": "http=000 connect=403"
+      },
+      "exitCode": 1,
+      "result": "{\"type\":\"result\",\"subtype\":\"failure\",\"is_error\":true,\"duration_ms\":192,\"num_turns\":0,\"result\":\"403 status code (no body)\",\"session_id\":\"6abc6cb1-bd54-499d-8674-92eeb6ac29ec\",\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":0,\"factory_credits\":0}}",
+      "requestUrls": [
+        "requestUrl: 'https://telemetry.factory.ai/api/ingest'"
+      ],
+      "deleted": true
+    },
+    {
+      "allow": "app.factory.ai,api.factory.ai,telemetry.factory.ai",
+      "installed": "0.238.0",
+      "proxyEnv": "HTTPS_PROXY=http://172.20.0.1:18080\nno_proxy=localhost,127.0.0.1,::1\nNO_PROXY=localhost,127.0.0.1,::1\nhttps_proxy=http://172.20.0.1:18080\nhttp_proxy=http://172.20.0.1:18080\nHTTP_PROXY=http://172.20.0.1:18080",
+      "reach": {
+        "api.factory.ai": "http=200 connect=200",
+        "relay.factory.ai": "http=000 connect=403",
+        "telemetry.factory.ai": "http=405 connect=200",
+        "example.com": "http=000 connect=403"
+      },
+      "exitCode": 1,
+      "result": "{\"type\":\"result\",\"subtype\":\"failure\",\"is_error\":true,\"duration_ms\":245,\"num_turns\":0,\"result\":\"403 status code (no body)\",\"session_id\":\"51b022c2-368a-451d-95c4-4b803c92278e\",\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":0,\"factory_credits\":0}}",
+      "requestUrls": [],
+      "deleted": true
+    }
+  ],
+  "leftInOrg": [],
+  "finishedAt": "2026-10-17T19:50:36.055Z"
+}

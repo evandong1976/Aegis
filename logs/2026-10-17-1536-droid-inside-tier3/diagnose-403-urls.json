@@ -1,0 +1,76 @@
+{
+  "startedAt": "2026-10-17T19:48:45.141Z",
+  "trials": [
+    {
+      "allow": "app.factory.ai,api.factory.ai",
+      "installed": "0.238.0",
+      "reach": {
+        "api.factory.ai": "HTTP 200",
+        "app.factory.ai": "HTTP 200",
+        "telemetry.factory.ai": "unreachable",
+        "relay.factory.ai": "unreachable",
+        "example.com": "unreachable"
+      },
+      "exitCode": 1,
+      "result": "{\"type\":\"result\",\"subtype\":\"failure\",\"is_error\":true,\"duration_ms\":369,\"num_turns\":0,\"result\":\"403 status code (no body)\",\"session_id\":\"95803b9d-ee99-4e2e-b3a4-46fb3366558f\",\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":0,\"factory_credits\":0}}",
+      "urls": [
+        "https://telemetry.factory.ai/api/ingest"
+      ],
+      "lines403": [
+        "[2026-10-17T19:49:05.667Z] WARN: Error flushing telemetry events to web: nn [FetchError]: 403 Fetch failed",
+        "  metadata: { errorMessage: '', statusCode: 403 },",
+        "[2026-10-17T19:48:58.516Z] INFO: [tui-startup] Startup phase completed | Context: {\"phase\":\"host_identity_local\",\"outcome\":\"success\",\"durationMs\":619.4030150000001,\"startupRunId\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "FetchError: 403 Fetch failed",
+        "    at processTicksAndRejections (native:7:39) | Context: {\"errorMessage\":\"\",\"statusCode\":403,\"cause\":{\"name\":\"FetchError\",\"message\":\"403 Fetch failed\",\"stack\":\"FetchError: 403 Fetch failed\\n    at $H (../../packages/utils/src/api/fetch.ts:307:15)\\n    at async requestForTarget (src/api/BackendClient.ts:344:18)\\n    at async <anonymous> (src/services/CloudSyncService.ts:207:27)\\n    at async <anonymous> (../../packages/daemon-sdk/src/retry.ts:87:30)\\n    at async attemptSessionCreate (src/services/CloudSyncService.ts:245:5)\\n    at processTicksAndRejections (native:7:39)\"},\"sessionId\":\"95803b9d-ee99-4e2e-b3a4-46fb3366558f\",\"attempt\":1,\"maxAttempts\":6,\"tags\":{…},\"factory.process.instance_id\":",
+        "    at processTicksAndRejections (native:7:39) | Context: {\"errorMessage\":\"\",\"statusCode\":403,\"cause\":{\"name\":\"FetchError\",\"message\":\"403 Fetch failed\",\"stack\":\"FetchError: 403 Fetch failed\\n    at $H (../../packages/utils/src/api/fetch.ts:307:15)\\n    at async requestForTarget (src/api/BackendClient.ts:344:18)\\n    at async <anonymous> (src/services/CloudSyncService.ts:207:27)\\n    at async <anonymous> (../../packages/daemon-sdk/src/retry.ts:87:30)\\n    at async attemptSessionCreate (src/services/CloudSyncService.ts:245:5)\\n    at processTicksAndRejections (native:7:39)\"},\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}"
+      ],
+      "firstLines": [
+        "[2026-10-17T19:49:05.667Z] WARN: Error flushing telemetry events to web: nn [FetchError]: 403 Fetch failed",
+        "    at $H (../../packages/utils/src/api/fetch.ts:307:15)",
+        "  requestUrl: 'https://telemetry.factory.ai/api/ingest',",
+        "[2026-10-17T19:48:57.859Z] INFO: [tui-startup] Startup phase completed | Context: {\"phase\":\"runtime_settings_path\",\"outcome\":\"success\",\"durationMs\":0.03307999999998401,\"startupRunId\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "[2026-10-17T19:48:59.020Z] INFO: Updated built-in droid | Context: {\"path\":\"/home/daytona/.factory/droids/user-testing-flow-validator.md\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "[2026-10-17T19:48:59.021Z] INFO: Updated built-in droid | Context: {\"path\":\"/home/daytona/.factory/droids/scrutiny-feature-reviewer.md\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "[2026-10-17T19:48:59.023Z] INFO: [CustomerOtelClient] Customer traces disabled | Context: {\"state\":\"legacy\",\"surface\":\"none\",\"reason\":\"no-customer-otlp-endpoint\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "[2026-10-17T19:48:59.128Z] INFO: [TaskToolManager] Watching personal droid directory | Context: {\"path\":\"/home/daytona/.factory/droids\",\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "[2026-10-17T19:48:59.443Z] INFO: [metrics_log_connector_catalog_backend_request_latency_ms] | Context: {\"outcome\":\"success\",\"transport\":\"standalone\",\"metricsAggregated\":true,\"metric\":\"connector_catalog_backend_request_latency_ms\",\"value\":438,\"tags\":{…},\"factory.process.instance_id\":\"b5ce33dc-70e9-4a9a-8324-54fbbec8c6fe\",\"process.pid\":213}",
+        "FetchError: 403 Fetch failed",
+        "    at $H (../../packages/utils/src/api/fetch.ts:307:15)",
+        "    at async requestForTarget (src/api/BackendClient.ts:344:18)",
+        "    at processTicksAndRejections (native:7:39) | Context: {\"errorMessage\":\"\",\"statusCode\":403,\"cause\":{\"name\":\"FetchError\",\"message\":\"403 Fetch failed\",\"stack\":\"FetchError: 403 Fetch failed\\n    at $H (../../packages/utils/src/api/fetch.ts:307:15)\\n    at async requestForTarget (src/api/BackendClient.ts:344:18)\\n    at async <anonymous> (src/services/CloudSyncService.ts:207:27)\\n    at async <anon",
+        "FetchError: 403 Fetch failed",
+        "    at $H (../../packages/utils/src/api/fetch.ts:307:15)"
+      ],
+      "deleted": true
+    },
+    {
+      "allow": "factory.ai,*.factory.ai",
+      "installed": "0.238.0",
+      "reach": {
+        "api.factory.ai": "HTTP 200",
+        "app.factory.ai": "HTTP 200",
+        "telemetry.factory.ai": "HTTP 405",
+        "relay.factory.ai": "HTTP 404",
+        "example.com": "unreachable"
+      },
+      "exitCode": 0,
+      "result": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":3324,\"num_turns\":1,\"result\":\"This check worked.\",\"session_id\":\"29738f27-ef17-4dca-9123-188f404841ac\",\"usage\":{\"input_tokens\":3,\"output_tokens\":8,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":6622,\"factory_credits\":6657,\"ttft_ms\":2931}}",
+      "urls": [],
+      "lines403": [],
+      "firstLines": [
+        "[2026-10-17T19:49:19.748Z] INFO: [tui-startup] Startup phase completed | Context: {\"phase\":\"runtime_settings_path\",\"outcome\":\"success\",\"durationMs\":0.02308999999999628,\"startupRunId\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:20.496Z] INFO: Updated built-in droid | Context: {\"path\":\"/home/daytona/.factory/droids/scrutiny-feature-reviewer.md\",\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:20.496Z] INFO: Updated built-in droid | Context: {\"path\":\"/home/daytona/.factory/droids/user-testing-flow-validator.md\",\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:20.498Z] INFO: [CustomerOtelClient] Customer traces disabled | Context: {\"state\":\"legacy\",\"surface\":\"none\",\"reason\":\"no-customer-otlp-endpoint\",\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:20.581Z] INFO: [TaskToolManager] Watching personal droid directory | Context: {\"path\":\"/home/daytona/.factory/droids\",\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:20.926Z] INFO: [metrics_log_connector_catalog_backend_request_latency_ms] | Context: {\"outcome\":\"success\",\"transport\":\"standalone\",\"metricsAggregated\":true,\"metric\":\"connector_catalog_backend_request_latency_ms\",\"value\":443,\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b828-5ccf17cb0477\",\"process.pid\":217}",
+        "[2026-10-17T19:49:21.036Z] INFO: [Agent] Outbound request prepared | Context: {\"sessionId\":\"29738f27-ef17-4dca-9123-188f404841ac\",\"modelId\":\"gpt-6.1-sol\",\"count\":2,\"lastUserMessageId\":\"b4a91f0e-4d25-4bcb-8033-0a9df6ba57c9\",\"lastMessageId\":\"b4a91f0e-4d25-4bcb-8033-0a9df6ba57c9\",\"type\":\"user\",\"totalEstimatedTokens\":1947,\"maxInputTokens\":922000,\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-",
+        "[2026-10-17T19:49:24.222Z] INFO: [metrics_log_chat_client_request_duration] | Context: {\"apiProvider\":\"openai\",\"isSpecMode\":false,\"modelId\":\"gpt-6.1-sol\",\"source\":\"builtin\",\"reasoningEffort\":\"high\",\"requestMode\":\"http\",\"transport\":\"http\",\"usedFallback\":true,\"metricsAggregated\":true,\"metric\":\"chat_client_request_duration\",\"value\":3.185,\"tags\":{…},\"factory.process.instance_id\":\"386dc1d8-90aa-44e6-b8",
+        "[2026-10-17T19:49:24.225Z] INFO: [Agent] Streaming result | Context: {\"count\":3,\"inputTokens\":3,\"cacheReadInputTokens\":0,\"totalInputTokens\":6625,\"reasoningTokens\":0,\"outputTokens\":8,\"reason\":\"stop\",\"hasReasoningContent\":false,\"upstreamRequestId\":\"req_04b89a1e18af451ca24f751688635a32\",\"upstreamResponseId\":\"resp_0246a83a0b4e7702016ad3d142a55487d0881e72d9d92fb757\",\"cachedTokensWritten\":6622,\"tags\":{…"
+      ],
+      "deleted": true
+    }
+  ],
+  "leftInOrg": [],
+  "finishedAt": "2026-10-17T19:49:29.045Z"
+}

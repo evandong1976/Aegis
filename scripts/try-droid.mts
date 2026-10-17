@@ -7,8 +7,10 @@
 //    is a line of harmless text. Droid must report the file's SHA-256, which it can only learn by
 //    calling a tool, so a correct hash proves the tools really reached the sandbox. Every tool call
 //    is logged (the start of Worker A's sandbox log). The sandbox is deleted in a `finally`.
-// 3. Option A, Droid *inside* a sandbox: only with AEGIS_TRY_DROID_INSIDE=1. This account's Daytona
-//    tier can't reach Factory from a sandbox, so it's skipped by default.
+// 3. Option A, Droid *inside* a sandbox: only with AEGIS_TRY_DROID_INSIDE=1 (option B is chosen).
+//    The sandbox gets a domain allow-list (Factory's hosts, plus npm for the install), never open
+//    internet, and never holds a sample. AEGIS_FACTORY_DOMAINS overrides Factory's hosts
+//    (default api.factory.ai,prem.factory.ai).
 //
 //   pnpm try:droid
 //
@@ -247,9 +249,11 @@ try {
   await rm(cwd, { recursive: true, force: true })
 }
 
-// 3. Option A, inside a Daytona sandbox: opt-in. Tier 1/2 blocked Factory from sandboxes; Tier 3
-// (PLAN.md decision 28) allows it. No network setting here, so on Tier 3 the sandbox has the whole
-// internet unless AEGIS_FACTORY_DOMAINS narrows it. It never holds a sample.
+// 3. Option A, inside a Daytona sandbox: opt-in (decision 19 chose B). Tier 1/2 blocked Factory
+// from sandboxes; Tier 3 (decision 28) has open internet by default, so this sandbox is created with
+// a domain allow-list, never open: Factory's hosts plus the npm registry to install the CLI. After
+// the install the list is narrowed to Factory's hosts alone, which is all a prebuilt option A image
+// would have, and probed from inside before droid runs. It never holds a sample.
 if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
   console.log(
     'skip droid inside a Daytona sandbox: option B chosen (set AEGIS_TRY_DROID_INSIDE=1 to try)'
@@ -257,53 +261,103 @@ if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
 } else if (!process.env.DAYTONA_API_KEY) {
   record('droid inside a Daytona sandbox', false, 'needs DAYTONA_API_KEY in .env.local or .env')
 } else {
+  // What `droid exec` connects to (logged through a proxy, logs/2026-10-17-1536-droid-inside-tier3):
+  // api.factory.ai, and prem.factory.ai for session sync (without it Daytona's allow-list proxy
+  // answers 403 and droid fails). telemetry.factory.ai is optional; app.factory.ai isn't used.
+  const factoryHosts = (process.env.AEGIS_FACTORY_DOMAINS || 'api.factory.ai,prem.factory.ai')
+    .split(',')
+    .map((h) => h.trim())
+    .filter(Boolean)
+  // `npm install -g droid` fetches droid and its platform binary (@factory/cli-linux-x64), both
+  // from the registry; install.js falls back to the same registry. Nothing else is needed.
+  const installHosts = ['registry.npmjs.org']
+  // Hosts that must stay unreachable once narrowed: the open web, the install host, a Factory host
+  // that isn't listed, and an address by IP (a domain allow-list must not leave raw IPs open).
+  const outside = ['example.com', 'registry.npmjs.org', 'telemetry.factory.ai', '1.1.1.1'].filter(
+    (h) => !factoryHosts.includes(h)
+  )
+  const key = process.env.FACTORY_API_KEY ?? ''
+  const scrub = (text: string): string => (key ? text.split(key).join('<FACTORY_API_KEY>') : text)
+  const daytona = new Daytona()
   let sandbox: Sandbox | undefined
   try {
+    // An empty list would clear the allow-list on narrowing, i.e. open the network.
+    if (factoryHosts.length === 0) throw new Error('AEGIS_FACTORY_DOMAINS names no hosts')
     const t3 = performance.now()
-    const box = await new Daytona().create(
+    const box = await daytona.create(
       {
         snapshot: process.env.AEGIS_DAYTONA_SNAPSHOT || undefined,
+        domainAllowList: [...factoryHosts, ...installHosts].join(','),
         ephemeral: true,
         autoStopInterval: 10,
-        labels: { app: 'aegis', job: 'try-droid' }
+        ttlMinutes: 30,
+        labels: { app: 'aegis', job: 'try-droid-inside' }
       },
-      { timeout: 20 }
+      { timeout: 30 }
     )
     sandbox = box
+    if (!box.domainAllowList || box.networkBlockAll) {
+      throw new Error(
+        `sandbox ${box.id} came back with domainAllowList=${box.domainAllowList}, networkBlockAll=${box.networkBlockAll}`
+      )
+    }
+    record('sandbox (allow-list)', true, `${box.id} in ${seconds(t3)}; ${box.domainAllowList}`)
+
     type Run = ReturnType<Sandbox['process']['executeCommand']>
     const sh = (cmd: string, timeout: number, env?: Record<string, string>): Run =>
       box.process.executeCommand(`sh -c '${cmd.replace(/'/g, `'"'"'`)}'`, undefined, env, timeout)
-    const hasNpm = (await sh('command -v npm', 15)).exitCode === 0
-    const install = hasNpm
-      ? `npm install -g droid@${SANDBOX_DROID_VERSION}`
-      : 'curl -fsSL https://app.factory.ai/cli | sh'
+    const reach = async (host: string): Promise<string> => {
+      const r = await sh(
+        `curl -sk -o /dev/null -m 8 -w "%{http_code}" https://${host}/ || true`,
+        20
+      )
+      const code = r.result.trim()
+      return code === '' || code === '000' ? 'unreachable' : `HTTP ${code}`
+    }
+    const reachAll = async (hosts: string[]): Promise<Record<string, string>> =>
+      Object.fromEntries(await Promise.all(hosts.map(async (h) => [h, await reach(h)] as const)))
+
+    const node = await sh('node --version && npm --version', 15)
+    if (node.exitCode !== 0) {
+      throw new Error('no Node.js/npm in this image: option A needs Node.js in the image')
+    }
+    const t4 = performance.now()
     const installed = await sh(
-      `${install} && export PATH="$HOME/.local/bin:$PATH" && droid --version`,
+      `npm install -g --no-audit --no-fund droid@${SANDBOX_DROID_VERSION} && droid --version`,
       300
     )
     record(
       'droid CLI in the sandbox',
       installed.exitCode === 0,
-      `${box.id}: "${install}" exit ${installed.exitCode}; ${installed.result.trim().split('\n').pop()} (${seconds(t3)} incl. start)`
+      `node ${node.result.trim().split('\n').join(', npm ')}; npm install droid@${SANDBOX_DROID_VERSION} exit ${installed.exitCode} in ${seconds(t4)}; ${installed.result.trim().split('\n').pop()}`
+    )
+    if (installed.exitCode !== 0) throw new Error(`install failed: ${installed.result.slice(-500)}`)
+
+    // Narrow to Factory alone. Never widened: the list only loses the install host.
+    await box.updateNetworkSettings({ domainAllowList: factoryHosts.join(',') })
+    const seen = await reachAll([...factoryHosts, ...outside])
+    const leaks = outside.filter((h) => seen[h] !== 'unreachable')
+    const factoryUp = factoryHosts.filter((h) => seen[h] !== 'unreachable')
+    record(
+      'allow-list holds',
+      leaks.length === 0 && factoryUp.length > 0,
+      `limited to ${factoryHosts.join(',')}; ${Object.entries(seen)
+        .map(([h, v]) => `${h} ${v}`)
+        .join(', ')}`
     )
 
-    const domains = process.env.AEGIS_FACTORY_DOMAINS
-    if (domains) await box.updateNetworkSettings({ domainAllowList: domains })
-    const t4 = performance.now()
+    const t5 = performance.now()
     const prompt = 'Reply with exactly one sentence saying this check worked. Do not use any tools.'
-    const ran = await sh(
-      `export PATH="$HOME/.local/bin:$PATH" && droid exec --output-format json "${prompt}"`,
-      120,
-      { FACTORY_API_KEY: process.env.FACTORY_API_KEY ?? '' }
-    )
-    const network = domains ? `network limited to ${domains}` : 'network open'
+    const ran = await sh(`droid exec --output-format json "${prompt}"`, 120, {
+      FACTORY_API_KEY: key
+    })
     record(
       'droid exec inside the sandbox',
       ran.exitCode === 0 && ran.result.trim().length > 0,
-      `exit ${ran.exitCode} in ${seconds(t4)}, ${network}; ${ran.result.trim().slice(0, 300)}`
+      `exit ${ran.exitCode} in ${seconds(t5)}, network limited to ${factoryHosts.join(',')}; ${scrub(ran.result.trim()).slice(0, 400)}`
     )
   } catch (err) {
-    record('droid inside a Daytona sandbox', false, message(err))
+    record('droid inside a Daytona sandbox', false, scrub(message(err)))
   } finally {
     if (sandbox) {
       try {
@@ -312,6 +366,28 @@ if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
       } catch (err) {
         record('delete', false, `${sandbox.id}: ${message(err)}`)
       }
+    }
+    // `list()` is an async iterator in @daytona/sdk 0.220.0: count by walking it. A sandbox just
+    // deleted is still listed (even as "started") for a few seconds after `delete()` returns, so
+    // look again for up to 20 s before calling it a leak.
+    try {
+      const t6 = performance.now()
+      let left: string[] = []
+      for (let tries = 0; tries < 10; tries++) {
+        left = []
+        for await (const s of daytona.list()) {
+          if (s.state !== 'destroying' && s.state !== 'destroyed') left.push(`${s.id} (${s.state})`)
+        }
+        if (left.length === 0) break
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+      }
+      record(
+        'no sandboxes left',
+        left.length === 0,
+        `${left.length} in the org after ${seconds(t6)} ${left.join(', ')}`
+      )
+    } catch (err) {
+      record('no sandboxes left', false, `list failed: ${message(err)}`)
     }
   }
 }
