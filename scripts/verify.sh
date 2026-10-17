@@ -69,7 +69,7 @@ AEGIS_USER_DATA="$OUT/profile-real" AEGIS_BRIDGE_PORT=$PORT AEGIS_CAPTURE_DIR="$
   ./node_modules/.bin/electron-vite dev > "$OUT/app-real.log" 2>&1 &
 APP=$!
 i=0
-until [ "$(curl -s -o /dev/null -w '%{http_code}' -H "Origin: chrome-extension://$EXT_ID" "http://127.0.0.1:$PORT/status")" = 200 ] || [ $i -ge 90 ]; do
+until [ "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "Origin: chrome-extension://$EXT_ID" "http://127.0.0.1:$PORT/status")" = 200 ] || [ $i -ge 90 ]; do
   sleep 1
   i=$((i + 1))
 done
@@ -92,11 +92,12 @@ check() {
 B="http://127.0.0.1:$PORT"
 O="Origin: chrome-extension://$EXT_ID"
 J="Content-Type: application/json"
-check "GET /status from the Aegis extension" 200 -H "$O" "$B/status"
-check "GET /status with no Origin" 403 "$B/status"
-check "GET /status from a web page" 403 -H "Origin: https://evil.example" "$B/status"
-check "GET /status from another extension" 403 -H "Origin: chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" "$B/status"
-check "GET /status with a rebinding Host header" 403 -H "$O" -H "Host: evil.example:$PORT" "$B/status"
+check "POST /status from the Aegis extension" 200 -X POST -H "$O" "$B/status"
+check "POST /status with no Origin" 403 -X POST "$B/status"
+check "GET /status (reads are POST)" 404 -H "$O" "$B/status"
+check "POST /status from a web page" 403 -X POST -H "Origin: https://evil.example" "$B/status"
+check "POST /status from another extension" 403 -X POST -H "Origin: chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" "$B/status"
+check "POST /status with a rebinding Host header" 403 -X POST -H "$O" -H "Host: evil.example:$PORT" "$B/status"
 check "OPTIONS /status preflight from the extension" 204 -X OPTIONS -H "$O" "$B/status"
 check "POST /ping heartbeat" 200 -X POST -H "$O" -H "$J" -d '{"extensionVersion":"0.1.0","at":"2026-10-17T00:00:00Z"}' "$B/ping"
 check "POST /trust example.com" 200 -X POST -H "$O" -H "$J" -d '{"domain":"example.com"}' "$B/trust"
@@ -104,7 +105,7 @@ check "POST /trust with an empty domain" 400 -X POST -H "$O" -H "$J" -d '{"domai
 check "POST /page (milestone 2)" 501 -X POST -H "$O" -H "$J" -d '{}' "$B/page"
 check "POST /download (milestone 3)" 501 -X POST -H "$O" "$B/download"
 check "POST /inspect (milestone 7)" 501 -X POST -H "$O" -H "$J" -d '{}' "$B/inspect"
-check "GET /scan/abc (milestone 3)" 501 -H "$O" "$B/scan/abc"
+check "POST /scan/abc (milestone 3)" 501 -X POST -H "$O" "$B/scan/abc"
 check "GET /nope" 404 -H "$O" "$B/nope"
 rm -f "$OUT/.body"
 {
