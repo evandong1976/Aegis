@@ -1,7 +1,7 @@
-## Handoff (updated 2026-10-17 16:30 EDT, by Claude Code session, Opus 4.8)
+## Handoff (updated 2026-10-17 18:45 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–29, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–30, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
@@ -10,6 +10,31 @@ disagree, PLAN.md › Decisions wins.
   (`daytona.ts`, run a file network-off) merged; 4 — approach proven (`pnpm try:droid`); 8 — fn
   add-on only. Everything else not started. Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **In progress — branch `feature/visualization` (Zach), not committed (Zach asked not to yet):
+  the live view (PLAN.md decision 30).** A caught file is opened in a real network-off Daytona
+  sandbox while the main window shows it happening: five stages; Droid on the left, on this Mac,
+  with each read-only tool call into the sandbox; the sandbox on the right with **Terminal** (the
+  `sh -x` trace streamed live, blocked network attempts in red) and **Desktop** (real pictures of
+  the sandbox's Linux desktop, the file open in a terminal window there) tabs. It becomes the
+  Report when the verdict lands; the panel shows a live line and **Watch**.
+  - **Droid's words are a scripted stand-in** (labelled everywhere) until `workerA.ts` implements
+    `LiveAgent` (M4); its tool calls are Droid's real fixed tools, run in the real sandbox.
+  - **Try it:** `pnpm dev` → Downloads → **Test the sandbox** → Fake Zoom installer (Malicious) or
+    Terminal demo (Clean). Uses one sandbox per run; needs `DAYTONA_API_KEY`.
+  - **Evidence:** `logs/2026-10-17-1834-live-view/SUMMARY.md` (both samples live, screenshots,
+    bugs found and fixed), `logs/2026-10-17-1818-desktop-probe/` (`pnpm try:desktop`: Computer Use
+    works with the network off). 148 tests pass (3 new files); typecheck and lint pass for `src`,
+    `scripts`, `extension`; 0 sandboxes left.
+  - **Joint changes, for Evan:** new `src/shared/live.ts`; `src/shared/ipc.ts` gains `live:get`,
+    `live:start` and the `live:event` push; `DroidReport` gains optional `reviewer`
+    (`'droid' | 'scripted'`). `try:sandbox`'s sample moved to `src/main/testSamples.ts` (same
+    bytes).
+  - **Next:** M3's `/download` calls `sandboxScan()` in `src/main/index.ts` with the intercepted
+    bytes; M4's `workerA.ts` implements `LiveAgent` and replaces `scriptedAgent()` there.
+  - `pnpm lint` over the whole folder also lints `.claude/worktrees/happy-haslett-a1ae53/` (another
+    session's worktree: 863 errors in its vendored files). Remove that worktree or ignore
+    `.claude/` in `eslint.config.mjs`.
+
 - **Just finished — branch `link-checks`, merged into `main`: milestone 2.** Links are judged
   without opening them (decision 20); every choice and its cost is decision 29.
   - Main: `links.ts` (Tier 1 rules, lookalikes incl. digit swaps and Cyrillic, redirect
@@ -176,6 +201,7 @@ Everything in this table was checked by `pnpm verify` on 2026-10-16 at 23:39 EDT
 | The click-guard overlay                                                        | Checked by eye in the browser pane during development, not in a logged run                                                                                                            |
 | The Daylight (light) theme                                                     | The Mac was in dark mode                                                                                                                                                              |
 | Packaging `Aegis.app` (`pnpm app`)                                             | Not run                                                                                                                                                                               |
+| The live view with a real download or the real Droid session                   | M3 (interception) and M4 (`workerA.ts`) aren't built; the test button and the scripted stand-in take their place (`logs/2026-10-17-1834-live-view/`)                                  |
 | Sponsor integrations in the app (Daytona, Droid, Chalk, Photon, Safe Browsing) | Not built yet. Daytona and Droid were checked on their own by `pnpm try:daytona` / `pnpm try:droid` (passing, evidence in `logs/2026-10-17-*`); Chalk and Photon only from their docs |
 
 ## Open issues
@@ -245,6 +271,10 @@ behind clicks is not yet covered by a logged run (see "Not verified yet").
 - **Report** (Figma frame): verdict header with risk score, finding chips and actions (disabled
   until milestone 8), timeline, indicators, code evidence with flagged lines, capabilities, checks
   that ran, sandbox / privacy footer.
+- **Live view** (in the Report route while a sandbox scan runs, decision 30): stages, Droid's steps
+  and tool calls, the sandbox's Terminal and Desktop tabs; the Report that follows keeps the
+  sandbox session as a card. Downloads has a **Test the sandbox** card; the panel's Scanning now
+  shows a live line with **Watch**.
 - **Messages, Accuracy**: empty states; Messages will hold the Photon screenshot threads (M5);
   Accuracy reads `evals/results.json` (milestone 6).
 - **Settings**: protection toggles (persisted), connections, API key status, trusted sites, sandbox
@@ -283,6 +313,11 @@ Not yet seen in a running app's Settings › Connections.
 - `pnpm build:sandbox` and `pnpm eval` exit 1 with "not implemented yet".
 - Sandbox budget meter shows 0 until the queue records jobs (milestone 3).
 - Settings › API keys shows status only; paste-in storage (safeStorage) not built.
+- The live view's agent is a **scripted stand-in for Droid** (`scriptedAgent`, decision 30): fixed
+  words and patterns, real tool calls in the real sandbox. The Report says so ("Scripted stand-in
+  for Droid", "Agent review: scripted stand-in").
+- Downloads › **Test the sandbox** stands in for download interception (M3) with built-in harmless
+  samples; those scans are marked "Sandbox test".
 
 ## Sponsor findings
 
@@ -294,18 +329,22 @@ checks (`sponsors.ts`) also passed against the real services (`logs/2026-10-17-s
 
 ## Sandbox leak check (Daytona dashboard after each milestone)
 
-| After                                       | Sandboxes left running                                    |
-| ------------------------------------------- | --------------------------------------------------------- |
-| `sponsor-check` live runs, 2026-10-17 10:39 | 0 (checked with `daytona.list()`: 0 sandboxes in the org) |
-| `try-droid` live runs, 2026-10-17 10:58     | 0 (`logs/2026-10-17-droid/leak-check.txt`)                |
-| `droid-tool-lockdown` live run, 11:27       | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)       |
-| `sponsor-check-sync` live checks, 11:39     | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)         |
-| `feature/sandbox` live runs, 12:30          | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)     |
-| `feature/sandbox` faster check, 12:39       | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)     |
-| Tier 3 probes + `try:sandbox`, 15:17–15:27  | 0 (`logs/2026-10-17-1526-sandbox-run/leak-check.txt`)     |
+| After                                                   | Sandboxes left running                                                            |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `sponsor-check` live runs, 2026-10-17 10:39             | 0 (checked with `daytona.list()`: 0 sandboxes in the org)                         |
+| `try-droid` live runs, 2026-10-17 10:58                 | 0 (`logs/2026-10-17-droid/leak-check.txt`)                                        |
+| `droid-tool-lockdown` live run, 11:27                   | 0 (`logs/2026-10-17-droid-lockdown/leak-check.txt`)                               |
+| `sponsor-check-sync` live checks, 11:39                 | 0 (`logs/2026-10-17-sponsor-sync/leak-check.txt`)                                 |
+| `feature/sandbox` live runs, 12:30                      | 0 (`logs/2026-10-17-1229-sandbox-run/leak-check.txt`)                             |
+| `feature/sandbox` faster check, 12:39                   | 0 (`logs/2026-10-17-1238-sandbox-run/leak-check.txt`)                             |
+| Tier 3 probes + `try:sandbox`, 15:17–15:27              | 0 (`logs/2026-10-17-1526-sandbox-run/leak-check.txt`)                             |
+| `feature/visualization` probes + live view, 18:17–18:39 | 0 (`daytona.list({ app: 'aegis' })`, `logs/2026-10-17-1834-live-view/SUMMARY.md`) |
 
 ## Decisions log
 
+- 2026-10-17 18:45: The live view (PLAN.md decision 30) on `feature/visualization`, Zach's
+  choices: in the main window, turning into the Report; Terminal + Desktop tabs; Droid drawn
+  outside the sandbox, reaching in (decision 19); a real sandbox with a scripted Droid until M4.
 - 2026-10-17 15:30: Daytona Tier 3 checked live and recorded (PLAN.md decision 28): analysis
   sandboxes stay network-off from creation; decisions 19 and 20 stand, open to revisit.
 - 2026-10-17 11:50: `sponsor-check-sync` and `droid-tool-lockdown` merged into `main`; `main`

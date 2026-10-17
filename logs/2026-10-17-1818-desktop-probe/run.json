@@ -1,0 +1,175 @@
+{
+  "at": "2026-10-17T22:19:28.374Z",
+  "sample": "demo/aegis-terminal-demo.command",
+  "snapshot": "default",
+  "error": null,
+  "deleted": true,
+  "steps": [
+    {
+      "step": "computerUse.start",
+      "ms": 4802,
+      "detail": "{\"message\":\"Computer use processes started successfully\",\"status\":{\"atspi\":{\"Running\":true,\"Priority\":250,\"AutoRestart\":false,\"Pid\":null},\"novnc\":{\"Running\":true,\"Priority\":400,\"AutoRestart\":true,\"Pid\":253},\"pulseaudio\":{\"Running\":true,\"Priority\":150,\"AutoRestart\":true,\"Pid\":162},\"x11vnc\":{\"Running\":true,\"Priority\":300,\"AutoRestart\":true,\"Pid\":181},\"xfce4\":{\"Running\":true,\"Priority\":200,\"AutoRestart\":true,\"Pid\":168},\"xvfb\":{\"Running\":true,\"Priority\":100,\"AutoRestart\":true,\"Pid\":161}}}"
+    },
+    {
+      "step": "computerUse.getStatus",
+      "ms": 84,
+      "detail": "{\"status\":\"active\"}"
+    },
+    {
+      "step": "display.getInfo",
+      "ms": 70,
+      "detail": "{\"displays\":[{\"id\":0,\"x\":0,\"y\":0,\"width\":1024,\"height\":768,\"isActive\":true}]}"
+    },
+    {
+      "step": "display.getWindows",
+      "ms": 90,
+      "detail": "{\"windows\":[{\"id\":282,\"title\":\"xfce4-panel\",\"x\":0,\"y\":0,\"width\":0,\"height\":0,\"isActive\":false},{\"id\":298,\"title\":\"Desktop\",\"x\":0,\"y\":0,\"width\":0,\"height\":0,\"isActive\":false},{\"id\":487,\"title\":\"aegis-terminal-demo.command\",\"x\":0,\"y\":0,\"width\":0,\"height\":0,\"isActive\":false}]}"
+    }
+  ],
+  "sandboxLog": [
+    {
+      "at": "2026-10-17T22:18:56.260Z",
+      "ms": 831,
+      "step": "create",
+      "ok": true,
+      "detail": "f6ab0714-5254-4573-874c-3383aac55b4a from the default snapshot, 1 attempt, networkBlockAll=true"
+    },
+    {
+      "at": "2026-10-17T22:18:57.092Z",
+      "ms": 508,
+      "step": "upload",
+      "ok": true,
+      "bytes": 524,
+      "detail": "sample/file + sample/meta.json"
+    },
+    {
+      "at": "2026-10-17T22:18:57.600Z",
+      "ms": 86,
+      "step": "check upload",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 78,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:18:57.686Z",
+      "ms": 8095,
+      "step": "network probe (2 hosts × 3 tools, in parallel)",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 8,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-17T22:19:12.740Z",
+      "ms": 108,
+      "step": "desktop environment",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 101,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:19:12.848Z",
+      "ms": 1768,
+      "step": "open sample in a desktop terminal",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 327,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T22:19:20.032Z",
+      "ms": 8207,
+      "step": "network probe (2 hosts × 3 tools, in parallel)",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 8,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-17T22:19:28.238Z",
+      "ms": 133,
+      "step": "delete",
+      "ok": true,
+      "detail": "f6ab0714-5254-4573-874c-3383aac55b4a"
+    }
+  ],
+  "result": {
+    "meta": {
+      "filename": "aegis-terminal-demo.command",
+      "url": null,
+      "referrer": null,
+      "contentType": "text/x-shellscript",
+      "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+      "size": 524
+    },
+    "offBefore": true,
+    "offAfter": true,
+    "status": {
+      "status": "active"
+    },
+    "display": {
+      "displays": [
+        {
+          "id": 0,
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 768,
+          "isActive": true
+        }
+      ]
+    },
+    "windows": {
+      "windows": [
+        {
+          "id": 282,
+          "title": "xfce4-panel",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "isActive": false
+        },
+        {
+          "id": 298,
+          "title": "Desktop",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "isActive": false
+        },
+        {
+          "id": 487,
+          "title": "aegis-terminal-demo.command",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "isActive": false
+        }
+      ]
+    },
+    "frames": [
+      {
+        "file": "logs/2026-10-17-1818-desktop-probe/frame-1.jpg",
+        "bytes": 24976,
+        "ms": 189
+      },
+      {
+        "file": "logs/2026-10-17-1818-desktop-probe/frame-2.jpg",
+        "bytes": 24976,
+        "ms": 110
+      },
+      {
+        "file": "logs/2026-10-17-1818-desktop-probe/frame-3.jpg",
+        "bytes": 24976,
+        "ms": 115
+      }
+    ],
+    "open": "launched\n    487 xfce4-terminal --disable-server --hold --title=aegis-terminal-demo.command -x sh -x /tmp/aegis-terminal-demo.command\n\n(xfce4-terminal:487): xfce4-terminal-WARNING **: 22:19:13.011: Failed to connect to session manager: Failed to connect to the session manager: SESSION_MANAGER environment variable not defined\n"
+  },
+  "failures": []
+}

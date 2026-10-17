@@ -31,7 +31,7 @@ Claim a milestone in PROGRESS.md before starting it.
 | 0b  | `sandbox/Dockerfile` now; `demo/` test `.pkg`, scripts and EICAR at the end (decision 22)                                                                                                                                            | Zach        | Dockerfile + self-test merged to `main` (via `feature/sandbox`); demo files at the end                                                                                                         |
 | 1   | Shell + bridge: tray, no Dock, main window, panel on fn / ⌃⌥A, SQLite, health, bridge; extension skeleton                                                                                                                            | Zach / Evan | Built and verified (`logs/2026-10-16-2339`); heartbeat bug fixed (merged); the real-Chrome check found the GET/Origin bug (decision 28), fixed on `extension-status`; recheck after restarting |
 | 2   | Links: content script, Tier 1 rules, Safe Browsing, threat feeds, RDAP domain age, DNS and certificate-transparency checks, URL stripping, allow list, outlines, click-guard wiring — **all without opening the link** (decision 20) | Evan        | Merged to `main` (2026-10-17): verified end to end in headless Chrome against the real app, `logs/2026-10-17-link-checks/`; real Chrome and Gmail still to check                               |
-| 3   | Downloads: interception, offscreen fetch, pre-check, queue, Daytona sandbox, `analyze.py`, deliver/hold                                                                                                                              | Evan + Zach | Not started (Report + Downloads screens are ready)                                                                                                                                             |
+| 3   | Downloads: interception, offscreen fetch, pre-check, queue, Daytona sandbox, `analyze.py`, deliver/hold                                                                                                                              | Evan + Zach | Not started (Report + Downloads screens are ready; the live view is built, decision 30)                                                                                                        |
 | 4   | Worker A: Droid on the Mac with read-only tools into a network-off Daytona sandbox (decision 19), returns result + sandbox log; `compare.ts`; prompt-injection test                                                                  | Zach        | Approach proven by `pnpm try:droid`; build on branch `worker-a` after M3                                                                                                                       |
 | 5   | Photon: forward a phone screenshot by iMessage, get a verdict back (decision 21)                                                                                                                                                     | Evan        | In scope for the Photon track; build near the end, before submission                                                                                                                           |
 | 6   | Chalk: Worker B in a Chalk Compute sandbox (standalone analyst + sandbox log), link features, scam-text check via Chalk prompts, evals per worker and combined, Accuracy tab                                                         | Evan        | Not started; Chalk docs read (Sponsor findings › Chalk), `try-chalk` not written yet                                                                                                           |
@@ -63,16 +63,17 @@ Merged so far (2026-10-17, pushed): `extension-heartbeat` (a fix branch, not in 
 app, Chalk setup) came in through `sponsor-check-sync`, with main's docs kept as the source of
 truth. Evan's next branch is `link-checks` (M2).
 
-| Order | Branch            | Item                                                                                          | Needs first                                          | Unblocks                                  |
-| ----- | ----------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
-| 1     | `sponsor-check`   | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17**                               | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
-| 2     | `sandbox-image`   | 0b                                                                                            | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
-| 3     | `ui-fixes`        | Open issues from the verification run                                                         | —                                                    | —                                         |
-| —     | `feature/sandbox` | A shell file into a network-off Daytona sandbox, run there (`daytona.ts`, `pnpm try:sandbox`) | `sandbox-image` (merged in)                          | M3's Daytona half, `worker-a`             |
-| —     | _no branch_       | 3 (joint, not started)                                                                        | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
-| 4     | `worker-a`        | 4 (option B, decision 19)                                                                     | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
-| 5     | `detonate`        | 7 — **parked** (decision 20)                                                                  | —                                                    | —                                         |
-| 6     | `watcher`         | 8 (the fn add-on part is already done)                                                        | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
+| Order | Branch                  | Item                                                                                          | Needs first                                          | Unblocks                                  |
+| ----- | ----------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| 1     | `sponsor-check`         | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17**                               | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
+| 2     | `sandbox-image`         | 0b                                                                                            | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
+| 3     | `ui-fixes`              | Open issues from the verification run                                                         | —                                                    | —                                         |
+| —     | `feature/sandbox`       | A shell file into a network-off Daytona sandbox, run there (`daytona.ts`, `pnpm try:sandbox`) | `sandbox-image` (merged in)                          | M3's Daytona half, `worker-a`             |
+| —     | `feature/visualization` | The live view of a caught file in the sandbox (decision 30)                                   | `feature/sandbox` (in `main`)                        | M3's download screen, `worker-a`'s view   |
+| —     | _no branch_             | 3 (joint, not started)                                                                        | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
+| 4     | `worker-a`              | 4 (option B, decision 19)                                                                     | `sandbox-image`, M3, the `WorkerResult` type (joint) | M6's comparison with Worker B             |
+| 5     | `detonate`              | 7 — **parked** (decision 20)                                                                  | —                                                    | —                                         |
+| 6     | `watcher`               | 8 (the fn add-on part is already done)                                                        | `sandbox-image`, M3's pipeline                       | Report actions (decision 12)              |
 
 ### 1. `sponsor-check`
 
@@ -138,6 +139,20 @@ truth. Evan's next branch is `link-checks` (M2).
 - **Then:** M3's `scans.ts` and `workerA.ts` use `withSandbox`; `observe.py` in the image can
   replace the shell-based observation when the snapshot exists.
 
+### `feature/visualization`
+
+- **Holds:** the live view (decision 30). `src/shared/live.ts` (the event stream, joint),
+  `src/main/live.ts` (event bus), `src/main/sandboxScan.ts` (a caught file through a real sandbox
+  with live events, the desktop and the streamed trace; writes the scan and its Report),
+  `src/main/liveAgent.ts` (`LiveAgent` + the scripted stand-in for Droid),
+  `src/main/testSamples.ts`, `views/main/LiveView.tsx`, the Report hand-off, the panel's live line,
+  Downloads' "Test the sandbox", and `scripts/try-desktop.mts` (desktop in a network-off sandbox).
+- **Done when:** a test run shows every stage, the file on the sandbox desktop, Droid's tool calls
+  and the Report, with 0 sandboxes left. **Result (2026-10-17 18:38):** both samples pass live
+  (`logs/2026-10-17-1834-live-view/SUMMARY.md`); 148 tests; not committed yet.
+- **Then:** M3's `/download` calls `sandboxScan()` (index.ts) with the intercepted bytes; M4's
+  `workerA.ts` implements `LiveAgent` and replaces `scriptedAgent()`.
+
 ### 4. `worker-a` (milestone 4)
 
 - **Holds:**
@@ -146,6 +161,9 @@ truth. Evan's next branch is `link-checks` (M2).
   - `src/main/compare.ts` with tests, implementing the comparison table in architectural.md §3.6.
   - The prompt-injection test.
   - "Reviewed by Droid" in the Report.
+  - `LiveAgent` (`src/main/liveAgent.ts`, decision 30): stream Droid's messages and tool calls as
+    `agent` events, so the live view shows the real session; then drop `scriptedAgent()` from
+    `index.ts`.
   - The README section "How Aegis uses Droid", which Factory requires.
 - **Needs first:**
   - `sponsor-check`, for how Droid reaches the sandbox.
@@ -424,6 +442,46 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     - Not in M2: the scam-text check and webmail sender spoofing (they need the LLM, M6), and
       iframes (the content script runs in the top frame).
 
+30. **The live view: watch a caught file being opened and reverse engineered** (Zach, 2026-10-17,
+    on `feature/visualization`). When a file is caught, the main window opens on it and shows,
+    as it happens: five stages (Caught → Sandbox, network off → Opened in the sandbox → Reverse
+    engineering → Verdict); **Droid on the left, on this Mac**, with each read-only tool call it
+    makes into the sandbox; **the sandbox on the right** with Terminal and Desktop tabs, like
+    Daytona's playground. When the verdict lands it turns into the Report, which keeps the sandbox
+    session as a card. The mini panel shows one line ("Opening it in the sandbox…") and **Watch**.
+    Choices, each with its cost:
+    - **The sandbox is real; only Droid's words are scripted** until `workerA.ts` (M4). The file
+      goes through `daytona.ts` unchanged (network off at creation, SHA-256 check, network probe,
+      `sh -x` under a time limit, delete in a `finally`). The stand-in (`scriptedAgent`,
+      `src/main/liveAgent.ts`) calls Droid's real fixed tools inside the real sandbox and judges by
+      fixed patterns plus what the run recorded, through `verdict.ts`. The UI and the Report say
+      "Scripted stand-in" wherever it speaks. _Cost:_ until M4 the narration is canned, and its
+      patterns only know shell scripts. Each test run costs one sandbox (≈30–60 s).
+    - **`LiveAgent` is the seam for M4:** `workerA.ts` implements it, streaming Droid's messages and
+      tool calls as `agent` events; nothing in the view changes.
+    - **Droid is drawn outside the box, reaching in** (decision 19), with a dashed "read-only tools"
+      line between them that lights up during a call. Each call also appears in the sandbox
+      terminal as `droid › <command>`. _Cost:_ if the team moves to option A, the picture changes
+      (`LiveAgentInfo.where`).
+    - **Desktop tab = real pictures of the sandbox's own Linux desktop** (Daytona Computer Use:
+      Xvfb + xfce4), one a second, with the file open in a terminal window titled with its name.
+      The window shows the very run being recorded (it tails the run's output files), not a second
+      run. Proven with the network off (Sponsor findings › Daytona › Computer Use). _Cost:_ about
+      3.5 s to start the desktop and ~20 KB a picture over IPC; a fast file is held on screen ~2 s
+      after it finishes so a picture shows the result. Without a desktop the run goes on and the
+      tab says why.
+    - **Terminal tab = the run's `sh -x` trace, streamed while it runs**, read from the side every
+      0.7 s; network attempts show as "✕ blocked". The recorded observation stays the evidence.
+      _Cost:_ stdout and the trace are read one after the other, so their order on screen is
+      approximate.
+    - **Events live in memory** (last 5 runs, `src/main/live.ts`), pushed over IPC (`live:event`);
+      the report in SQLite outlives them. _Cost:_ after a restart the Report has no sandbox session
+      card.
+    - **"Test the sandbox" on Downloads** sends a built-in harmless file (the fake Zoom installer
+      from `try:sandbox`, or `demo/aegis-terminal-demo.command`) until M3's `/download` route calls
+      `sandboxScan()` in `index.ts` with intercepted bytes. Test runs are recorded with "Sandbox test"
+      as where they were seen; a Clean test run is "allowed", not "delivered" (nothing was).
+
 ## Tradeoffs at a glance
 
 For every decision made in this conversation: what it buys, what it costs, and when to revisit.
@@ -450,6 +508,7 @@ For every decision made in this conversation: what it buys, what it costs, and w
 | 27    | Sponsor checks: free lookups every 60 s, live tests at start and on Check now          | Settings shows whether Daytona and Droid really work, not just whether a key is set                      | One tiny sandbox and one tiny Droid prompt per start (at most every 15 min) and per Check now (at most every 30 s)                      | Credits run low: live tests on Check now only                         |
 | 28    | Every bridge route is POST, reads included                                             | The extension's status reads reach the bridge, and "no Origin → 403" stays strict                        | Reads aren't plain GETs: `curl` needs `-X POST`, and a GET answers 404                                                                  | Chrome starts sending Origin on extension GETs                        |
 | 29    | Links: feeds matched locally, RDAP + DNS + Cert Spotter, 1.5 s budget, clicks recorded | Nothing about the user's links goes to feeds; pages never wait long; every check is listed in the report | Small hand-kept brand list until M6; ccTLDs without RDAP get no age; slow lookups land after the first answer                           | Chalk features (M6) replace the lists and feeds                       |
+| 30    | Live view: real sandbox, scripted Droid, Terminal + Desktop tabs                       | The demo shows the file really opening in the sandbox, and M4 only has to fill in `LiveAgent`            | Droid's words are canned until M4; each test run is a real sandbox (credits); the desktop adds ~3.5 s; events are lost on restart       | `workerA.ts` lands: switch `index.ts` to it                           |
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
@@ -564,6 +623,23 @@ What it means for Aegis (decision 28):
   never open, and it holds no sample. It passes: Factory Droid › Option A on Tier 3.
 - **Link detonation: now possible on Daytona** in a separate, network-on sandbox, never the one
   that holds a sample.
+
+#### Computer Use with the network off (2026-10-17 18:17–18:19, evidence: `logs/2026-10-17-1818-desktop-probe/`)
+
+`pnpm try:desktop` (`scripts/try-desktop.mts`), default snapshot, sandbox created with
+`networkBlockAll: true`. For the live view's Desktop tab (decision 30).
+
+| Call                                                           | Result                                                                                |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `sandbox.computerUse.start()`                                  | 3.4 s; starts Xvfb (`:0`, 1024×768), xfce4, x11vnc, noVNC. Works with the network off |
+| `computerUse.screenshot.takeCompressed({ format: 'jpeg', … })` | ~0.1 s, ~14–25 KB at quality 60–70, scale 0.5–0.6; base64 in `.screenshot`            |
+| `computerUse.display.getWindows()`                             | Window titles, used to check the file's window opened                                 |
+| Network probe after the desktop started                        | Still all blocked                                                                     |
+
+Three findings for opening a window: `xfce4-terminal` needs `--disable-server` (no D-Bus session)
+and `setsid -f` (otherwise it dies with the command's process group), and the sandbox's shell did
+not word-split an unquoted `$A`, so arguments are spelled out (`desktopOpenCommand`). Not used:
+Daytona's web terminal and VNC URLs, which would put remote content in the renderer.
 
 ### Factory Droid
 

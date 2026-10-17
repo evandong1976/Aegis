@@ -79,6 +79,7 @@ Electron itself; for prompts under the Aegis name, package the app with `pnpm ap
 | `pnpm build:native`                        | Build the fn-key add-on (`native/fn-key`) against Electron's headers  |
 | `pnpm verify`                              | Every check + app launch + bridge smoke test, evidence to `logs/`     |
 | `pnpm try:daytona`, `pnpm try:droid`       | Live sponsor checks with your keys; each deletes its sandbox          |
+| `pnpm try:sandbox`, `pnpm try:desktop`     | Run a test file in a network-off sandbox; show the sandbox's desktop  |
 | `pnpm build:sandbox`, `pnpm eval`          | Not built yet (milestones 3, 6); they exit with a message             |
 
 ## Layout

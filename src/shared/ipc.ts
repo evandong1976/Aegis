@@ -1,5 +1,6 @@
 // Typed IPC between the main process and the renderer (via the preload API).
 
+import type { LiveEvent, LiveRun, LiveSampleKey } from './live'
 import type { AppStatus, LogEntry, ScanReport, ScanSummary, ServiceHealth } from './types'
 
 export interface Settings {
@@ -87,6 +88,13 @@ export interface IpcInvoke {
   'protection:resume': { args: []; result: AppStatus }
   /** Retries the fn key after Input Monitoring is granted; opens the System Settings pane if not. */
   'fnkey:retry': { args: []; result: ServiceHealth[] }
+  /** The live view of a scan opened in a sandbox (src/shared/live.ts); null once it is forgotten. */
+  'live:get': { args: [scanId: string]; result: LiveRun | null }
+  /**
+   * Sends a built-in harmless test file through a real network-off sandbox, until milestone 3
+   * intercepts downloads. Returns the new scan's ID, or why it couldn't start.
+   */
+  'live:start': { args: [sample: LiveSampleKey]; result: { scanId: string } | { error: string } }
 }
 
 /** Fire-and-forget calls: `ipcRenderer.send(channel, ...args)`. */
@@ -101,6 +109,7 @@ export interface IpcEvents {
   'scans:changed': { id: string }
   'log:appended': LogEntry
   navigate: { route: MainRoute; scanId?: string }
+  'live:event': { scanId: string; event: LiveEvent }
 }
 
 export type InvokeChannel = keyof IpcInvoke
@@ -121,14 +130,17 @@ export const INVOKE_CHANNELS: InvokeChannel[] = [
   'evals:get',
   'protection:pause',
   'protection:resume',
-  'fnkey:retry'
+  'fnkey:retry',
+  'live:get',
+  'live:start'
 ]
 export const SEND_CHANNELS: SendChannel[] = ['panel:hide', 'main:open']
 export const EVENT_CHANNELS: EventChannel[] = [
   'status:changed',
   'scans:changed',
   'log:appended',
-  'navigate'
+  'navigate',
+  'live:event'
 ]
 
 export interface AegisApi {

@@ -9,6 +9,7 @@ import { Label, ScanSteps, StatusDot, VerdictBadge, type StepState } from '../co
 import { Button } from '../components/ds'
 import { displayUrl, shortClock } from '../lib/format'
 import { useInvoke, useStatus } from '../lib/hooks'
+import { liveState, useLiveRun } from '../lib/live'
 
 const DOTS: Array<[ServiceKey, string]> = [
   ['daytona', 'Daytona'],
@@ -35,6 +36,22 @@ function steps(s: ScanSummary): Array<{ label: string; state: StepState }> {
     { label: 'Analyzing', state: state(4, [2, 3, 4]) },
     { label: 'Droid reviewing', state: state(5, [5]) }
   ]
+}
+
+/** The live run in one line: the stage in progress and what it is doing. */
+function liveLine(s: ReturnType<typeof liveState>): string | null {
+  const order = ['agent', 'opened', 'sandbox', 'caught'] as const
+  const active = order.find((k) => s.stages[k].state === 'active')
+  if (s.end) return null
+  if (!active) return s.desktop?.state === 'starting' ? 'Starting the sandbox desktop…' : 'Working…'
+  const word = {
+    caught: 'Caught',
+    sandbox: 'Starting the sandbox',
+    opened: 'Opening it in the sandbox',
+    agent: 'Droid reviewing'
+  }[active]
+  const last = s.agent[s.agent.length - 1]
+  return active === 'agent' && last?.step === 'tool' ? `${word} · ${last.tool}` : `${word}…`
 }
 
 function Card({
@@ -76,6 +93,9 @@ export default function Panel(): React.JSX.Element {
   const stateOf = (key: ServiceKey): ServiceState =>
     health.find((h) => h.key === key)?.state ?? 'pending'
   const live = (recent ?? []).filter((s) => s.action === 'scanning').slice(0, 1)
+  // A scan opened in a sandbox right now: one line on what is happening, and a way to watch.
+  const run = useLiveRun(live[0]?.id)
+  const now = run ? liveLine(liveState(run)) : null
   const done = (recent ?? []).filter((s) => s.verdict).slice(0, 2)
   const p = PROTECTION[status?.protection ?? 'protected']
   const paused = status?.protection === 'paused'
@@ -142,7 +162,22 @@ export default function Panel(): React.JSX.Element {
             live.map((s) => (
               <div key={s.id} className="flex flex-col gap-1.5">
                 <span className="mono truncate text-ink">{s.filename ?? displayUrl(s.url)}</span>
-                <ScanSteps steps={steps(s)} />
+                {now ? (
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-0 flex-1 truncate text-[12px] leading-[17px] text-ink-muted">
+                      {now}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => window.aegis.send('main:open', 'report', s.id)}
+                    >
+                      Watch
+                    </Button>
+                  </div>
+                ) : (
+                  <ScanSteps steps={steps(s)} />
+                )}
               </div>
             ))
           ) : (
