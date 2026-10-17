@@ -99,7 +99,7 @@ flowchart LR
 
   CS -- "runtime messages" --> SW
   SW <--> OFF
-  POP -- "GET /status" --> BR
+  POP -- "POST /status" --> BR
   SW -- "HTTP, Origin-checked" --> BR
   OFF -- "HTTP, Origin-checked" --> BR
   BR <--> CORE
