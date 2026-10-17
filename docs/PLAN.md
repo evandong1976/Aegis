@@ -51,15 +51,15 @@ Not branched:
 When a branch is done and `pnpm typecheck && pnpm lint && pnpm test` pass, merge it into `main`,
 update PROGRESS.md, and bring the later branches up to date with `main`.
 
-| Order | Branch          | Item                                    | Needs first                                                            | Unblocks                                  |
-| ----- | --------------- | --------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
-| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) | Daytona and Factory keys in `.env`                                     | M3's Daytona half, `worker-a`, `detonate` |
-| 2     | `sandbox-image` | 0b                                      | —                                                                      | M3, `worker-a`, `detonate`, `watcher`     |
-| 3     | `ui-fixes`      | Open issues from the verification run   | —                                                                      | —                                         |
-| —     | _no branch_     | 3 (joint, not started)                  | `sponsor-check`, `sandbox-image`                                       | `worker-a`, `detonate`, `watcher`         |
-| 4     | `worker-a`      | 4                                       | `sponsor-check`, `sandbox-image`, M3, the `WorkerResult` type (joint)  | M6's comparison with Worker B             |
-| 5     | `detonate`      | 7                                       | `sponsor-check`, `sandbox-image`, M3's `daytona.ts` + queue; Evan's M2 | —                                         |
-| 6     | `watcher`       | 8 (the fn add-on part is already done)  | `sandbox-image`, M3's pipeline                                         | Report actions (decision 12)              |
+| Order | Branch          | Item                                                            | Needs first                                                            | Unblocks                                  |
+| ----- | --------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17** | Daytona and Factory keys in `.env`                                     | M3's Daytona half, `worker-a`, `detonate` |
+| 2     | `sandbox-image` | 0b                                                              | —                                                                      | M3, `worker-a`, `detonate`, `watcher`     |
+| 3     | `ui-fixes`      | Open issues from the verification run                           | —                                                                      | —                                         |
+| —     | _no branch_     | 3 (joint, not started)                                          | `sponsor-check`, `sandbox-image`                                       | `worker-a`, `detonate`, `watcher`         |
+| 4     | `worker-a`      | 4                                                               | `sponsor-check`, `sandbox-image`, M3, the `WorkerResult` type (joint)  | M6's comparison with Worker B             |
+| 5     | `detonate`      | 7                                                               | `sponsor-check`, `sandbox-image`, M3's `daytona.ts` + queue; Evan's M2 | —                                         |
+| 6     | `watcher`       | 8 (the fn add-on part is already done)                          | `sandbox-image`, M3's pipeline                                         | Report actions (decision 12)              |
 
 ### 1. `sponsor-check`
 
