@@ -58,12 +58,14 @@ Not branched:
 When a branch is done and `pnpm typecheck && pnpm lint && pnpm test` pass, merge it into `main`,
 update PROGRESS.md, and bring the later branches up to date with `main`.
 
-Merged so far (2026-10-17, local `main`, not pushed): `extension-heartbeat` (a fix branch, not in
-the table) and `sponsor-check`. Evan's next branch is `link-checks` (M2).
+Merged so far (2026-10-17, pushed): `extension-heartbeat` (a fix branch, not in the table),
+`sponsor-check` and `docs-update`. Zach's later `sponsor-check` commits (live sponsor checks in the
+app, Chalk setup) came in through `sponsor-check-sync`, with main's docs kept as the source of
+truth. Evan's next branch is `link-checks` (M2).
 
 | Order | Branch          | Item                                                            | Needs first                                          | Unblocks                                  |
 | ----- | --------------- | --------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
-| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17** | Daytona and Factory keys in `.env`                   | M3's Daytona half, `worker-a`, `detonate` |
+| 1     | `sponsor-check` | Daytona + Droid docs check (BUILD §4.5) — **merged 2026-10-17** | Daytona and Factory keys in `.env.local`             | M3's Daytona half, `worker-a`, `detonate` |
 | 2     | `sandbox-image` | 0b                                                              | —                                                    | M3, `worker-a`, `detonate`, `watcher`     |
 | 3     | `ui-fixes`      | Open issues from the verification run                           | —                                                    | —                                         |
 | —     | _no branch_     | 3 (joint, not started)                                          | `sponsor-check`, `sandbox-image`                     | `worker-a`, `detonate`, `watcher`         |
@@ -86,6 +88,9 @@ the table) and `sponsor-check`. Evan's next branch is `link-checks` (M2).
   Daytona can't cut the network per sandbox. Record the nearest honest alternative for each.
 - **Done when:** both scripts pass, the two findings rows are filled in, and the Daytona dashboard
   shows no leaked sandboxes (record it in PROGRESS.md › Sandbox leak check).
+- **Result (2026-10-17):** done. Both scripts pass live; Worker A is option B (decision 19). Zach
+  also added the live sponsor checks in the app (`sponsors.ts`, decision 27) and the Chalk project
+  files (`chalk/`).
 
 ### 2. `sandbox-image` (milestone 0b)
 
@@ -324,29 +329,47 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     - **Trust this site** isn't offered for shortener domains: trusting `bit.ly` would trust every
       link behind it.
 
+27. **Sponsor checks spend credits only when asked** (Zach, 2026-10-17, on `sponsor-check`; it was
+    his decision 19, renumbered because 19 is Worker A option B). `src/main/sponsors.ts` checks
+    Daytona, the sandbox image and Droid for `health.ts` at two depths:
+    - **Every 60 s, free lookups only:** Daytona lists sandboxes and looks up the snapshot named by
+      `AEGIS_DAYTONA_SNAPSHOT` (and the local Docker image `aegis-sandbox`); Droid lists models
+      through its CLI (`DROID_PATH`, `PATH` or the usual install folders).
+    - **At start (in the background) and on Check now, the live tests from BUILD_PROMPT §4.1:**
+      Daytona creates a sandbox with `networkBlockAll` at creation, ephemeral, 20 s start limit,
+      runs one command and deletes it in a `finally`; Droid answers one tiny prompt in an empty
+      folder with every tool request refused (`run()` with `autoRejectPermissionRequests`; no
+      sample is involved, so it doesn't need Worker A's tools).
+    - **Credit guards:** a passing result is reused at start for 15 minutes, even across launches
+      (saved in the store), and Check now ignores repeat presses within 30 seconds. A failed result
+      is retried at the next start. Dev captures (`pnpm capture`, `pnpm verify`) never run live
+      tests.
+    - Building the snapshot (`pnpm build:sandbox`) stays with milestone 3.
+
 ## Tradeoffs at a glance
 
 For every decision made in this conversation: what it buys, what it costs, and when to revisit.
 
-| #     | Decision                                                      | What we gain                                                                                             | What it costs / the risk                                                                                                                | Revisit if                                                            |
-| ----- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 1     | Four verdicts (Malicious … Clean)                             | Matches the design system and Figma; "Unknown" is an honest answer when evidence is missing              | Departs from MEGA_PROMPT's three words; "Clean" sounds close to "safe", so sentences still say "No threats found"                       | —                                                                     |
-| 2–3   | Figma shell, adapted for one person's Mac                     | One consistent look; screens match the team's designs                                                    | Figma shows a team product; we dropped its User column, account chip and bell                                                           | Figma frames for Messages, Accuracy, first run arrive                 |
-| 4     | Coverage ring from live health checks                         | A real number, not decoration                                                                            | Reads low until keys and the extension are set up                                                                                       | —                                                                     |
-| 5–6   | Figma-only components kept in the app; DS port in React       | Zach's design system stays untouched; strict CSP; typed components                                       | Two copies of component markup to keep in step with `bundle.js`                                                                         | The design system ships a React build                                 |
-| 10    | Demo data in a separate database                              | Screens can be checked against Figma without fake rows in real history                                   | Someone could mistake demo data for real; the "Demo data" chip guards against that                                                      | —                                                                     |
-| 11    | `node:sqlite`                                                 | No native module, no Electron rebuild                                                                    | Marked experimental in Node 22 (tests print a warning)                                                                                  | A breaking change in Node's SQLite API                                |
-| 14    | fn key via Klair's add-on                                     | The panel opens on fn, as specified                                                                      | Needs Input Monitoring; pre-event code must be declared on Devpost; one native build step                                               | macOS changes CGEventTap rules                                        |
-| 16    | Fixed window frame                                            | Nav rail never moves                                                                                     | The page itself doesn't scroll; every new screen must live inside the content column                                                    | —                                                                     |
-| 17    | Two analysis workers, compared                                | Two independent opinions; the more severe wins; each sandbox log is evidence                             | Twice the sandbox time and cost; a scan waits for both (up to 120 s); "a test that errors is dangerous" will flag some benign files     | Evals show the second worker rarely changes the verdict               |
-| 18/21 | Photon: in scope for the track, built late                    | Enters the Photon track with a focused feature (screenshot → verdict)                                    | Built under time pressure at the end; Photon's v2 beta API is newer and less proven                                                     | Time runs short: ship text-only verdicts first                        |
-| 19    | Worker A = Droid on the Mac, tools into a network-off sandbox | Works on this Daytona tier; the file never shares a machine with Droid or its key; proven by `try-droid` | Droid can only do what our tools allow (fixed commands); not "Droid living in the sandbox"; one SDK/CLI protocol workaround to maintain | The org reaches Daytona Tier 3, or Factory ships a matching SDK       |
-| 20    | No link detonation                                            | No Tier 3 upgrade; no one-time links used up; faster verdicts; less to build before Sunday               | No screenshots or landing-page evidence; short links become Unknown; the demo loses its "Inspect in sandbox" moment                     | Time allows: detonation in a Chalk sandbox                            |
-| 22    | Demo materials at the end                                     | Time goes to features first                                                                              | The demo path is untested until late; leave at least the last 3 hours for it (BUILD_PROMPT §6)                                          | —                                                                     |
-| 23    | One branch per feature                                        | Clean history; parallel work doesn't collide; easy review                                                | More merges; later branches need `main` merged in after each landing                                                                    | —                                                                     |
-| 24    | Keys in `.env.local`                                          | Matches the team's habit; never committed                                                                | Two possible files; `.env.local` wins if both set a value                                                                               | —                                                                     |
-| 25    | Evidence in `logs/`                                           | Progress claims are checkable; the first run caught two bugs                                             | Repo grows by a few MB per run (screenshots are shrunk)                                                                                 | —                                                                     |
-| 26    | Short links held at the click as Unknown                      | Safer than a passive warning: nothing behind a hidden destination opens without the user confirming      | An extra click on every short link, including harmless ones, and on sites that wrap every outbound link                                 | People click through without reading: limit it to emails and messages |
+| #     | Decision                                                                      | What we gain                                                                                             | What it costs / the risk                                                                                                                | Revisit if                                                            |
+| ----- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1     | Four verdicts (Malicious … Clean)                                             | Matches the design system and Figma; "Unknown" is an honest answer when evidence is missing              | Departs from MEGA_PROMPT's three words; "Clean" sounds close to "safe", so sentences still say "No threats found"                       | —                                                                     |
+| 2–3   | Figma shell, adapted for one person's Mac                                     | One consistent look; screens match the team's designs                                                    | Figma shows a team product; we dropped its User column, account chip and bell                                                           | Figma frames for Messages, Accuracy, first run arrive                 |
+| 4     | Coverage ring from live health checks                                         | A real number, not decoration                                                                            | Reads low until keys and the extension are set up                                                                                       | —                                                                     |
+| 5–6   | Figma-only components kept in the app; DS port in React                       | Zach's design system stays untouched; strict CSP; typed components                                       | Two copies of component markup to keep in step with `bundle.js`                                                                         | The design system ships a React build                                 |
+| 10    | Demo data in a separate database                                              | Screens can be checked against Figma without fake rows in real history                                   | Someone could mistake demo data for real; the "Demo data" chip guards against that                                                      | —                                                                     |
+| 11    | `node:sqlite`                                                                 | No native module, no Electron rebuild                                                                    | Marked experimental in Node 22 (tests print a warning)                                                                                  | A breaking change in Node's SQLite API                                |
+| 14    | fn key via Klair's add-on                                                     | The panel opens on fn, as specified                                                                      | Needs Input Monitoring; pre-event code must be declared on Devpost; one native build step                                               | macOS changes CGEventTap rules                                        |
+| 16    | Fixed window frame                                                            | Nav rail never moves                                                                                     | The page itself doesn't scroll; every new screen must live inside the content column                                                    | —                                                                     |
+| 17    | Two analysis workers, compared                                                | Two independent opinions; the more severe wins; each sandbox log is evidence                             | Twice the sandbox time and cost; a scan waits for both (up to 120 s); "a test that errors is dangerous" will flag some benign files     | Evals show the second worker rarely changes the verdict               |
+| 18/21 | Photon: in scope for the track, built late                                    | Enters the Photon track with a focused feature (screenshot → verdict)                                    | Built under time pressure at the end; Photon's v2 beta API is newer and less proven                                                     | Time runs short: ship text-only verdicts first                        |
+| 19    | Worker A = Droid on the Mac, tools into a network-off sandbox                 | Works on this Daytona tier; the file never shares a machine with Droid or its key; proven by `try-droid` | Droid can only do what our tools allow (fixed commands); not "Droid living in the sandbox"; one SDK/CLI protocol workaround to maintain | The org reaches Daytona Tier 3, or Factory ships a matching SDK       |
+| 20    | No link detonation                                                            | No Tier 3 upgrade; no one-time links used up; faster verdicts; less to build before Sunday               | No screenshots or landing-page evidence; short links become Unknown; the demo loses its "Inspect in sandbox" moment                     | Time allows: detonation in a Chalk sandbox                            |
+| 22    | Demo materials at the end                                                     | Time goes to features first                                                                              | The demo path is untested until late; leave at least the last 3 hours for it (BUILD_PROMPT §6)                                          | —                                                                     |
+| 23    | One branch per feature                                                        | Clean history; parallel work doesn't collide; easy review                                                | More merges; later branches need `main` merged in after each landing                                                                    | —                                                                     |
+| 24    | Keys in `.env.local`                                                          | Matches the team's habit; never committed                                                                | Two possible files; `.env.local` wins if both set a value                                                                               | —                                                                     |
+| 25    | Evidence in `logs/`                                                           | Progress claims are checkable; the first run caught two bugs                                             | Repo grows by a few MB per run (screenshots are shrunk)                                                                                 | —                                                                     |
+| 26    | Short links held at the click as Unknown                                      | Safer than a passive warning: nothing behind a hidden destination opens without the user confirming      | An extra click on every short link, including harmless ones, and on sites that wrap every outbound link                                 | People click through without reading: limit it to emails and messages |
+| 27    | Sponsor checks: free lookups every 60 s, live tests at start and on Check now | Settings shows whether Daytona and Droid really work, not just whether a key is set                      | One tiny sandbox and one tiny Droid prompt per start (at most every 15 min) and per Check now (at most every 30 s)                      | Credits run low: live tests on Check now only                         |
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 
@@ -356,13 +379,13 @@ checked on 2026-10-17 against each SDK's README and installed type definitions (
 `sponsor-check`). `pnpm try:daytona` and `pnpm try:droid` have both run and passed with real keys (live results
 below).
 
-| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                               | Findings                                                                                                 |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox     | Below. `pnpm try:daytona` **passes** (2026-10-17); this account's tier limits network (see Live results) |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19)                              |
-| Photon               | iMessage/SMS channels, receiving images (screenshots), setup, env var names                                                         | Below, from docs only (2026-10-17); no `try-photon` yet                                                  |
-| Chalk                | Features, LLM calls, evals, **can Chalk host Worker B's sandbox**, env var names                                                    | Below, from docs and the dashboard (2026-10-17); no `try-chalk` yet                                      |
-| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                | Key set in `.env.local`; the health check exercises it on the next app start                             |
+| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                               | Findings                                                                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox     | Below. `pnpm try:daytona` **passes** (2026-10-17); this account's tier limits network (see Live results)              |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log | Below. `pnpm try:droid` **passes** (2026-10-17) with option B (decision 19)                                           |
+| Photon               | iMessage/SMS channels, receiving images (screenshots), setup, env var names                                                         | Below, from docs only (2026-10-17); no `try-photon` yet                                                               |
+| Chalk                | Features, LLM calls, evals, **can Chalk host Worker B's sandbox**, env var names                                                    | Below, from docs, the dashboard and Chalk's generated guide (2026-10-17): network open by default; no `try-chalk` yet |
+| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                | Key set in `.env.local`; the health check exercises it on the next app start                                          |
 
 ### Daytona
 
@@ -503,26 +526,55 @@ What each Aegis need gets on this tier:
   host / CIDR / port ([sandboxes](https://docs.chalk.ai/docs/compute/sandbox),
   [launch post](https://chalk.ai/blog/chalk-compute)). Evan's project already has Compute enabled
   (dashboard: Sandboxes, Functions, Volumes, Images). Environment ID: `gswl7f3494e1`.
+- **Network is open by default — Worker B must turn it off** (from Chalk's generated guide,
+  `chalk/CLAUDE.md` › Sandboxes, 2026-10-17). On the default `host` compute class, outbound traffic
+  is allowed unless a `NetworkPolicy` restricts it (`network_policy=NetworkPolicy(allowed_hosts=…)`;
+  `denied_routes` takes CIDRs, and denied wins). So "no allow-list" means **open**, not off. Worker
+  B passes a policy that allows no hosts (and denies `0.0.0.0/0` and `::/0` if an empty allow-list
+  isn't enough), and `try-chalk` must prove the network is off with the same probes `try-daytona`
+  runs before any sample goes in. `k8s` compute loses network policies, so Worker B stays on
+  `host`.
+- **Images:** `Image.from_dockerfile(path)` exists, so Worker B can likely build from
+  `sandbox/Dockerfile` — to confirm in `try-chalk`.
 - **SDK is Python:** `chalkcompute` — `Sandbox(image=Image.debian_slim("3.12"), lifetime="300s").run()`,
   `sandbox.exec(...)` → `stdout_text`, `exit_code`; `sandbox.terminate()`;
   `SandboxClient.create(image, cpu, memory, env, secrets, network_policy, lifetime, timeout, …)`;
   `sandbox.fs` for file transfer; `Image.with_claude_code(...)` for agent images. Network policies
   need the default `host` compute class. No TypeScript SDK is documented, so Worker B needs a small
   Python helper that the main process calls.
-- **Setup (dashboard):** `curl -s -L https://api.chalk.ai/install.sh | sh`, `chalk login`,
-  `chalk init`, then `uv run` a script.
+- **Setup:** `curl -s -L https://api.chalk.ai/install.sh | sh`, `chalk login`, `chalk init`, then
+  `uv run` a script. Zach ran `chalk init` on 2026-10-17; its files (`chalk.yaml`: project
+  `Default`, environment block `default`, Python 3.12; `pyproject.toml` with `chalkcompute` and
+  `chalkpy[runtime]`; `uv.lock`; `.chalkignore`; Chalk's agent guide `CLAUDE.md`) now live in
+  **`chalk/`**, not the repo root: `chalk apply` uploads the folder that holds `chalk.yaml`.
+  `chalk init` also added seven Chalk skills under `.claude/skills/` (their `references/` files
+  weren't committed) and chalk-lsp settings in `.helix/` and `.zed/`.
+- **Two credentials, never mixed** (Zach, 2026-10-17): the **app** uses a Chalk service token for
+  one environment (`CHALK_CLIENT_ID`, `CHALK_CLIENT_SECRET`, `CHALK_ENVIRONMENT` in `.env.local`)
+  with only the permissions it needs; the **developer** uses a personal `chalk login` in a terminal
+  for deploys, evals and logs, which never goes in `.env.local`. A leaked `.env.local` then can't
+  change the Chalk project. Still unknown: which token permission starts a sandbox, and whether
+  sandboxes draw on the same credits.
 - **Link data:** the TypeScript client `@chalk-ai/client` runs online feature queries
   (`new ChalkClient({ clientId, clientSecret, environment })`, `client.query({ inputs, outputs })`).
 - **LLM calls:** `chalk.prompts` `P.completion(...)` with structured output (a Pydantic model) and
   image inputs (`P.MultimodalPromptResponse`); named prompts / `run_prompt` are **no longer
-  supported**. "AI Gateway" and "Federated Queries" in MEGA_PROMPT are not Chalk product names in
-  its current docs; use prompts and features instead.
+  supported**. MEGA_PROMPT's "AI Gateway" is Chalk's **Model Gateway**: an OpenAI-compatible router
+  (`https://api.chalk.ai/v1/router`, `Authorization: Bearer <router key>`, `X-Chalk-Env-Id`) over
+  OpenAI, Anthropic and Gemini models, with keys, budgets and fallbacks set in the dashboard. It's
+  an option for the app's direct LLM calls if feature-based prompts prove awkward; the plan stays
+  `P.completion`. "Federated Queries" isn't a Chalk product name; features and resolvers do that
+  job.
 - **Evals:** `chalk_client.prompt_evaluation(dataset_name, evaluators=["exact_match", …],
 reference_output, prompts=[P.Prompt(model=…), …])` over a dataset made with `create_dataset`;
   results land in a dataset and the dashboard. This is the basis for the Accuracy tab.
-- **Env vars:** `CHALK_CLIENT_ID`, `CHALK_CLIENT_SECRET` (set in `.env.local`), `CHALK_ENVIRONMENT`
-  (still empty; set it to `gswl7f3494e1`).
-- **Next:** `scripts/try-chalk` — one Compute sandbox, one command, terminate; one online query.
+  `chalkcompute` also has **Evaluations** (`Evaluation.create(name, dataset, task, scorers)`, then
+  `.run().wait()`; built-in scorers such as `exact_match`, `json_match`, `llm_judge`), which fit
+  scoring each worker's verdict against labels. Chalk support must enable Evaluations first.
+- **Env vars:** `CHALK_CLIENT_ID`, `CHALK_CLIENT_SECRET`, `CHALK_ENVIRONMENT` (`gswl7f3494e1`), all
+  set in `.env.local`.
+- **Next:** `scripts/try-chalk` — one Compute sandbox **with the network off and proven off**, one
+  command, terminate in a `finally`; one online query.
 
 ### Photon (from docs, 2026-10-17; not run yet)
 
