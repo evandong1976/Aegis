@@ -302,13 +302,13 @@ Do this before writing each integration, record the exact calls here, and get
 checked on 2026-10-17 against each SDK's README and installed type definitions (branch
 `sponsor-check`). Their try scripts are written, but they haven't run yet because no keys are set.
 
-| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                             |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below: from the SDK's types; `pnpm try:daytona` not run yet (no key) |
-| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)   |
-| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                    |
-| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | —                                                                    |
-| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                         |
+| Sponsor              | Questions to answer (MEGA_PROMPT §10)                                                                                                                                                                 | Findings                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Daytona              | Snapshot/image options, start-up time, per-sandbox network off, concurrency, credits, can an agent (Droid) run inside a sandbox                                                                       | Below: from the SDK's types; `pnpm try:daytona` not run yet (no key)  |
+| Factory Droid        | TS vs Python SDK, **can it run inside a Daytona sandbox** and use tools there (Worker A), MCP (REA), run time, how it reports a log                                                                   | Below: from the SDK's types; `pnpm try:droid` not run yet (no key)    |
+| Photon (later)       | When mobile starts: iMessage/SMS channels, receiving images (screenshots), setup time, exact env var names                                                                                            | —                                                                     |
+| Chalk                | Features / Federated Queries / AI Gateway / Agent Evals availability, **can Chalk host a standalone analysis worker with its own sandbox (Worker B)**, resolver deploy, gateway models, env var names | Partial, below: two credentials; Chalk has sandboxes (`chalkcompute`) |
+| Google Safe Browsing | v4 `threatMatches:find` with the documented test URL                                                                                                                                                  | Health check uses it; untested without a key                          |
 
 ### Daytona
 
@@ -336,6 +336,28 @@ checked on 2026-10-17 against each SDK's README and installed type definitions (
 - **Not answered by the SDK:**
   - Start-up time: `try-daytona` logs it.
   - Concurrency limits and hackathon credits: ask Daytona at the event.
+
+### Chalk
+
+Partial, from Chalk's get-started guide and its token permissions (2026-10-17). Chalk is Evan's
+milestone 6.
+
+- **Two credentials:**
+  - **App:** a service token for one environment, in `.env` as `CHALK_CLIENT_ID`,
+    `CHALK_CLIENT_SECRET` and `CHALK_ENVIRONMENT`. It gets only "Query online features", plus
+    "Use Chalk AI assistant" if the AI Gateway needs it.
+  - **Developer:** a personal `chalk login`, used in a terminal for deploys, evals and logs.
+    Never in `.env`.
+  - The split keeps a leaked `.env` from being able to change the Chalk project.
+- **Project setup:** the CLI installs with Chalk's script; then `chalk login` and `chalk init`.
+  `chalk init` writes `chalk.yaml` (environment `default`, Python 3.12) and `pyproject.toml`.
+- **Worker B sandbox:** Chalk has its own sandboxes, in the Python package `chalkcompute`: a
+  `Sandbox` from an `Image` with a `lifetime`, `exec(...)`, and `terminate()` in a `finally`.
+- **Unknown:**
+  - whether its network can be switched off;
+  - whether it can run our image;
+  - which token permission starts a sandbox, and whether it uses the same credits;
+  - the exact env var names for the app token.
 
 ### Factory Droid
 
