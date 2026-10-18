@@ -2,9 +2,9 @@
   "name": "aegis-video",
   "private": true,
   "type": "module",
-  "description": "Aegis product video: animated scenes in HTML, rendered frame by frame with headless Chrome.",
+  "description": "Aegis product video: two HTML animations cut together (cut.json), rendered frame by frame with headless Chrome.",
   "scripts": {
-    "render": "node render.mjs"
+    "build": "sh build.sh"
   },
   "dependencies": {
     "gsap": "^3.13.0",

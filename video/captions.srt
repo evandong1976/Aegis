@@ -11,34 +11,74 @@ Most antivirus checks a file after it's already on your Mac. Then it tells you t
 This is Aegis. It opens the dangerous stuff so you don't have to, and shows you exactly what it would have done.
 
 4
-00:00:24,800 --> 00:00:35,605
-Every link gets a verdict before you click, without ever being opened. Lookalike domains. Link text that lies. Three day old sites asking for your password. Checked in under a second.
+00:00:24,050 --> 00:00:25,939
+Every link and file gets a verdict.
 
 5
-00:00:37,600 --> 00:00:47,139
-Downloads are caught in memory, before they ever touch your disk. Risky files go to a throwaway Daytona sandbox, with the network cut off from the moment it's created.
+00:00:25,950 --> 00:00:26,605
+Malicious.
 
 6
-00:00:48,800 --> 00:00:58,226
-Then you watch it run. Factory Droid reverse engineers the file from your Mac, through read only tools that only work inside the sandbox. Every call home fails.
+00:00:26,850 --> 00:00:27,608
+Suspicious.
 
 7
-00:01:00,300 --> 00:01:08,858
-When the run ends, you get the answer in plain English. It would have fetched a second stage, started itself at login, and gone looking for your passwords.
+00:00:27,700 --> 00:00:28,220
+Unknown.
 
 8
-00:01:10,800 --> 00:01:21,524
-And the AI can't be talked out of it. It can only raise the verdict Aegis's rules produce. Never lower it. Aegis never calls anything safe. Without evidence, the answer is Unknown.
+00:00:28,450 --> 00:00:29,059
+Or clean.
 
 9
-00:01:23,000 --> 00:01:25,121
-Every claim is backed by a saved run.
+00:00:31,100 --> 00:00:34,366
+Links are judged before you click, without ever being opened.
 
 10
-00:01:28,600 --> 00:01:33,263
-Next, a second analyst in Chalk, and verdicts over iMessage with Photon.
+00:00:35,020 --> 00:00:41,909
+Lookalike domains. Link text that lies. Three day old sites asking for your password. Checked in under a second.
 
 11
-00:01:35,000 --> 00:01:38,340
-Aegis. See what's behind the click, before it lands.
+00:00:43,900 --> 00:00:53,439
+Downloads are caught in memory, before they ever touch your disk. Risky files go to a throwaway Daytona sandbox, with the network cut off from the moment it's created.
+
+12
+00:00:55,100 --> 00:01:04,526
+Then you watch it run. Factory Droid reverse engineers the file from your Mac, through read only tools that only work inside the sandbox. Every call home fails.
+
+13
+00:01:06,400 --> 00:01:13,339
+And Aegis never relies on one opinion. Two independent analysts take it apart at once, each in its own sandbox.
+
+14
+00:01:13,700 --> 00:01:15,676
+Factory Droid, on Daytona.
+
+15
+00:01:16,000 --> 00:01:17,832
+And Chalk, on Chalk Compute.
+
+16
+00:01:20,100 --> 00:01:26,169
+Aegis compares their answers. The more severe one wins, and AI can only raise a verdict, never lower it.
+
+17
+00:01:27,700 --> 00:01:36,258
+When the run ends, you get the answer in plain English. It would have fetched a second stage, started itself at login, and gone looking for your passwords.
+
+18
+00:01:37,000 --> 00:01:42,430
+On your phone? Text Aegis a screenshot, and get a verdict back in seconds.
+
+19
+00:01:44,900 --> 00:01:48,729
+Everything lives in your menu bar. Always watching, never in the way.
+
+20
+00:01:50,000 --> 00:01:53,121
+Every claim is backed by a saved run.
+
+21
+00:01:57,600 --> 00:01:59,466
+Aegis. Know before you click.
 

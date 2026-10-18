@@ -1,0 +1,46 @@
+{
+  "fps": 30,
+  "sources": {
+    "scenes": "index.html",
+    "promo": "aegis-promo.html"
+  },
+  "segments": [
+    { "id": "open",      "src": "scenes",                "from": 0,    "to": 6 },
+    { "id": "oldway",    "src": "scenes",                "from": 6,    "to": 16 },
+    { "id": "meet",      "src": "scenes",                "from": 16,   "to": 24 },
+    { "id": "verdicts",  "src": "promo", "scene": "s4",  "from": 21.9, "to": 28.2 },
+    { "id": "links",     "src": "scenes",                "from": 24,   "to": 37 },
+    { "id": "downloads", "src": "scenes",                "from": 37,   "to": 48 },
+    { "id": "liveview",  "src": "scenes",                "from": 48,   "to": 59.5 },
+    { "id": "analysts",  "src": "promo", "scene": "s7",  "from": 46.4, "to": 60.2 },
+    { "id": "compare",   "src": "promo", "scene": "s8",  "from": 59.9, "to": 67.2 },
+    { "id": "report",    "src": "scenes",                "from": 59.5, "to": 70 },
+    { "id": "phone",     "src": "promo", "scene": "s10", "from": 74.4, "to": 81.2 },
+    { "id": "menubar",   "src": "promo", "scene": "s11", "from": 80.9, "to": 87.2 },
+    { "id": "proof",     "src": "scenes",                "from": 82.5, "to": 88 },
+    { "id": "outro",     "src": "promo", "scene": "s12", "from": 86.9, "to": 96 }
+  ],
+  "vo": [
+    { "seg": "open",      "at": 0.8,   "file": "s01",     "text": "Every day, you click links you didn't write, and open files you didn't make." },
+    { "seg": "oldway",    "at": 6.6,   "file": "s02",     "text": "Most antivirus checks a file after it's already on your Mac. Then it tells you two words. Threat detected. Not what it would have done. Not why." },
+    { "seg": "meet",      "at": 17.6,  "file": "s03",     "text": "This is Aegis. It opens the dangerous stuff so you don't have to, and shows you exactly what it would have done." },
+    { "seg": "verdicts",  "at": 21.95, "file": "v-intro", "text": "Every link and file gets a verdict." },
+    { "seg": "verdicts",  "at": 23.85, "file": "p04b",    "text": "Malicious." },
+    { "seg": "verdicts",  "at": 24.75, "file": "p04c",    "text": "Suspicious." },
+    { "seg": "verdicts",  "at": 25.6,  "file": "p04d",    "text": "Unknown." },
+    { "seg": "verdicts",  "at": 26.35, "file": "p04e",    "text": "Or clean." },
+    { "seg": "links",     "at": 24.8,  "file": "l-intro", "text": "Links are judged before you click, without ever being opened." },
+    { "seg": "links",     "at": 28.72, "file": "l-rest",  "text": "Lookalike domains. Link text that lies. Three day old sites asking for your password. Checked in under a second." },
+    { "seg": "downloads", "at": 37.6,  "file": "s05",     "text": "Downloads are caught in memory, before they ever touch your disk. Risky files go to a throwaway Daytona sandbox, with the network cut off from the moment it's created." },
+    { "seg": "liveview",  "at": 48.8,  "file": "s06",     "text": "Then you watch it run. Factory Droid reverse engineers the file from your Mac, through read only tools that only work inside the sandbox. Every call home fails." },
+    { "seg": "analysts",  "at": 47.0,  "file": "a-intro", "text": "And Aegis never relies on one opinion. Two independent analysts take it apart at once, each in its own sandbox." },
+    { "seg": "analysts",  "at": 54.3,  "file": "p07b",    "text": "Factory Droid, on Daytona." },
+    { "seg": "analysts",  "at": 56.6,  "file": "p07c",    "text": "And Chalk, on Chalk Compute." },
+    { "seg": "compare",   "at": 60.4,  "file": "p08",     "text": "Aegis compares their answers. The more severe one wins, and AI can only raise a verdict, never lower it." },
+    { "seg": "report",    "at": 60.3,  "file": "s07",     "text": "When the run ends, you get the answer in plain English. It would have fetched a second stage, started itself at login, and gone looking for your passwords." },
+    { "seg": "phone",     "at": 75.0,  "file": "p10",     "text": "On your phone? Text Aegis a screenshot, and get a verdict back in seconds." },
+    { "seg": "menubar",   "at": 81.6,  "file": "p11",     "text": "Everything lives in your menu bar. Always watching, never in the way." },
+    { "seg": "proof",     "at": 83.0,  "file": "s09",     "text": "Every claim is backed by a saved run." },
+    { "seg": "outro",     "at": 88.5,  "file": "p12",     "text": "Aegis. Know before you click." }
+  ]
+}
