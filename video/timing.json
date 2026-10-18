@@ -1,0 +1,239 @@
+{
+ "fps": 30,
+ "width": 1920,
+ "height": 1080,
+ "duration": 101,
+ "scenes": [
+  {
+   "id": "s01",
+   "name": "Every click",
+   "start": 0,
+   "end": 6,
+   "vo": 0.8
+  },
+  {
+   "id": "s02",
+   "name": "Threat detected",
+   "start": 6,
+   "end": 16,
+   "vo": 0.6
+  },
+  {
+   "id": "s03",
+   "name": "Meet Aegis",
+   "start": 16,
+   "end": 24,
+   "vo": 1.6
+  },
+  {
+   "id": "s04",
+   "name": "Links",
+   "start": 24,
+   "end": 37,
+   "vo": 0.8
+  },
+  {
+   "id": "s05",
+   "name": "Downloads",
+   "start": 37,
+   "end": 48,
+   "vo": 0.6
+  },
+  {
+   "id": "s06",
+   "name": "Watch it run",
+   "start": 48,
+   "end": 59.5,
+   "vo": 0.8
+  },
+  {
+   "id": "s07",
+   "name": "The report",
+   "start": 59.5,
+   "end": 70,
+   "vo": 0.8
+  },
+  {
+   "id": "s08",
+   "name": "AI can only raise it",
+   "start": 70,
+   "end": 82.5,
+   "vo": 0.8
+  },
+  {
+   "id": "s09",
+   "name": "Proof",
+   "start": 82.5,
+   "end": 88,
+   "vo": 0.5
+  },
+  {
+   "id": "s10",
+   "name": "Built with",
+   "start": 88,
+   "end": 94,
+   "vo": 0.6
+  },
+  {
+   "id": "s11",
+   "name": "Outro",
+   "start": 94,
+   "end": 101,
+   "vo": 1.0
+  }
+ ],
+ "hits": [
+  {
+   "t": 11.85,
+   "kind": "impact"
+  },
+  {
+   "t": 15.25,
+   "kind": "shatter"
+  },
+  {
+   "t": 17.35,
+   "kind": "impact"
+  },
+  {
+   "t": 27.7,
+   "kind": "click"
+  },
+  {
+   "t": 27.85,
+   "kind": "impact-soft"
+  },
+  {
+   "t": 38.35,
+   "kind": "lock"
+  },
+  {
+   "t": 40.4,
+   "kind": "chime"
+  },
+  {
+   "t": 42.55,
+   "kind": "impact-soft"
+  },
+  {
+   "t": 44.8,
+   "kind": "deny"
+  },
+  {
+   "t": 45.08,
+   "kind": "deny"
+  },
+  {
+   "t": 45.36,
+   "kind": "deny"
+  },
+  {
+   "t": 45.64,
+   "kind": "deny"
+  },
+  {
+   "t": 45.92,
+   "kind": "deny"
+  },
+  {
+   "t": 46.2,
+   "kind": "deny"
+  },
+  {
+   "t": 56.85,
+   "kind": "alarm-soft"
+  },
+  {
+   "t": 60.4,
+   "kind": "impact"
+  },
+  {
+   "t": 63.5,
+   "kind": "tick"
+  },
+  {
+   "t": 65.45,
+   "kind": "tick"
+  },
+  {
+   "t": 67.0,
+   "kind": "tick"
+  },
+  {
+   "t": 67.9,
+   "kind": "tick"
+  },
+  {
+   "t": 68.5,
+   "kind": "tick"
+  },
+  {
+   "t": 72.3,
+   "kind": "deny"
+  },
+  {
+   "t": 74.5,
+   "kind": "rise-hit"
+  },
+  {
+   "t": 76.0,
+   "kind": "deny"
+  },
+  {
+   "t": 78.0,
+   "kind": "strike"
+  },
+  {
+   "t": 80.35,
+   "kind": "chime"
+  },
+  {
+   "t": 82.7,
+   "kind": "tick"
+  },
+  {
+   "t": 82.9,
+   "kind": "tick"
+  },
+  {
+   "t": 83.1,
+   "kind": "tick"
+  },
+  {
+   "t": 83.3,
+   "kind": "tick"
+  },
+  {
+   "t": 88.15,
+   "kind": "tick"
+  },
+  {
+   "t": 88.35,
+   "kind": "tick"
+  },
+  {
+   "t": 89.4,
+   "kind": "tick"
+  },
+  {
+   "t": 91.2,
+   "kind": "tick"
+  },
+  {
+   "t": 94.7,
+   "kind": "impact"
+  }
+ ],
+ "transitions": [
+  6,
+  16,
+  24,
+  37,
+  48,
+  59.5,
+  70,
+  82.5,
+  88,
+  94
+ ]
+}
