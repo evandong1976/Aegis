@@ -1,0 +1,150 @@
+reference: resources/droid/file_types_vulnerabilities.md (16 rows); inspector: 111336 bytes
+
+=== invoice.pdf (JavaScript that runs on open (/OpenAction)) ===
+type: PDF document; rows: .pdf; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets, inspect_pdf
+  droid: I'm Droid, on this Mac. invoice.pdf is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (pdf).
+  droid: I’ll verify the file type and hash, then inspect the PDF for malicious actions and parser risks.
+  droid: I’ll check the actual file type and confirm its size and SHA-256.
+  tool:  identify_file
+  tool:  describe_sample
+         exit 0, 959 bytes
+         exit 0, 82 bytes
+  droid: I’ll inspect PDF actions and embedded content, extract suspicious strings, and read the full file to verify any findings.
+  tool:  inspect_pdf
+  tool:  read_sample
+  tool:  extract_strings
+         exit 0, 290 bytes
+         exit 0, 2249 bytes
+         exit 0, 431 bytes
+  droid: Aegis also runs scan_secrets, so its rules see every check for this type.
+  tool:  scan_secrets
+         exit 0, 201 bytes
+reviewer: droid; Droid says suspicious (high): The PDF automatically runs JavaScript that displays an alert, but no harmful payload or specific vulnerability was confirmed.
+  finding [high] Automatic JavaScript execution on opening
+  finding [high] Contains JavaScript
+  finding [medium] Does something as soon as it is opened
+rules: suspicious at 60 from pdf_javascript+25, pdf_auto_javascript+25, pdf_open_action+10
+unknowns: Actual behavior depends on the Mac's PDF reader and its JavaScript settings. | Inspection used static parsing and stream decompression, not sandboxed rendering or execution. | No specific parser vulnerability was confirmed; static inspection cannot establish safety against every reader defect. | Droid skipped scan_secrets; Aegis ran them for its rules.
+ok   final verdict suspicious (score 60; expected suspicious/malicious); sandbox deleted; 44.7 s
+
+=== photos.zip (a Zip Slip entry aimed at LaunchAgents) ===
+type: ZIP archive; rows: .zip .tar .gz; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets, inspect_archive
+  droid: I'm Droid, on this Mac. photos.zip is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (archive).
+  droid: I’ll first check the file’s actual type and hash.
+  droid: I’ll check whether the bytes match the `.zip` name.
+  tool:  identify_file
+         exit 0, 1186 bytes
+  droid: I’ll record the sample’s measured size and SHA-256.
+  tool:  describe_sample
+         exit 0, 82 bytes
+  droid: I’ll load the archive and string checks to examine entry paths and payload text without running anything.
+  droid: I’ll inspect the archive for escaping paths, links, executable entries, and bomb indicators.
+  tool:  inspect_archive
+         exit 0, 981 bytes
+  droid: I’ll check readable strings for payload content and signs of persistence or command execution.
+  tool:  extract_strings
+         exit 0, 824 bytes
+  droid: I’ll read the small archive as text to see what the LaunchAgents entry contains.
+  tool:  read_sample
+         exit 0, 362 bytes
+  droid: Aegis also runs scan_secrets, so its rules see every check for this type.
+  tool:  scan_secrets
+         exit 0, 201 bytes
+reviewer: droid; Droid says malicious (high): The ZIP contains a Zip Slip payload targeting a LaunchAgents path, but working persistence or code execution was not confirmed.
+  finding [critical] Zip Slip payload targets a LaunchAgents path
+  finding [high] Mentions an autostart location
+rules: suspicious at 65 from archive_path_traversal+40, persistence_strings+25
+unknowns: Extraction testing was unavailable; the archive inspector lists entries without extracting them. | No vulnerability in the Mac's actual extractor was confirmed. | The final write location depends on the extraction directory and extractor behavior. | Droid skipped scan_secrets; Aegis ran them for its rules.
+ok   final verdict malicious (score 70; expected suspicious/malicious); sandbox deleted; 57.1 s
+
+=== zoom-update.sh (download-and-run, persistence, password lookups (all fake)) ===
+type: shell script (sh); rows: .sh .bash .ps1; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets, review_shell
+  droid: I'm Droid, on this Mac. zoom-update.sh is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (shell).
+  droid: I’ll load the read-only inspection tools to identify the file and check its contents.
+  droid: I’ll identify the file from its bytes rather than trust its name.
+  tool:  identify_file
+         exit 0, 1025 bytes
+  droid: I’ll confirm the sample’s size and SHA-256 for the report.
+  tool:  describe_sample
+         exit 0, 83 bytes
+  droid: I’ll check shell behavior, extract indicators, scan for secrets, and read the source to trace input flow.
+  tool:  review_shell
+  tool:  extract_strings
+  tool:  scan_secrets
+  tool:  read_sample
+         exit 0, 1610 bytes
+         exit 0, 2991 bytes
+         exit 0, 1779 bytes
+         exit 0, 203 bytes
+reviewer: droid; Droid says malicious (high): The script contains conditional download-and-run and credential-access behavior, but exits unless AEGIS_SANDBOX=1.
+  finding [critical] Conditional download and execution (line 10)
+  finding [high] Attempts Chrome credential access (line 25)
+  finding [high] Creates a login-triggered LaunchAgent (line 14)
+  finding [high] Encoded shell-execution indicator (line 28)
+  finding [medium] Attempts hostname transmission (line 31)
+  finding [high] Mentions an autostart location
+  finding [high] Reaches for saved passwords or wallets
+  finding [medium] Downloads from the internet
+rules: malicious at 100 from sh_download_exec+40!, sh_persistence+25, sh_credential_access+25, sh_hidden_command+25, sh_sends_data+10
+unknowns: ShellCheck was not installed; its diagnostics could not be collected. | The script was not executed, so runtime outcomes and macOS permission prompts were not observed. | No second-stage payload was available for inspection. | The recipient's environment variable, installed commands, and Keychain access permissions are unknown. | Droid cited aegis-sandbox___review_shell without calling it.
+ok   final verdict malicious (score 100; expected malicious); sandbox deleted; 81.5 s
+
+=== notes.txt (plain text) ===
+type: text; rows: none; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets
+  droid: I'm Droid, on this Mac. notes.txt is in a Daytona sandbox with no network; I reach it through 6 read-only tools chosen for its type (no reference row).
+  droid: I’ll load the file-identification and metadata tools first.
+  droid: I’ll check the bytes to identify the actual file type.
+  tool:  identify_file
+         exit 0, 902 bytes
+  droid: I’ll verify the sample’s size and SHA-256.
+  tool:  describe_sample
+         exit 0, 81 bytes
+  droid: I’ll load the remaining tools to inspect the text, strings, and possible secrets.
+  droid: I’ll check which files are present in the sample folder.
+  tool:  list_sample_files
+         exit 0, 212 bytes
+  droid: I’ll read the complete file to check its content for harmful instructions or code.
+  tool:  read_sample
+         exit 0, 58 bytes
+  droid: I’ll check the extracted strings for URLs, commands, and other suspicious indicators.
+  tool:  extract_strings
+         exit 0, 278 bytes
+  droid: I’ll scan for exposed credentials and private keys.
+  tool:  scan_secrets
+         exit 0, 201 bytes
+reviewer: droid; Droid says clean (high): The file is ordinary ASCII text with no detected malware, vulnerabilities, or exposed secrets.
+rules: clean at 0 from nothing
+unknowns: The reference has no row for plain-text files, so general inspection methods were used.
+ok   final verdict clean (score 0; expected clean/unknown); sandbox deleted; 39.9 s
+
+=== settings.env (exposed credentials (AWS's documentation examples) and debug on: weaknesses, not malware) ===
+type: configuration (key=value); rows: .env .config .ini; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets, review_config
+  droid: I'm Droid, on this Mac. settings.env is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (config).
+  droid: I’ll load the file checks, then verify the type and hash before reviewing the configuration.
+  droid: I’ll check whether the bytes match the reported configuration format.
+  tool:  identify_file
+         exit 0, 989 bytes
+  droid: I’ll verify the sample’s size and SHA-256 for the report.
+  tool:  describe_sample
+         exit 0, 82 bytes
+  droid: I’ll scan for exposed credentials with their values masked.
+  tool:  scan_secrets
+         exit 0, 1190 bytes
+  droid: I’ll check for insecure settings, debug mode, and credential-related configuration risks.
+  tool:  review_config
+         exit 0, 1733 bytes
+  droid: I’ll check the readable strings for commands, network destinations, or other signs of malicious behavior.
+  tool:  extract_strings
+         exit 0, 335 bytes
+  droid: I’ll read the full configuration to confirm the findings and check for anything the scanners missed.
+  tool:  read_sample
+         exit 0, 113 bytes
+reviewer: droid; Droid says clean (high): No malware was found, but the configuration contains an AWS credential pair and enables debug mode.
+  finding [critical] AWS access key ID exposed (line 2)
+  finding [critical] AWS secret access key exposed (line 3)
+  finding [medium] Debug mode enabled (line 1)
+rules: clean at 22 from vulnerabilities+22
+unknowns: Whether the AWS credentials are genuine, active, or privileged. | Original and deployed file permissions; the sandbox permissions were set during upload. | Which application consumes these settings and whether it honors them.
+ok   final verdict clean (score 22; expected clean/unknown/suspicious); sandbox deleted; 58.6 s
+
+5/5 samples as expected

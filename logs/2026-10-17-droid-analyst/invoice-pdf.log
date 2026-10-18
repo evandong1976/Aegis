@@ -1,0 +1,33 @@
+reference: resources/droid/file_types_vulnerabilities.md (16 rows); inspector: 111072 bytes
+
+=== invoice.pdf (JavaScript that runs on open (/OpenAction)) ===
+type: PDF document; rows: .pdf; tools: list_sample_files, describe_sample, read_sample, identify_file, extract_strings, scan_secrets, inspect_pdf
+  droid: I'm Droid, on this Mac. invoice.pdf is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (pdf).
+  droid: I’ll check the file’s type and hash first, then inspect its PDF structure and actions.
+  droid: I’ll verify the file type from its bytes, rather than its name.
+  tool:  identify_file
+         exit 0, 959 bytes
+  droid: I’ll record the sample’s measured size and SHA-256.
+  tool:  describe_sample
+         exit 0, 82 bytes
+  droid: I’ll inspect the PDF for automatic actions, scripts, embedded files, and exploit indicators.
+  tool:  inspect_pdf
+         exit 0, 2165 bytes
+  droid: I’ll check readable strings for the script’s behavior and any external destinations.
+  tool:  extract_strings
+         exit 0, 431 bytes
+  droid: I’ll scan for exposed credentials or other secrets.
+  tool:  scan_secrets
+         exit 0, 201 bytes
+  droid: I’ll read the file to verify the action chain and look for evidence the inspectors did not expose.
+  tool:  read_sample
+         exit 0, 290 bytes
+reviewer: droid; Droid says suspicious (medium): The PDF is configured to run JavaScript when opened, but harmful behavior and exploitable vulnerabilities were not confirmed.
+  finding [high] Automatic JavaScript action on opening
+  finding [high] Contains JavaScript
+  finding [medium] Does something as soon as it is opened
+rules: suspicious at 60 from pdf_javascript+25, pdf_auto_javascript+25, pdf_open_action+10
+unknowns: The inspector reported inflating the script but did not expose its decoded contents, leaving its behavior and intent unconfirmed. | Sandboxed rendering and execution were not performed; inspection was limited to static structure and stream processing. | No vulnerability was confirmed. Reader-specific parser vulnerabilities were not dynamically tested. | Actual execution on a Mac depends on the PDF reader and its security settings.
+ok   final verdict suspicious (score 60; expected suspicious/malicious); sandbox deleted; 59.1 s
+
+1/1 samples as expected

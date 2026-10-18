@@ -166,6 +166,54 @@ describe('the download pipeline', () => {
     expect(report.summary).toBe('Downloads and runs a second file.')
   })
 
+  it("puts Droid's review in the report and counts the sandbox checks' reasons", async () => {
+    const svc = service({
+      analyze: async () => ({
+        verdict: 'unknown',
+        summary: "Aegis's checks found: downloads a script and runs it.",
+        reasons: [
+          {
+            code: 'sh_download_exec',
+            text: 'downloads a script and runs it',
+            weight: 40,
+            hard: true
+          }
+        ],
+        droid: {
+          timeline: [],
+          verdict: 'unknown',
+          summary: 's',
+          confidence: 'low',
+          unknowns: ['Droid timed out'],
+          reviewer: 'rules'
+        },
+        findings: [
+          { severity: 'critical', title: 'Downloads a script and runs it', detail: 'Malware sign.' }
+        ],
+        capabilities: ['Download and run'],
+        code: [
+          {
+            path: 'update.sh',
+            origin: 'read inside the sandbox',
+            startLine: 1,
+            lines: ['curl x | sh'],
+            flags: []
+          }
+        ]
+      })
+    })
+    const report = await finished(svc, svc.fromChrome(SCRIPT, meta('update.sh')))
+    expect(report).toMatchObject({ verdict: 'malicious', action: 'quarantined' })
+    expect(report.reasons.map((r) => r.code)).toContain('sh_download_exec')
+    expect(report.droid?.reviewer).toBe('rules')
+    expect(report.stage1?.findings[0].title).toBe('Downloads a script and runs it')
+    expect(report.code[0].lines).toEqual(['curl x | sh'])
+    expect(report.checks.find((c) => c.name === 'Analysis')).toMatchObject({
+      state: 'warn',
+      result: "Aegis's checks only"
+    })
+  })
+
   it('delivers a plain document without uploading it, as the exact bytes', async () => {
     const daytona = fakeDaytona()
     const ledger = createDeliveredLedger()

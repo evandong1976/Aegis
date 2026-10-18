@@ -80,6 +80,7 @@ Electron itself; for prompts under the Aegis name, package the app with `pnpm ap
 | `pnpm verify`                              | Every check + app launch + bridge smoke test, evidence to `logs/`     |
 | `pnpm try:daytona`, `pnpm try:droid`       | Live sponsor checks with your keys; each deletes its sandbox          |
 | `pnpm try:sandbox`, `pnpm try:desktop`     | Run a test file in a network-off sandbox; show the sandbox's desktop  |
+| `pnpm try:analyst [file ...]`              | Droid reviews five harmless samples of different types, live          |
 | `pnpm build:sandbox`, `pnpm eval`          | Not built yet (milestones 3, 6); they exit with a message             |
 
 ## Layout
@@ -130,9 +131,17 @@ What leaves this Mac today, all from the health check and only when the matching
 - Daytona: a list of your sandboxes every 60 s, and at start and on Check now a tiny sandbox with
   the network off that runs `echo` and is deleted;
 - Factory: a list of models every 60 s, and at start and on Check now a one-line test prompt
-  ("Reply with the single word OK.").
+  ("Reply with the single word OK.") with the file-type reference, which holds no data of yours.
 
-No file, link or page text is sent anywhere yet.
+When a download needs the cloud (scripts, programs, archives, risky documents):
+
+- the file is uploaded to a fresh Daytona sandbox created with the network off, and the sandbox is
+  deleted after the scan;
+- Droid, through Factory, reads what Aegis's checks report about it, including parts of its text
+  (at most 8 KB per check), with secret-looking values masked. The file itself never goes to
+  Factory.
+
+No link or page text is sent anywhere yet.
 
 When the full pipeline lands, this copy (also in Settings) must stay true:
 
@@ -161,7 +170,8 @@ Every risky file goes to two workers at once, each on its own copy (details and 
 Each returns a verdict, evidence, a "what would have happened" timeline and a log of what happened
 in its sandbox. `compare.ts` reconciles them (the more severe answer wins when they disagree) and
 the result can only raise Aegis's rule-based verdict, never lower it. The report shows both logs.
-Not built yet (milestones 3, 4 and 6); Worker A's approach is proven by `pnpm try:droid`.
+Worker A is built (see How Aegis uses Droid, `pnpm try:analyst`); Worker B and `compare.ts` are
+not yet (milestone 6), so today Worker A's answer goes straight to `verdict.ts`.
 
 ## How Aegis uses Daytona
 
@@ -176,14 +186,51 @@ the sandbox and its log. Calls and evidence: `docs/PLAN.md` › Sponsor findings
 
 ## How Aegis uses Droid
 
-Not built into the app yet (milestone 4); proven by `pnpm try:droid`. Droid is Worker A's analyst.
-It runs on the Mac (the Factory Droid SDK driving the `droid` CLI) with every built-in tool switched
-off, and its only tools are fixed, argument-free commands that run inside the network-off Daytona
+Droid is Worker A's analyst (`src/main/droidAgent.ts`), for the live view and for downloads. It
+runs on the Mac (the Factory Droid SDK driving the `droid` CLI) with every built-in tool switched
+off; its only tools are fixed, argument-free commands that run inside the network-off Daytona
 sandbox. A permission handler cancels anything else, every tool output is fenced as untrusted, and
-each tool call becomes Worker A's sandbox log. It returns a zod-validated result (verdict, timeline
-with code evidence, summary), compared with Chalk's, which can only raise the verdict. The file never
-shares a machine with Droid or its key. Coordinated from `src/main/workerA.ts`. Why not inside the
-sandbox, and the SDK/CLI workaround: `docs/PLAN.md` decision 19 and Sponsor findings › Factory Droid.
+each tool call becomes the sandbox log. The file never shares a machine with Droid or its key.
+
+**Every Droid call carries [`resources/droid/file_types_vulnerabilities.md`](resources/droid/file_types_vulnerabilities.md)**
+(file type → attack surface → method), appended to Droid's system prompt: the analyst, the health
+check's test prompt and every call in `try-droid`. A test fails if a new call doesn't.
+
+**Its tools follow the file's type.** The reference's table is parsed (`src/main/fileTypes.ts`);
+each row's methods are one check of the inspector, [`sandbox/aegis_inspect.py`](sandbox/aegis_inspect.py),
+which Aegis uploads into the sandbox after the file has run. The rows come from the file's name and
+from its bytes, so a disguised file gets both. Every file also gets `identify_file`,
+`extract_strings` and `scan_secrets`, plus the three general tools (list, fingerprint, read).
+
+| Reference row               | Droid's tool for it          |
+| --------------------------- | ---------------------------- |
+| `.c` `.cpp` `.h`            | `review_c_cpp`               |
+| `.py`                       | `review_python`              |
+| `.js` `.ts` (and HTML)      | `review_javascript`          |
+| `.php`                      | `review_php`                 |
+| `.sql`                      | `review_sql`                 |
+| `.json`                     | `inspect_json`               |
+| `.xml`                      | `inspect_xml`                |
+| `.yaml` `.yml`              | `inspect_yaml`               |
+| `.zip` `.tar` `.gz`         | `inspect_archive`            |
+| `.pdf`                      | `inspect_pdf`                |
+| `.docx` `.xlsx` `.pptx`     | `inspect_office`             |
+| `.jpg` `.png` `.svg`        | `inspect_image`              |
+| `.env` `.config` `.ini`     | `review_config`              |
+| `.sh` `.bash` `.ps1`        | `review_shell`               |
+| `.pem` `.key` `.p12`        | `inspect_keys`               |
+| `.wasm` `.so` `.dll` `.exe` | `analyze_binary`, `run_capa` |
+
+**Its answer is checked, not trusted.** Aegis's rules come from the inspector's findings, and every
+check for the file's type runs even if Droid skips it; Droid's verdict can only raise the result. A
+weakness alone never makes a file Suspicious; malware signs do. Line numbers Droid cites are looked
+up in the file, and a SHA-256 that doesn't match lowers its confidence. If Droid can't run or
+finish, the report says "Aegis's checks only" and the file is never called Clean. Without
+`FACTORY_API_KEY` and the `droid` CLI, the live view uses the scripted stand-in and downloads use
+the inspector's checks alone.
+
+`pnpm try:analyst` runs it live on five harmless samples. Decisions and costs: `docs/PLAN.md`
+decisions 19 and 32 (including the droid 0.244 change that needs `toolExecutionMode: 'direct_only'`).
 
 ## How Aegis uses Photon
 

@@ -27,9 +27,14 @@ import { refreshFeeds } from './linkData'
 import { registeredDomain } from './links'
 import { SHORTENERS } from './linkLists'
 import { LiveBus } from './live'
-import { scriptedAgent } from './liveAgent'
+import { scriptedAgent, type LiveAgent } from './liveAgent'
 import { startSandboxScan, type SandboxScanInput } from './sandboxScan'
-import type { SandboxClient } from './daytona'
+import type { SandboxClient, SandboxSession, SampleMeta } from './daytona'
+import { droidAgent } from './droidAgent'
+import { FILE_TYPE_REFERENCE, INSPECTOR_SOURCE, REFERENCE_ROWS } from './droidAssets'
+import { prepareToolkit } from './droidToolkit'
+import { findDroidCli } from './sponsors'
+import { WORKER_TIMEOUT_MS, type SandboxAnalysis } from './scans'
 import { FAKE_INSTALLER } from './testSamples'
 import { ScanService } from './scans'
 import { createQuarantine } from './quarantine'
@@ -60,6 +65,63 @@ async function sandboxClient(): Promise<SandboxClient | null> {
     daytona = new Daytona() as unknown as SandboxClient
   }
   return daytona
+}
+
+let droidCli: Promise<string | null> | null = null
+
+/** The droid CLI when FACTORY_API_KEY is set and the CLI is installed, looked up once. */
+function droidPath(): Promise<string | null> {
+  droidCli ??= process.env.FACTORY_API_KEY ? findDroidCli() : Promise.resolve(null)
+  return droidCli
+}
+
+/** Droid as the analyst, with the file-type reference (droidAssets.ts); null CLI = rules only. */
+function analyst(execPath: string | null): LiveAgent {
+  return droidAgent({
+    execPath,
+    apiKey: process.env.FACTORY_API_KEY,
+    reference: FILE_TYPE_REFERENCE
+  })
+}
+
+/**
+ * Worker A for downloads: Droid reviews the file in its sandbox with the tools for its type. The
+ * sample isn't run here, only read. Without Droid, the inspector's checks still decide (never
+ * Clean on their own).
+ */
+async function analyzeDownload(
+  session: SandboxSession,
+  sample: SampleMeta
+): Promise<SandboxAnalysis> {
+  const kit = await prepareToolkit(session, {
+    filename: sample.filename,
+    inspector: INSPECTOR_SOURCE,
+    rows: REFERENCE_ROWS
+  })
+  const result = await analyst(await droidPath()).review({
+    filename: sample.filename,
+    meta: sample,
+    observation: null,
+    tools: kit.tools,
+    match: kit.match,
+    notes: kit.problem ? [kit.problem] : [],
+    runTool: async (name) => {
+      const spec = kit.tools.find((t) => t.name === name)
+      if (!spec) throw new Error(`no tool named ${name}`)
+      const res = await session.exec(`droid tool ${name}`, spec.command, spec.timeoutS ?? 15)
+      return { exitCode: res.exitCode, output: res.result }
+    },
+    emit: () => undefined
+  })
+  return {
+    verdict: result.report.verdict,
+    summary: result.report.summary,
+    reasons: result.reasons,
+    droid: result.report,
+    findings: result.findings,
+    capabilities: result.capabilities,
+    code: result.code
+  }
 }
 
 /** Where downloads land. AEGIS_DOWNLOADS_DIR points tests and verification runs elsewhere. */
@@ -113,12 +175,16 @@ const live = new LiveBus((scanId, event) => send('live:event', { scanId, event }
  * `/download` route will call this with the intercepted bytes; until then the Downloads screen's
  * "Test the sandbox" button sends a built-in harmless sample.
  */
-function sandboxScan(input: SandboxScanInput): { scanId: string } | { error: string } {
+async function sandboxScan(
+  input: SandboxScanInput
+): Promise<{ scanId: string } | { error: string }> {
   if (!store) return { error: 'The local store is not open.' }
   if (!process.env.DAYTONA_API_KEY) {
     return { error: 'DAYTONA_API_KEY not set. Add it to .env.local, then restart Aegis.' }
   }
   const db = store
+  // Droid when it is set up; otherwise the scripted stand-in, which the live view labels.
+  const execPath = await droidPath()
   const { scanId } = startSandboxScan(
     {
       client: async () => {
@@ -126,7 +192,8 @@ function sandboxScan(input: SandboxScanInput): { scanId: string } | { error: str
         return new Daytona() as unknown as SandboxClient
       },
       bus: live,
-      agent: scriptedAgent(),
+      agent: execPath ? analyst(execPath) : scriptedAgent(),
+      toolkit: execPath ? { inspector: INSPECTOR_SOURCE, rows: REFERENCE_ROWS } : undefined,
       snapshot: process.env.AEGIS_DAYTONA_SNAPSHOT || undefined,
       putScan: (report) => {
         db.putScan(report, { fileCategory: 'Scripts', caughtBy: 'Sandbox' })
@@ -235,6 +302,9 @@ app.whenReady().then(async () => {
     mode: () => status.mode,
     takeSandboxJob: () => store?.takeSandboxJob(getSettings(store).sandboxDailyBudget) ?? false,
     concurrency: config.sandboxConcurrency,
+    analyze: analyzeDownload,
+    // Droid's review (DROID_TIMEOUT_MS) comes on top of the sandbox's own steps.
+    workerTimeoutMs: WORKER_TIMEOUT_MS + 120_000,
     log: (level, text) => status.record(level, text),
     onActive: (count) => {
       status.activeScans = count

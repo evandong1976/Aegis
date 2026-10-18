@@ -229,7 +229,9 @@ export default function ReportView({
               r.droid
                 ? r.droid.reviewer === 'scripted'
                   ? 'Scripted stand-in for Droid'
-                  : 'Reviewed by Droid'
+                  : r.droid.reviewer === 'rules'
+                    ? "Aegis's checks only (Droid didn't finish)"
+                    : 'Reviewed by Droid'
                 : undefined
             }
           >

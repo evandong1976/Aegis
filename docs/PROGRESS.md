@@ -1,4 +1,4 @@
-## Handoff (updated 2026-10-17 18:45 EDT, by Claude Code session, Opus 5.5)
+## Handoff (updated 2026-10-18 00:15 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
 1–31, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
@@ -10,6 +10,27 @@ disagree, PLAN.md › Decisions wins.
   (`daytona.ts`, run a file network-off) merged; 4 — approach proven (`pnpm try:droid`); 8 — fn
   add-on only. Everything else not started. Table: "Milestone checklist" below.
 - **Owner:** Evan = Person A (browser and data), Zach = Person B (app and sandbox)
+- **Branch `feature/aiSec` (Zach), from `main` — Worker A for real (PLAN.md decision 32).** Droid
+  replaces the scripted stand-in in the live view (when `FACTORY_API_KEY` and the CLI are set up)
+  and analyses risky downloads. Every Droid call carries
+  `resources/droid/file_types_vulnerabilities.md`; its tools follow the file's type (name and
+  bytes), each one a check of `sandbox/aegis_inspect.py`. Rules come from the inspector, Droid
+  only raises, and everything Droid sees has secrets masked.
+  - **Try it:** `pnpm try:analyst` (five harmless samples, live, ~1 min each, 3 at a time), or
+    `pnpm dev` → Downloads → **Test the sandbox**.
+  - **Evidence:** `logs/2026-10-17-droid-analyst/` (5/5 as expected, 0 sandboxes left).
+  - **Found on the way:** droid CLI 0.244.0 (2026-10-17) only lets a session call MCP tools
+    directly if it asks at start (`toolExecutionMode: 'direct_only'`); otherwise they're reachable
+    only through the built-in `Script` tool, which the lockdown turns off, and SDK 0.9.1 can't
+    answer Script's permission requests. `droidLockdown.ts › directToolCalls` asks for it.
+    `pnpm try:droid` needed the same fix; its option A `droid exec` path is untested with the
+    new `--append-system-prompt-file` flag on the pinned droid 0.232.0.
+  - **Joint changes, for Evan:** `DroidReport.reviewer` gains `'rules'` (Droid didn't finish;
+    the Report says "Aegis's checks only"). `SandboxAnalysis` (scans.ts) gains optional `droid`,
+    `findings`, `capabilities`, `code`, and its `reasons` now count toward the score.
+    `PRIVACY_COPY` and the README's Privacy section now say what Droid reads.
+  - **Flaky, not from this branch:** `store.test.ts › computes the overview counts` fails just
+    after midnight (demo rows are "N minutes ago", so some land in yesterday).
 - **In progress — branch `feature/visualization` (Zach), not committed (Zach asked not to yet):
   the live view (PLAN.md decision 30).** A caught file is opened in a real network-off Daytona
   sandbox while the main window shows it happening: five stages; Droid on the left, on this Mac,

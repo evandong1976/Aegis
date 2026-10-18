@@ -250,6 +250,16 @@ describe('Droid', () => {
     expect(r.detail).toMatch(/Droid answered a test prompt in \d+\.\d s/)
   })
 
+  it('carries the file-type reference, like every Droid call', async () => {
+    process.env.FACTORY_API_KEY = 'k'
+    process.env.DROID_PATH = await fakeCli()
+    await checkDroid('start', memory)
+    const [, options] = fake.run.mock.calls[0]
+    expect(options.systemPrompt).toMatchObject({ type: 'preset', preset: 'droid' })
+    expect(options.systemPrompt.append).toContain('file_types_vulnerabilities.md')
+    expect(options.systemPrompt.append).toContain('| `.pdf` |')
+  })
+
   it('a rejected key or a failed run is down', async () => {
     process.env.FACTORY_API_KEY = 'k'
     process.env.DROID_PATH = await fakeCli()
