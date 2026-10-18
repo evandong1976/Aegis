@@ -1,0 +1,32 @@
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 43 modules transformed.
+rendering chunks...
+out/main/index.js  367.32 kB
+
+✓ built in 33ms
+
+electron main process built successfully
+
+-----
+
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 3 modules transformed.
+rendering chunks...
+out/preload/index.js  1.29 kB
+
+✓ built in 9ms
+
+electron preload scripts built successfully
+
+-----
+
+Port 5173 is in use, trying another one...
+dev server running for the electron renderer process at:
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: use --host to expose
+
+starting electron app...
+

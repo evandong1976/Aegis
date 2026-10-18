@@ -1,0 +1,117 @@
+[
+  {
+    "at": "2026-10-18T02:48:02.301Z",
+    "level": "allow",
+    "text": "file name=statement-sept.pdf verdict=clean checked=local uploaded=no"
+  },
+  {
+    "at": "2026-10-18T03:27:02.301Z",
+    "level": "allow",
+    "text": "link url=docs.vendor.com/api/auth verdict=clean cached=true"
+  },
+  {
+    "at": "2026-10-18T03:46:02.301Z",
+    "level": "warn",
+    "text": "file name=Q3-summary.xlsm source=watcher verdict=suspicious reason=macro-autoexec"
+  },
+  {
+    "at": "2026-10-18T04:03:02.301Z",
+    "level": "warn",
+    "text": "link url=cdn-assets-delivery.top/pkg.js verdict=suspicious reason=obfuscated-js"
+  },
+  {
+    "at": "2026-10-18T04:13:02.301Z",
+    "level": "block",
+    "text": "file name=invoice_oct.iso sha256=9c1f…04ab verdict=malicious engine=sandbox"
+  },
+  {
+    "at": "2026-10-18T04:17:02.301Z",
+    "level": "block",
+    "text": "link url=login-northwlnd-io.sbs/sso verdict=malicious rule=newly-registered+brand-match"
+  },
+  {
+    "at": "2026-10-18T04:23:02.310Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47397"
+  },
+  {
+    "at": "2026-10-18T04:23:02.353Z",
+    "level": "warn",
+    "text": "fnkey running=false loaded=false"
+  },
+  {
+    "at": "2026-10-18T04:23:03.159Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27720"
+  },
+  {
+    "at": "2026-10-18T04:23:03.267Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=docker state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=droid state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-18T04:23:04.685Z",
+    "level": null,
+    "text": "health service=fnKey state=unconfigured"
+  },
+  {
+    "at": "2026-10-18T04:23:14.037Z",
+    "level": "warn",
+    "text": "sandbox scan id=2eb89878 file=aegis-terminal-demo.command held"
+  },
+  {
+    "at": "2026-10-18T04:24:11.191Z",
+    "level": "allow",
+    "text": "sandbox scan id=2eb89878 verdict=clean score=0 ms=57154"
+  }
+]

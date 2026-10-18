@@ -515,6 +515,49 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
     - **Delivered files get `com.apple.quarantine`**, as Chrome's own downloads do, so Gatekeeper
       still checks them.
 
+32. **Worker A: Droid picks its methods by file type, from a reference every call carries**
+    (Zach, 2026-10-18, on `feature/aiSec`; evidence `logs/2026-10-17-droid-analyst/`).
+    `resources/droid/file_types_vulnerabilities.md` maps file type → attack surface → method. Each
+    choice with its cost:
+    - **Every Droid call carries the reference**, appended to Droid's own system prompt
+      (`droidBrief.ts › droidSystemPrompt`): the analyst, the health check's one-word test, and
+      every call in `try-droid` (option A through `--append-system-prompt-file`).
+      `droidBrief.test.ts` scans `src/main` and `scripts` and fails if a Droid call doesn't.
+      _Cost:_ ~1.3k more input tokens per call, the health check's too.
+    - **The table is parsed, not copied** (`fileTypes.ts`): a row added there reaches Droid's
+      prompt and the tool choice. Each row is tied to an inspector check by its first extension;
+      a row with no check still reaches Droid, with the general tools.
+    - **The methods are one inspector, `sandbox/aegis_inspect.py`, standard library only**, so it
+      runs in Daytona's default image (no snapshot yet). Each row's methods are one check (PDF
+      keywords over inflated streams, archive paths without extracting, OOXML relationships and
+      macros, XXE without resolving, PE/ELF/Mach-O/WASM headers and imports, secret scanning with
+      values masked…). Where the snapshot will have the dedicated tool (Bandit, ShellCheck,
+      flawfinder, cppcheck, olevba, capa) the check runs it too and otherwise says it isn't
+      installed. _Cost:_ static only: no ASan, GDB, fuzzing, rendering or `npm audit` (they need
+      a build, a harness or the network); pattern rules miss what a real parser would catch.
+    - **Droid gets only the tools for its file's rows**: the three general tools, three
+      inspector tools for every file, and one per matching row. The rows come from the name
+      _and_ the bytes (the inspector's `identify` check), so a disguised file gets both sets and
+      Droid is told to trust the bytes. Still argument-free commands; the inspector is uploaded
+      after the sample has run, into a random folder, hash-checked, run with `python3 -I`, and
+      anything the run left behind is killed first.
+    - **Aegis's rules come from the inspector's findings, not from Droid.** Every check for the
+      file's type runs even if Droid skips it; Droid's verdict only raises (verdict.ts), and a
+      finding it confirms keeps at least the inspector's severity. Malware signs score by
+      severity; weaknesses together add at most 25, below Suspicious: a vulnerable file is not
+      malware by itself (the reference). A strings hit the type's own check already scored
+      isn't counted again. Line numbers Droid cites are looked up in the file.
+    - **Droid failing is never Clean**: the report says `reviewer: 'rules'` ("Aegis's checks
+      only") and the verdict is at least Unknown. Downloads use the same agent; without Droid
+      the inspector's checks still decide.
+    - **droid 0.244 (released 2026-10-17) broke MCP tools for locked-down sessions**: for some
+      models MCP tools can only be called from inside the built-in `Script` tool, which the
+      lockdown turns off (and SDK 0.9.1 can't answer Script's permission requests). The session
+      start request now asks for `toolExecutionMode: 'direct_only'`; the SDK has no option for
+      it, so `droidLockdown.ts › directToolCalls` adds it on the way to the CLI. _Cost:_ relies
+      on a field the CLI accepts but the SDK doesn't know; an SDK or CLI update may move it.
+      `pnpm try:analyst` shows at once if Droid stops reaching its tools.
+
 ## Tradeoffs at a glance
 
 For every decision made in this conversation: what it buys, what it costs, and when to revisit.
@@ -543,6 +586,7 @@ For every decision made in this conversation: what it buys, what it costs, and w
 | 29    | Links: feeds matched locally, RDAP + DNS + Cert Spotter, 1.5 s budget, clicks recorded                | Nothing about the user's links goes to feeds; pages never wait long; every check is listed in the report | Small hand-kept brand list until M6; ccTLDs without RDAP get no age; slow lookups land after the first answer                                     | Chalk features (M6) replace the lists and feeds                       |
 | 30    | Live view: real sandbox, scripted Droid, Terminal + Desktop tabs                                      | The demo shows the file really opening in the sandbox, and M4 only has to fill in `LiveAgent`            | Droid's words are canned until M4; each test run is a real sandbox (credits); the desktop adds ~3.5 s; events are lost on restart                 | `workerA.ts` lands: switch `index.ts` to it                           |
 | 31    | Downloads held at `onDeterminingFilename`; fallback under Chrome's name; held until an analyst exists | Small downloads can't slip past the pause; tested live on every Chrome download path                     | A hidden temp file exists for milliseconds; a fallback file is briefly in `~/Downloads`; every script or program is held (Unknown) until Worker A | Worker A lands                                                        |
+| 32    | Droid picks methods by file type from a reference every call carries; rules from a stdlib inspector   | Droid's tools and prompt follow the file's real type; a fooled or failed Droid can't clear a file        | ~1.3k tokens more per call; static checks only; relies on a session field SDK 0.9.1 doesn't know                                                  | The Aegis snapshot ships; the SDK learns toolExecutionMode            |
 
 ## Sponsor findings (BUILD_PROMPT §4.5)
 

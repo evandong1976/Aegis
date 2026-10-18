@@ -8,7 +8,8 @@
 // - the sandbox's desktop (Daytona Computer Use: Xvfb + xfce4), with the file opened in a terminal
 //   window there and a picture sent every second. Optional: no desktop, no pictures, same verdict;
 // - the `sh -x` trace streamed while the file runs, by reading its output files from the side;
-// - the agent (liveAgent.ts) reverse engineering it through read-only tools.
+// - the agent (droidAgent.ts, or liveAgent.ts's stand-in) reverse engineering it through read-only
+//   tools chosen for its file type (droidToolkit.ts).
 //
 // Milestone 3's `/download` route calls `startSandboxScan` with the intercepted bytes; until then
 // the app's "Test the sandbox" button sends a built-in harmless sample (testSamples.ts).
@@ -33,6 +34,7 @@ import {
   type SandboxSession
 } from './daytona'
 import { sandboxToolSpecs } from './droidLockdown'
+import { prepareToolkit, type ToolkitInput } from './droidToolkit'
 import { LineSplitter, type LiveBus } from './live'
 import type { AgentResult, LiveAgent } from './liveAgent'
 import { applyAiSuggestion, combine } from './verdict'
@@ -67,6 +69,11 @@ export interface SandboxScanDeps {
   client: () => Promise<SandboxClient>
   bus: LiveBus
   agent: LiveAgent
+  /**
+   * The inspector and the reference rows, to give the agent tools for the file's type. Without
+   * it the agent gets the three general tools only (what the scripted stand-in uses).
+   */
+  toolkit?: Omit<ToolkitInput, 'filename'>
   putScan(report: ScanReport): void
   log(level: 'block' | 'warn' | 'allow' | null, text: string): void
   /** Called with +1 when a scan starts and -1 when it ends. */
@@ -335,17 +342,31 @@ async function inSandbox(
         ? 'Reverse engineering it through read-only tools (scripted stand-in for Droid)'
         : `${deps.agent.info.name} is reverse engineering it from this Mac, through read-only tools`
     )
-    const tools = sandboxToolSpecs(SAMPLE_PATH)
+    const kit = deps.toolkit
+      ? await prepareToolkit(session, { filename: input.filename, ...deps.toolkit })
+      : null
+    if (kit) {
+      const rows = kit.match.rows.map((r) => r.extensions.map((e) => `.${e}`).join(' '))
+      term(
+        'aegis',
+        'note',
+        `${kit.match.label} · reference rows: ${rows.join(', ') || 'none'} · ${count(kit.tools.length, 'tool')} for the agent`
+      )
+      if (kit.problem) term('aegis', 'err', kit.problem)
+    }
+    const tools = kit?.tools ?? sandboxToolSpecs(SAMPLE_PATH)
     const agent = await deps.agent.review({
       filename: input.filename,
       meta,
       observation,
       tools,
+      match: kit?.match,
+      notes: kit?.problem ? [kit.problem] : [],
       runTool: async (name) => {
         const spec = tools.find((t) => t.name === name)
         if (!spec) throw new Error(`no tool named ${name}`)
         term('agent', 'cmd', spec.command)
-        const res = await session.exec(`agent tool ${name}`, spec.command, 15)
+        const res = await session.exec(`agent tool ${name}`, spec.command, spec.timeoutS ?? 15)
         for (const line of res.result.split('\n').slice(0, 3)) if (line) term('agent', 'out', line)
         return { exitCode: res.exitCode, output: res.result }
       },
@@ -547,8 +568,13 @@ function finishedReport(
     },
     {
       name: 'Agent review',
-      state: r.agent.report.reviewer === 'scripted' ? 'warn' : 'ok',
-      result: r.agent.report.reviewer === 'scripted' ? 'scripted stand-in' : 'Droid'
+      state: r.agent.report.reviewer === 'droid' ? 'ok' : 'warn',
+      result:
+        r.agent.report.reviewer === 'droid'
+          ? 'Droid'
+          : r.agent.report.reviewer === 'rules'
+            ? "Aegis's checks only"
+            : 'scripted stand-in'
     },
     {
       name: 'Sandbox deleted',

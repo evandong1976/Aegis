@@ -133,7 +133,7 @@ export const TimelineStepSchema = z.object({
 })
 export type TimelineStep = z.infer<typeof TimelineStepSchema>
 
-/** Droid's Stage 2 report (MEGA_PROMPT §5.4). Validated in `droid.ts`. */
+/** Droid's Stage 2 report (MEGA_PROMPT §5.4). Built and validated in `droidAgent.ts`. */
 export const DroidReportSchema = z.object({
   timeline: z.array(TimelineStepSchema),
   verdict: VerdictSchema,
@@ -141,8 +141,12 @@ export const DroidReportSchema = z.object({
   summary: z.string(),
   confidence: z.enum(['low', 'medium', 'high']),
   unknowns: z.array(z.string()),
-  /** `scripted`: the rules-based stand-in the live view uses until Droid is wired (milestone 4). */
-  reviewer: z.enum(['droid', 'scripted']).optional()
+  /**
+   * `droid`: Droid reviewed it (droidAgent.ts). `rules`: Droid couldn't run or finish, so only
+   * Aegis's own checks for the file's type decided. `scripted`: the live view's stand-in, used
+   * when Droid isn't set up.
+   */
+  reviewer: z.enum(['droid', 'rules', 'scripted']).optional()
 })
 export type DroidReport = z.infer<typeof DroidReportSchema>
 

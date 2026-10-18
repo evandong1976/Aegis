@@ -15,6 +15,8 @@ import { access, mkdtemp, rm } from 'fs/promises'
 import { homedir, tmpdir } from 'os'
 import { delimiter, join } from 'path'
 import type { ServiceState } from '@shared/types'
+import { droidSystemPrompt } from './droidBrief'
+import { FILE_TYPE_REFERENCE } from './droidAssets'
 import { status } from './status'
 
 /** What asked for the check: app start or Check now may run live tests; the 60 s loop never does. */
@@ -172,6 +174,8 @@ async function droidLiveTest(
   execPath: string
 ): Promise<LiveResult> {
   // An empty working directory, and every tool request refused: the test can't touch this Mac.
+  // Like every Droid call, it carries the file-type reference, so the test also proves the
+  // reference reaches Droid.
   const cwd = await mkdtemp(join(tmpdir(), 'aegis-droid-check-'))
   const t0 = Date.now()
   try {
@@ -181,6 +185,7 @@ async function droidLiveTest(
       apiKey,
       autonomyLevel: sdk.AutonomyLevel.Off,
       autoRejectPermissionRequests: true,
+      systemPrompt: droidSystemPrompt(FILE_TYPE_REFERENCE),
       abortSignal: AbortSignal.timeout(DROID_TIMEOUT_MS)
     })
     if (!result.success)

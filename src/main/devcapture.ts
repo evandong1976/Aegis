@@ -81,7 +81,8 @@ async function captureLive(
   }
   console.log(`[capture] live run ${res.scanId}`)
   let finishedAt: number | null = null
-  for (let i = 1; i <= 60; i++) {
+  // Up to 6 minutes: a run with the real Droid takes 1–3.
+  for (let i = 1; i <= 180; i++) {
     await wait(2000)
     await save(dir, `live-${String(i).padStart(2, '0')}`, opts.main())
     if (i === 6) await save(dir, 'live-panel', opts.panel())

@@ -1,0 +1,15 @@
+(node:30711) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  extension loads  — onljkbhkoinihmjibfofcalimkolemam
+PASS  extension service worker running
+FAIL  aegis-terminal-demo.command: clean, delivered  — suspicious / held / chrome / 45119 ms; checks: Local pre-check=ok(needs the sandbox), Daytona sandbox=ok(network off, 1.2 s), Upload check (SHA-256)=ok(matched), Analysis=ok(Droid)
+PASS  aegis-terminal-demo.command: went to a network-off Daytona sandbox, SHA-256 matched, sandbox deleted  — c314e4e9-a163-475e-bad0-29037159060d network=off destroyed=2026-10-18T04:28:36.150Z
+FAIL  aegis-terminal-demo.command: reviewed by Droid  — reviewer=undefined; analysis=ok(Droid); ""
+file:///Users/zach/Desktop/Aegis/logs/2026-10-18-download-droid/e2e.mjs:186
+      `${report.stage1?.findings?.length ?? 0} findings; reasons: ${report.reasons.map((x) => `${x.code}+${x.weight}`).join(', ')}`)
+                                                                                   ^
+
+TypeError: Cannot read properties of undefined (reading 'map')
+    at file:///Users/zach/Desktop/Aegis/logs/2026-10-18-download-droid/e2e.mjs:186:84
+
+Node.js v22.16.0

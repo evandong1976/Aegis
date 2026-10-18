@@ -22,6 +22,27 @@ Nothing from a sample is ever opened or run on the Mac.
 
 Every version is exact and was at least two weeks old when pinned.
 
+## The inspector: `aegis_inspect.py`
+
+The checks Droid runs on a caught file, one per row of
+[`resources/droid/file_types_vulnerabilities.md`](../resources/droid/file_types_vulnerabilities.md)
+(plus `identify`, `strings`, `secrets` and `capa`). Droid can only run them as fixed tools,
+`python3 -I <folder>/aegis_inspect.py <check> sample/file` (`src/main/droidLockdown.ts`). Every
+check reads the file and reports; none runs, extracts or changes it.
+
+- **Standard library only**, so it works in Daytona's default image today. The app uploads it into
+  each sandbox after the sample has run, into a fresh folder, and checks its SHA-256
+  (`src/main/droidToolkit.ts`). It doesn't need to be in the image.
+- **Uses the dedicated tool when the image has it** (Bandit, ShellCheck, flawfinder, cppcheck,
+  olevba, capa, 7z, openssl) and says "not installed in this sandbox image" when it doesn't.
+- **Output:** findings first for Droid (at most 7,000 characters), then one `AEGIS_RESULT {json}`
+  line the app's rules read and Droid never sees. Secret values are masked.
+- **Tests:** `src/main/inspector.test.ts` runs it on harmless files written by the test.
+
+```bash
+python3 -I sandbox/aegis_inspect.py pdf path/to/sample/file
+```
+
 ## Not in it yet
 
 - `entry.py`, `analyze.py` and `observe.py`: milestone 3, joint.

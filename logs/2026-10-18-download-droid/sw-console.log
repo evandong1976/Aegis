@@ -1,0 +1,3 @@
++5179 ms  onCreated {"id":1,"url":"http://127.0.0.1:8766/dl/aegis-terminal-demo.command","finalUrl":"http://127.0.0.1:8766/dl/aegis-terminal-demo.command","filename":"","mime":"application/octet-stream","state":"in_progress","byExtensionId":null,"totalBytes":524}
++5179 ms  onChanged {"canResume":{"current":true,"previous":false},"id":1,"paused":{"current":true,"previous":false}}
++5185 ms  onChanged {"canResume":{"current":false,"previous":true},"error":{"current":"USER_CANCELED"},"id":1,"state":{"current":"interrupted","previous":"in_progress"}}

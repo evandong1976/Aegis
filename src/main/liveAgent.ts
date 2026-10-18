@@ -1,9 +1,10 @@
 // The agent half of the live view: who reverse engineers the file once it has been opened in the
-// sandbox, and how its steps reach the screen. `LiveAgent` is the seam workerA.ts fills at
-// milestone 4 with the real Droid session (on this Mac, read-only tools into the sandbox, decision
-// 19). Until then `scriptedAgent` stands in: its words are scripted, but every tool call it makes
-// is one of Droid's real fixed tools (droidLockdown.ts), run inside the real sandbox, and its
-// findings come from fixed patterns plus what the sandbox run recorded. It says so in the report.
+// sandbox, and how its steps reach the screen. `LiveAgent` is the seam droidAgent.ts fills with
+// the real Droid session (on this Mac, read-only tools into the sandbox, decision 19). Without a
+// Factory key or the droid CLI, `scriptedAgent` stands in: its words are scripted, but every tool
+// call it makes is one of Droid's real fixed tools (droidLockdown.ts), run inside the real
+// sandbox, and its findings come from fixed patterns plus what the sandbox run recorded. It says
+// so in the report.
 
 import type { LiveAgentInfo, LiveEventBody } from '@shared/live'
 import type {
@@ -17,6 +18,7 @@ import type {
 } from '@shared/types'
 import type { Observation, SampleMeta } from './daytona'
 import type { SandboxToolSpec } from './droidLockdown'
+import type { FileTypeMatch } from './fileTypes'
 import { combine } from './verdict'
 
 export interface AgentContext {
@@ -25,6 +27,10 @@ export interface AgentContext {
   /** What the sample did when it was opened in the sandbox; null if it couldn't run. */
   observation: Observation | null
   tools: SandboxToolSpec[]
+  /** The file's type and the reference rows that apply (droidToolkit.ts), when known. */
+  match?: FileTypeMatch
+  /** Things the agent should report as not known, e.g. the inspector couldn't be set up. */
+  notes?: string[]
   /** Runs one fixed tool inside the sandbox and logs it in the sandbox log. */
   runTool(name: string): Promise<{ exitCode: number; output: string }>
   emit(event: Extract<LiveEventBody, { kind: 'agent' }>): void

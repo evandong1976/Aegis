@@ -22,6 +22,9 @@ import { promisify } from 'util'
 import { QUARANTINE_EXTENSION } from '@shared/constants'
 import type { DownloadMeta, ScanStatusResponse } from '@shared/bridge'
 import type {
+  CodeExcerpt,
+  DroidReport,
+  Finding,
   Reason,
   SandboxRecord,
   ScanAction,
@@ -45,11 +48,18 @@ import type { DeliveredLedger } from './watcher'
 /** Whole sandbox job, start included (architectural.md §4.6). */
 export const WORKER_TIMEOUT_MS = 120_000
 
-/** What an analyst (Worker A at M4) returns while the sample is in the sandbox. */
+/** What an analyst (Worker A, droidAgent.ts) returns while the sample is in the sandbox. */
 export interface SandboxAnalysis {
+  /** The analyst's (AI's) verdict: it can only raise the rules' verdict. */
   verdict: Verdict
   summary: string
+  /** Rule reasons from the sandbox checks; they count toward the score like the pre-check's. */
   reasons: Reason[]
+  /** Droid's review, for the Report's timeline. */
+  droid?: DroidReport
+  findings?: Finding[]
+  capabilities?: string[]
+  code?: CodeExcerpt[]
 }
 
 export interface ScanServiceDeps {
@@ -327,17 +337,32 @@ export class ScanService {
       let analysis: SandboxAnalysis | null = null
       if (pc.needsCloud) analysis = await this.sandbox(r, pc, bytes, intake)
 
-      let verdict = combine(pc.reasons, { confident: !pc.needsCloud || analysis !== null })
-      if (analysis) verdict = applyAiSuggestion(verdict, analysis.verdict, analysis.reasons[0])
+      const a = analysis
+      let verdict = combine([...pc.reasons, ...(a?.reasons ?? [])], {
+        confident: !pc.needsCloud || a !== null
+      })
+      if (a) verdict = applyAiSuggestion(verdict, a.verdict)
+      const top = [...verdict.reasons].sort((x, y) => y.weight - x.weight)[0]
       Object.assign(r, {
         status: 'verdict',
         verdict: verdict.verdict,
         score: verdict.score,
         reasons: verdict.reasons,
-        reason:
-          verdict.reasons[0]?.text ?? (pc.needsCloud ? 'Not analysed yet' : 'Checked on this Mac'),
-        summary: analysis?.summary ?? this.summary(r, pc, verdict.verdict)
+        reason: top?.text ?? (pc.needsCloud ? 'Not analysed yet' : 'Checked on this Mac'),
+        summary: a?.summary ?? this.summary(r, pc, verdict.verdict)
       })
+      if (a?.droid) r.droid = a.droid
+      if (a?.code?.length) r.code = a.code
+      if (a?.findings) {
+        r.stage1 = {
+          file: { name: intake.name, realType: pc.realType, sha256: pc.sha256, size: pc.size },
+          findings: a.findings,
+          iocs: [],
+          capabilities: a.capabilities ?? [],
+          score: verdict.score,
+          partial: false
+        }
+      }
       this.save(r, pc)
       await this.act(r, pc, bytes, intake)
     } catch (err) {
@@ -438,12 +463,24 @@ export class ScanService {
         this.deps.log('warn', `sandbox failed scan=${r.id} error=${out.error}`)
         return null
       }
+      // Assigned inside the job above, which TypeScript can't see.
+      const done = analysis as SandboxAnalysis | null
+      const reviewer = done?.droid?.reviewer
       r.checks.push(
         { name: 'Daytona sandbox', state: 'ok', result: `network off, ${secs(create?.ms ?? 0)}` },
         { name: 'Upload check (SHA-256)', state: 'ok', result: 'matched' },
-        analysis
-          ? { name: 'Analysis', state: 'ok', result: 'complete' }
-          : { name: 'Analysis (Worker A)', state: 'skipped', result: 'not built yet' }
+        done
+          ? {
+              name: 'Analysis',
+              state: reviewer === 'rules' ? 'warn' : 'ok',
+              result:
+                reviewer === 'droid'
+                  ? 'Droid'
+                  : reviewer === 'rules'
+                    ? "Aegis's checks only"
+                    : 'complete'
+            }
+          : { name: 'Analysis (Worker A)', state: 'skipped', result: 'not set up' }
       )
       if (!analysis) r.partial = true
       this.deps.log(

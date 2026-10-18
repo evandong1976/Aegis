@@ -10,7 +10,7 @@ import { useInvoke } from '../../lib/hooks'
 
 // BUILD_PROMPT §5.2. Must stay true: update it if the build differs.
 const PRIVACY_COPY =
-  "Documents that look clean are checked on this Mac and never uploaded. Risky files and suspicious links are opened in a Daytona sandbox in the cloud, which is deleted after each scan. Link domains (with tokens removed) are checked with Chalk and Google Safe Browsing. Page text is checked for scams by an AI model through Chalk and isn't stored. Your Chrome cookies never leave Chrome."
+  "Documents that look clean are checked on this Mac and never uploaded. Risky files and suspicious links are opened in a Daytona sandbox in the cloud, which is deleted after each scan. Droid, Factory's AI analyst, reads what Aegis's checks find in a risky file, including parts of its text, with secrets masked; it never gets the file itself. Link domains (with tokens removed) are checked with Chalk and Google Safe Browsing. Page text is checked for scams by an AI model through Chalk and isn't stored. Your Chrome cookies never leave Chrome."
 
 const KEYS: Array<{ service: ServiceKey; env: string; where: string }> = [
   { service: 'daytona', env: 'DAYTONA_API_KEY', where: 'Daytona dashboard › API keys' },

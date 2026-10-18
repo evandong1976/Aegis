@@ -12,6 +12,11 @@
 //    internet, and never holds a sample. AEGIS_FACTORY_DOMAINS overrides Factory's hosts
 //    (default api.factory.ai,prem.factory.ai).
 //
+// Every Droid call here carries the file-type reference (resources/droid/
+// file_types_vulnerabilities.md) in its system prompt, as every Droid call in Aegis does
+// (src/main/droidBrief.ts): `run()` and Worker A through the SDK's `systemPrompt`, and option A's
+// `droid exec` through `--append-system-prompt-file`.
+//
 //   pnpm try:droid
 //
 // Needs FACTORY_API_KEY and DAYTONA_API_KEY in .env.local or .env, and the droid CLI on PATH
@@ -20,6 +25,7 @@
 
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -27,6 +33,7 @@ import {
   AutonomyLevel,
   DroidMessageType,
   OutputFormatType,
+  ProcessTransport,
   createSdkMcpServer,
   createSession,
   run,
@@ -38,10 +45,12 @@ import {
   SANDBOX_SERVER,
   allowOnlySandboxTools,
   builtInToolIds,
+  directToolCalls,
   fenceToolOutput,
   sandboxToolSpecs,
   toolsStillOn
 } from '../src/main/droidLockdown.ts'
+import { REFERENCE_PATH, droidSystemPrompt, referenceBlock } from '../src/main/droidBrief.ts'
 
 /** The droid CLI version installed in the sandbox: exact, and at least two weeks old when pinned. */
 const SANDBOX_DROID_VERSION = '0.232.0'
@@ -70,6 +79,13 @@ try {
   )
   process.exit(1)
 }
+
+const reference = readFileSync(new URL(`../${REFERENCE_PATH}`, import.meta.url), 'utf8')
+record(
+  'reference',
+  reference.trim().length > 0,
+  `${REFERENCE_PATH}, ${reference.length} characters`
+)
 
 // An empty working directory, so even a misbehaving run has nothing of ours to read.
 const cwd = await mkdtemp(join(tmpdir(), 'aegis-try-droid-'))
@@ -123,13 +139,25 @@ async function workerA(cwd: string): Promise<void> {
     const started = await sandboxTools.start()
     const { oauth: _sdkOAuthOptOut, ...toolServer } = started
     void _sdkOAuthOptOut
+    // droid 0.244+ only lets a session call MCP tools directly if it asks when it starts
+    // (src/main/droidLockdown.ts › TOOL_EXECUTION_MODE), so the process is started here.
+    const droidProcess = new ProcessTransport({
+      droidExecPath: execPath,
+      cwd,
+      env: {
+        FACTORY_API_KEY: process.env.FACTORY_API_KEY ?? '',
+        FACTORY_UPSTREAM_CLIENT_TYPE: 'sdk'
+      }
+    })
+    await droidProcess.connect()
     const session = await createSession({
       cwd,
-      execPath,
+      transport: directToolCalls(droidProcess),
       autonomyLevel: AutonomyLevel.Off,
       mcpServers: [toolServer],
       // Allow only our server's tools; cancel everything else.
-      permissionHandler: allowOnlySandboxTools
+      permissionHandler: allowOnlySandboxTools,
+      systemPrompt: droidSystemPrompt(reference)
     })
     try {
       const builtIn = builtInToolIds(await session.listTools())
@@ -191,6 +219,7 @@ async function workerA(cwd: string): Promise<void> {
       console.log('sandbox log:', JSON.stringify(sandboxLog))
     } finally {
       await session.close()
+      await droidProcess.close()
       await sandboxTools.close()
     }
   } catch (err) {
@@ -217,6 +246,7 @@ try {
       execPath,
       autonomyLevel: AutonomyLevel.Off,
       autoRejectPermissionRequests: true,
+      systemPrompt: droidSystemPrompt(reference),
       outputFormat: {
         type: OutputFormatType.JsonSchema,
         schema: {
@@ -346,11 +376,15 @@ if (process.env.AEGIS_TRY_DROID_INSIDE !== '1') {
         .join(', ')}`
     )
 
+    // The reference goes in as a file appended to Droid's system prompt, like every Droid call.
+    await box.fs.uploadFile(Buffer.from(referenceBlock(reference)), 'aegis-reference.md')
     const t5 = performance.now()
     const prompt = 'Reply with exactly one sentence saying this check worked. Do not use any tools.'
-    const ran = await sh(`droid exec --output-format json "${prompt}"`, 120, {
-      FACTORY_API_KEY: key
-    })
+    const ran = await sh(
+      `droid exec --append-system-prompt-file aegis-reference.md --output-format json "${prompt}"`,
+      120,
+      { FACTORY_API_KEY: key }
+    )
     record(
       'droid exec inside the sandbox',
       ran.exitCode === 0 && ran.result.trim().length > 0,
