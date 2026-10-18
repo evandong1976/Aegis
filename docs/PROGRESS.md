@@ -1,7 +1,7 @@
 ## Handoff (updated 2026-10-17 18:45 EDT, by Claude Code session, Opus 5.5)
 
 **New here?** Read in this order: this Handoff → `docs/PLAN.md` (Milestones, Branches, Decisions
-1–31, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
+1–32, "Tradeoffs at a glance", Sponsor findings) → `docs/architectural.md` (how the parts fit, the
 pipeline) → `MEGA_PROMPT.md` §0 (what changed from the original brief, with tradeoffs). Where they
 disagree, PLAN.md › Decisions wins.
 
@@ -34,6 +34,20 @@ disagree, PLAN.md › Decisions wins.
   - `pnpm lint` over the whole folder also lints `.claude/worktrees/happy-haslett-a1ae53/` (another
     session's worktree: 863 errors in its vendored files). Remove that worktree or ignore
     `.claude/` in `eslint.config.mjs`.
+
+- **In progress — branch `feature/chalk` (Evan): milestone 6, Worker B** (PLAN.md decision 32).
+  Built and unit-tested (61 Python tests, `pnpm test:chalk`; 220 TS tests); **not yet run
+  against Chalk**. `pnpm try:chalk` (2026-10-18 00:17) passes auth and the MCP Gateway, and fails
+  on two account settings only Evan can change:
+  1. The service token has only `agents.read` and `query.offline`; it needs `deploy.create` and
+     `deploy.read` (image builds, sandboxes) and whatever running Functions/Evaluations needs.
+     **Rotate it**: its secret was printed in a session on 2026-10-17.
+  2. The Model Gateway has no provider connection (0 models). Add Anthropic.
+     Then: `pnpm try:chalk` → deploy the Function (`cd chalk && uv run --env-file ../.env.local python
+-m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
+     MCP server and register it in the MCP Gateway (`mcp_server.py deploy`). The app runs Worker B
+     whenever `CHALK_CLIENT_ID/SECRET/ENVIRONMENT` are set (`local` mode by default;
+     `AEGIS_WORKER_B_VIA=function` after deploying).
 
 - **Merged into `main` (not pushed) — branch `feature/download` (Evan): milestone 3's intake and
   sandbox half** (PLAN.md decision 31). Zach's `watcher` branch is merged into it (docs kept from `main`).
