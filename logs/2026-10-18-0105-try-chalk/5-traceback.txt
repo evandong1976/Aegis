@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 33, in wrap
+    detail = fn()
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 115, in _
+    assert not res.get("error"), res.get("error")
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: SandboxFileSystemError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 33, in wrap
+    detail = fn()
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 94, in _
+    assert hit.get("matched") and miss.get("matched") is False, (hit, miss)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ({'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM "chalk.datasets.aegis_known_bad_hashes" WHERE sha256 = \'275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\' LIMIT 5'}, {'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM "chalk.datasets.aegis_known_bad_hashes" WHERE sha256 = \'0000000000000000000000000000000000000000000000000000000000000000\' LIMIT 5'})

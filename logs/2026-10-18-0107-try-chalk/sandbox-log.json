@@ -1,0 +1,37 @@
+[
+  {
+    "at": "2026-10-18T05:07:52Z",
+    "step": "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied)",
+    "ok": true,
+    "ms": 3735,
+    "detail": "sandbox 75d950d3-539a-44a7-8bac-5c846dd02364"
+  },
+  {
+    "at": "2026-10-18T05:07:52Z",
+    "step": "network probe (5 hosts \u00d7 curl, python)",
+    "ok": true,
+    "ms": 201,
+    "detail": "all blocked"
+  },
+  {
+    "at": "2026-10-18T05:07:52Z",
+    "step": "upload + SHA-256 check",
+    "ok": true,
+    "ms": 343,
+    "detail": "129 bytes, sha256 f085bd883c31f9f8\u2026"
+  },
+  {
+    "at": "2026-10-18T05:07:52Z",
+    "step": "tool identify",
+    "ok": true,
+    "ms": 171,
+    "detail": "exit 0, 194 bytes"
+  },
+  {
+    "at": "2026-10-18T05:07:53Z",
+    "step": "terminate",
+    "ok": true,
+    "ms": 768,
+    "detail": "None"
+  }
+]

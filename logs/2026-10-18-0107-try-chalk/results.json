@@ -1,0 +1,74 @@
+[
+  {
+    "step": "1 auth (service token)",
+    "ok": true,
+    "s": 0.5,
+    "detail": {
+      "api_server": "https://api.chalk.ai",
+      "environment": "gswl7f3494e1",
+      "token": true
+    }
+  },
+  {
+    "step": "2 Model Gateway: GPT",
+    "ok": true,
+    "s": 2.3,
+    "detail": {
+      "models": [
+        "openai/gpt-6.1-sol"
+      ],
+      "using": "openai/gpt-6.1-sol",
+      "reply": "ok"
+    }
+  },
+  {
+    "step": "3 MCP Gateway answers",
+    "ok": true,
+    "s": 0.2,
+    "detail": {
+      "server": true
+    }
+  },
+  {
+    "step": "3b federated query: feed into Chalk, Chalk SQL lookup",
+    "ok": false,
+    "s": 1.1,
+    "detail": "AssertionError: ({'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\\' LIMIT 5'}, {'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'0000000000000000000000000000000000000000000000000000000000000000\\' LIMIT 5'})"
+  },
+  {
+    "step": "4 sandbox: network off (proven), upload, one tool, terminate",
+    "ok": true,
+    "s": 5.4,
+    "detail": {
+      "sandbox": "75d950d3-539a-44a7-8bac-5c846dd02364",
+      "steps": [
+        "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied): sandbox 75d950d3-539a-44a7-8bac-5c846dd02364",
+        "network probe (5 hosts \u00d7 curl, python): all blocked",
+        "upload + SHA-256 check: 129 bytes, sha256 f085bd883c31f9f8\u2026",
+        "tool identify: exit 0, 194 bytes",
+        "terminate: None"
+      ]
+    }
+  },
+  {
+    "step": "5 Worker B end to end (sh-dropper, harmless)",
+    "ok": true,
+    "s": 18.0,
+    "detail": {
+      "verdict": "malicious",
+      "analyst": "agent",
+      "analyst_error": null,
+      "verified": 2,
+      "summary": "Do not run this script: it pipes a downloaded script directly into a shell and queries a Chrome-related Keychain entry. The download address is a reserved invalid domain, and creating a LaunchAgents folder alone does not establish persistence.",
+      "ms": 17842
+    }
+  },
+  {
+    "step": "6 leak check: no Aegis sandboxes left",
+    "ok": true,
+    "s": 3.1,
+    "detail": {
+      "left": 0
+    }
+  }
+]

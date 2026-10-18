@@ -1,0 +1,36 @@
+{
+  "worker": "B",
+  "provider": "chalk",
+  "filename": "zoom-update.sh",
+  "sha256": "f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79",
+  "size": 129,
+  "known_bad": {
+    "error": "Chalk SQL: SQLError: ",
+    "query": "SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = 'f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79' LIMIT 5"
+  },
+  "error": "SandboxFileSystemError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)",
+  "sandbox_log": [
+    {
+      "at": "2026-10-18T05:05:46Z",
+      "step": "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied)",
+      "ok": true,
+      "ms": 3666,
+      "detail": "sandbox 24c74452-4bb6-48ed-91bb-c215a5bbeff5"
+    },
+    {
+      "at": "2026-10-18T05:05:46Z",
+      "step": "network probe (5 hosts \u00d7 curl, python)",
+      "ok": true,
+      "ms": 627,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-18T05:05:47Z",
+      "step": "terminate",
+      "ok": true,
+      "ms": 719,
+      "detail": "None"
+    }
+  ],
+  "ms": 5231
+}

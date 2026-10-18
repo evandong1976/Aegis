@@ -1,0 +1,58 @@
+[
+  {
+    "step": "1 auth (service token)",
+    "ok": true,
+    "s": 0.5,
+    "detail": {
+      "api_server": "https://api.chalk.ai",
+      "environment": "gswl7f3494e1",
+      "token": true
+    }
+  },
+  {
+    "step": "2 Model Gateway: GPT",
+    "ok": true,
+    "s": 2.2,
+    "detail": {
+      "models": [
+        "openai/gpt-6.1-sol"
+      ],
+      "using": "openai/gpt-6.1-sol",
+      "reply": "ok"
+    }
+  },
+  {
+    "step": "3 MCP Gateway answers",
+    "ok": true,
+    "s": 0.2,
+    "detail": {
+      "server": true
+    }
+  },
+  {
+    "step": "3b federated query: feed into Chalk, Chalk SQL lookup",
+    "ok": false,
+    "s": 1.1,
+    "detail": "AssertionError: ({'error': 'Chalk SQL: SQLError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"query.online\" in environment \"gswl7f3494e1\" for endpoint \"chalk.protosql.v1.SqlService.ExecuteSqlQuery\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"qu', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\\' LIMIT 5'}, {'error': 'Chalk SQL: SQLError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"query.online\" in environment \"gswl7f3494e1\" for endpoint \"chalk.protosql.v1.SqlService.ExecuteSqlQuery\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"qu', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'0000000000000000000000000000000000000000000000000000000000000000\\' LIMIT 5'})"
+  },
+  {
+    "step": "4 sandbox: network off (proven), upload, one tool, terminate",
+    "ok": false,
+    "s": 4.7,
+    "detail": "ConnectError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"deploy.redeploy\" in environment \"gswl7f3494e1\" for endpoint \"chalk.sandbox.v2.SandboxProcessService.OpenSession\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"query.offline\", \"query.offline_read\", and \"secrets.write\". You can change the permissions for this service token in the Chalk dashboard."
+  },
+  {
+    "step": "5 Worker B end to end (sh-dropper, harmless)",
+    "ok": false,
+    "s": 6.0,
+    "detail": "AssertionError: ConnectError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"deploy.redeploy\" in environment \"gswl7f3494e1\" for endpoint \"chalk.sandbox.v2.SandboxProcessService.OpenSession\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"query.offline\", \"query.offline_read\", and \"secrets.write\". You can change the permissions for this service token in the Chalk dashboard."
+  },
+  {
+    "step": "6 leak check: no Aegis sandboxes left",
+    "ok": true,
+    "s": 3.1,
+    "detail": {
+      "left": 0
+    }
+  }
+]
