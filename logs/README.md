@@ -9,6 +9,7 @@ report (`screens/*/status.json`, `log.json`) and screenshots of every screen. Ea
 | --------------------------------------------- | --------- | ------------------------------------------------- |
 | [2026-10-16-2339](2026-10-16-2339/SUMMARY.md) | `35cba97` | All 16 checks as expected; 3 small UI issues open |
 | [2026-10-17-0043-sandbox-image](2026-10-17-0043-sandbox-image/SUMMARY.md) | branch `sandbox-image` | Targeted check (not `pnpm verify`): image builds; self-test 7 / 7, plain and hardened |
+| [2026-10-18-0257](2026-10-18-0257/SUMMARY.md) | `765e1d0` on `fix/accuracy-chalk-results` | Accuracy screen reads the Chalk results: 0 renderer errors in both modes; bridge smoke 17 / 2 (fixed on `fix/verify-bridge-smoke-m3`) |
 
 To add a run:
 

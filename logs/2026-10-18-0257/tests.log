@@ -1,0 +1,303 @@
+
+ RUN  v4.1.12 /Users/zach/Desktop/Aegis/.claude/worktrees/competent-tharp-3a334a
+
+ ✓ src/main/precheck.test.ts > real type from the bytes > knows programs, scripts, archives and documents 2ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > sends scripts and programs to the sandbox 1ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > clears a plain document on this Mac (never uploaded) 0ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > sends a document with a macro or a PDF action to the sandbox 1ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > makes a document or photo that is really a program a hard rule 0ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > passes media only when the bytes confirm it 0ms
+ ✓ src/main/precheck.test.ts > the pre-check decision > sends a PDF that is really something else to the sandbox 0ms
+ ✓ src/main/links.test.ts > parsing > finds the registered domain, private suffixes included 2ms
+ ✓ src/main/links.test.ts > parsing > only parses http and https 0ms
+ ✓ src/main/links.test.ts > stripSecrets (MEGA_PROMPT §6 rule 11) > removes token, session, email and code parameters, the fragment and userinfo 1ms
+ ✓ src/main/links.test.ts > stripSecrets (MEGA_PROMPT §6 rule 11) > removes long random values whatever the parameter is called 0ms
+ ✓ src/main/links.test.ts > stripSecrets (MEGA_PROMPT §6 rule 11) > keeps ordinary parameters and the path 0ms
+ ✓ src/main/links.test.ts > stripSecrets (MEGA_PROMPT §6 rule 11) > never returns the body of a data: or javascript: link 0ms
+ ✓ src/main/links.test.ts > redirect wrappers > reads the destination from the wrapper without following it 1ms
+ ✓ src/main/links.test.ts > redirect wrappers > ignores parameters that are not URLs 0ms
+ ✓ src/main/links.test.ts > lookalikes > measures edit distance with transpositions 1ms
+ ✓ src/main/links.test.ts > lookalikes > maps digits and Cyrillic letters to what they imitate 0ms
+ ✓ src/main/links.test.ts > lookalikes > catches digit swaps, typos and brand + lure word 1ms
+ ✓ src/main/links.test.ts > lookalikes > never fires for the brand itself or for ordinary words 1ms
+ ✓ src/main/links.test.ts > Tier 1 rules > flags link text that names a different domain 2ms
+ ✓ src/main/links.test.ts > Tier 1 rules > accepts text and link owned by the same brand 0ms
+ ✓ src/main/links.test.ts > Tier 1 rules > flags raw IPs, @ tricks, odd ports, risky TLDs and many subdomains 2ms
+ ✓ src/main/links.test.ts > Tier 1 rules > flags brands in subdomains, and in paths only next to sign-in words 2ms
+ ✓ src/main/links.test.ts > Tier 1 rules > flags punycode and, more heavily, mixed alphabets 0ms
+ ✓ src/main/links.test.ts > Tier 1 rules > flags executables in the path and shorteners 0ms
+ ✓ src/main/links.test.ts > Tier 1 rules > treats data: pages as risky and javascript:void(0) as nothing 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > is clean for an ordinary link 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > is malicious for the demo phishing link 1ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > makes a Safe Browsing or feed match malicious outright, even for trusted sites 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > holds short links as Unknown (decision 26) 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > makes a brand-new domain with no other signal Unknown, not Suspicious (decision 1) 1ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > never applies the young-domain rule to known domains 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > lets trusted sites skip the heuristics 0ms
+ ✓ src/main/links.test.ts > scoreLink verdicts > reports which checks ran 0ms
+ ✓ src/main/links.test.ts > certificate logs stand in for a missing registration date > counts a fresh certificate only when RDAP had no date 1ms
+ ✓ src/main/links.test.ts > a public link that points to this computer > is Unknown on its own and adds weight to other signals 1ms
+ ✓ src/main/links.test.ts > sign-in and payment pages over plain http > flags them as Suspicious 1ms
+ ✓ src/main/links.test.ts > sign-in and payment pages over plain http > leaves other http pages, https pages, known sites and local addresses alone 1ms
+ ✓ src/main/watcher.test.ts > which names are ignored > skips partial downloads, hidden files and our own .aegis files 1ms
+ ✓ src/main/watcher.test.ts > what gets scanned > passes media through only when the bytes confirm the type 1ms
+ ✓ src/main/watcher.test.ts > what gets scanned > always scans the always-scan list, bundles and anything unlisted 0ms
+ ✓ src/main/watcher.test.ts > what gets scanned > knows the media signatures 0ms
+ ✓ src/main/quarantine.test.ts > quarantine > moves a file in with .aegis, mode 600, its hash and where it came from 10ms
+ ✓ src/main/quarantine.test.ts > quarantine > restores to the original path with the original permissions 7ms
+ ✓ src/main/quarantine.test.ts > quarantine > never restores over another file 8ms
+ ✓ src/main/quarantine.test.ts > quarantine > deletes for good 5ms
+ ✓ src/main/quarantine.test.ts > quarantine > locks down a bundle and restores its permissions 22ms
+ ✓ src/main/quarantine.test.ts > quarantine > doesn't follow a bundle's symlinks when changing permissions 3ms
+ ✓ src/main/quarantine.test.ts > quarantine > refuses symlinks and bad ids 3ms
+ ✓ src/main/quarantine.test.ts > quarantine > keeps a given original path and never doubles .aegis 4ms
+ ✓ src/main/quarantine.test.ts > quarantine > keeps the macOS quarantine attribute 47ms
+ ✓ src/main/quarantine.test.ts > names > adds .aegis once 5ms
+ ✓ src/main/quarantine.test.ts > names > finds a free name beside a taken one 8ms
+ ✓ src/main/sponsors.test.ts > Daytona > is unconfigured without a key and makes no call 5ms
+ ✓ src/main/sponsors.test.ts > Daytona > reports a rejected key from the lookup 3ms
+ ✓ src/main/sponsors.test.ts > Daytona > every 60 s: lookup only, never a sandbox 2ms
+ ✓ src/main/sponsors.test.ts > Daytona > at start: a network-off ephemeral sandbox, 20 s start limit, deleted after 5ms
+ ✓ src/main/sponsors.test.ts > Daytona > reuses a passing test at start for 15 minutes, across launches 2ms
+ ✓ src/main/sponsors.test.ts > Daytona > Check now runs the test, but not twice within 30 s 2ms
+ ✓ src/main/sponsors.test.ts > Daytona > a failed test command is down, and the sandbox is still deleted 1ms
+ ✓ src/main/sponsors.test.ts > Daytona > a sandbox that never starts is down, and the failure is retried at the next start 2ms
+ ✓ src/main/sponsors.test.ts > Daytona > never runs a live test during a dev capture 2ms
+ ✓ src/main/sponsors.test.ts > Droid > is unconfigured without a key 1ms
+ ✓ src/main/sponsors.test.ts > Droid > is down with install steps when the CLI is missing 1ms
+ ✓ src/main/sponsors.test.ts > Droid > every 60 s: lists models only, never a prompt 4ms
+ ✓ src/main/sponsors.test.ts > Droid > at start: one tiny prompt, every tool request refused, in an empty folder 4ms
+ ✓ src/main/sponsors.test.ts > Droid > carries the file-type reference, like every Droid call 5ms
+ ✓ src/main/sponsors.test.ts > Droid > a rejected key or a failed run is down 3ms
+ ✓ src/main/sponsors.test.ts > Droid > finds the CLI on PATH or in the fallback folders, or DROID_PATH only 4ms
+ ✓ src/main/sponsors.test.ts > sandbox image > is pending with no snapshot set and no local image 1ms
+ ✓ src/main/sponsors.test.ts > sandbox image > is ok when the local image exists 1ms
+ ✓ src/main/sponsors.test.ts > sandbox image > is ok when the Daytona snapshot is active 2ms
+ ✓ src/main/sponsors.test.ts > sandbox image > is down when the named snapshot is missing and there is no local image 1ms
+ ✓ src/main/sponsors.test.ts > sandbox image > is degraded while the snapshot is still building 1ms
+ ✓ src/main/bridge.test.ts > origin check > accepts only our extension 1ms
+ ✓ src/main/bridge.test.ts > origin check > rejects rebinding hosts 0ms
+ ✓ src/main/bridge.test.ts > bridge server > rejects requests without our Origin 17ms
+ ✓ src/main/bridge.test.ts > bridge server > serves /status to the extension 4ms
+ ✓ src/main/bridge.test.ts > bridge server > records pings and trusts domains 6ms
+ ✓ src/main/bridge.test.ts > bridge server > rejects malformed bodies 2ms
+ ✓ src/main/bridge.test.ts > bridge server > takes a download as bytes with its metadata in a header 2ms
+ ✓ src/main/bridge.test.ts > bridge server > refuses a download over the limit (413) or without metadata (400) 10ms
+ ✓ src/main/bridge.test.ts > bridge server > takes quarantined downloads and answers scan status 7ms
+ ✓ src/main/bridge.test.ts > bridge server > marks routes from later milestones as not implemented 1ms
+ ✓ src/main/linkService.test.ts > LinkService.check > scores every link and fills the page counts 8ms
+ ✓ src/main/linkService.test.ts > LinkService.check > only sends stripped URLs to Safe Browsing and only domains to RDAP and DNS 3ms
+ ✓ src/main/linkService.test.ts > LinkService.check > skips domain lookups for known, trusted, shortener and same-site links 4ms
+ ✓ src/main/linkService.test.ts > LinkService.check > checks certificate logs only for young or undated domains 2ms
+ ✓ src/main/scans.test.ts > Worker B result → report > keeps only verified findings as reasons and evidence 4ms
+ ✓ src/main/scans.test.ts > Worker B result → report > a rules-only answer is not an analysis 1ms
+ ✓ src/main/scans.test.ts > Worker B result → report > reports a sandbox that failed before any analysis 0ms
+ ✓ src/main/scans.test.ts > the known-malware lookup (Chalk SQL) > a listed hash is a hard rule, even when the analyst says clean 0ms
+ ✓ src/main/scans.test.ts > the known-malware lookup (Chalk SQL) > no match and an unanswered lookup are reported differently 0ms
+ ✓ src/main/scans.test.ts > running Worker B > sends the bytes and parses the result 5ms
+ ✓ src/main/scans.test.ts > running Worker B > throws with the last stderr line when there is no result 1ms
+ ✓ src/main/scans.test.ts > running Worker B > needs all three Chalk credentials 0ms
+ ✓ src/main/scans.test.ts > safe file names > keeps names inside ~/Downloads 1ms
+ ✓ src/main/scans.test.ts > the download pipeline > uploads a script into a network-off sandbox, deletes it, and holds the file 67ms
+ ✓ src/main/scans.test.ts > the download pipeline > lets the analyst raise the verdict, never lower it 14ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > reads the committed evals/results.json (Chalk Evaluations: rules and agent) 9ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > accepts a well-formed file 1ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > fills optional fields a run or sample leaves out, and keeps null scores as null 1ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > returns an error, never throws, for the old shape (the Accuracy screen crash) 1ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > returns an error for malformed fields 1ms
+ ✓ src/shared/evals.test.ts > parseEvalResults > returns an error for text that is not JSON 0ms
+(node:98272) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/main/workerB.test.ts > Worker B result → report > keeps only verified findings as reasons and evidence 3ms
+ ✓ src/main/workerB.test.ts > Worker B result → report > a rules-only answer is not an analysis 0ms
+ ✓ src/main/workerB.test.ts > Worker B result → report > reports a sandbox that failed before any analysis 0ms
+ ✓ src/main/workerB.test.ts > the known-malware lookup (Chalk SQL) > a listed hash is a hard rule, even when the analyst says clean 0ms
+ ✓ src/main/workerB.test.ts > the known-malware lookup (Chalk SQL) > no match and an unanswered lookup are reported differently 0ms
+ ✓ src/main/workerB.test.ts > running Worker B > sends the bytes and parses the result 3ms
+ ✓ src/main/workerB.test.ts > running Worker B > throws with the last stderr line when there is no result 1ms
+ ✓ src/main/workerB.test.ts > running Worker B > needs all three Chalk credentials 0ms
+ ✓ src/main/scans.test.ts > the download pipeline > puts Droid's review in the report and counts the sandbox checks' reasons 11ms
+ ✓ src/main/scans.test.ts > the download pipeline > delivers a plain document without uploading it, as the exact bytes 16ms
+ ✓ src/main/scans.test.ts > the download pipeline > never writes over a file already in ~/Downloads 22ms
+ ✓ src/main/scans.test.ts > the download pipeline > holds the file when Daytona is not set up, and says why 18ms
+ ✓ src/main/scans.test.ts > the download pipeline > refuses a sandbox that came back with the network on 23ms
+ ✓ src/main/scans.test.ts > the download pipeline > treats a corrupted upload as a failed sandbox step 16ms
+ ✓ src/main/store.test.ts > store > creates every table from BUILD_PROMPT §4.3 5ms
+ ✓ src/main/store.test.ts > store > migrations are idempotent 1ms
+ ✓ src/main/store.test.ts > store > rebuilds the pre-release none/caution/danger schema 1ms
+ ✓ src/main/store.test.ts > store > rejects verdicts outside the four words 2ms
+ ✓ src/main/store.test.ts > store > round-trips a report 2ms
+ ✓ src/main/store.test.ts > store > updates what the pre-check learned on a scan saved before it 1ms
+ ✓ src/main/store.test.ts > store > filters by tab and search 1ms
+ ✓ src/main/store.test.ts > store > computes the overview counts 3ms
+ ✓ src/main/store.test.ts > store > stores settings and trusted sites 2ms
+ ✓ src/main/droidBrief.test.ts > the system prompt > appends the whole reference to Droid's own prompt 3ms
+ ✓ src/main/droidBrief.test.ts > the system prompt > refuses to go out without the reference 1ms
+ ✓ src/main/droidBrief.test.ts > the system prompt > is the file on disk 0ms
+ ✓ src/main/droidBrief.test.ts > every Droid call > found the places that call Droid 7ms
+ ✓ src/main/droidBrief.test.ts > every Droid call > carries the reference 9ms
+ ✓ src/main/droidBrief.test.ts > the analyst rules > treat text aimed at the analyst as manipulation, but don't flag a file for calling itself harmless 0ms
+ ✓ src/main/droidBrief.test.ts > the analyst prompt > names the rows, their methods and the tools for the file 1ms
+ ✓ src/main/droidBrief.test.ts > the analyst prompt > tells Droid to trust the bytes over a disguised name 0ms
+ ✓ src/main/droidBrief.test.ts > the analyst prompt > fences what the sample ran and its name as untrusted 1ms
+ ✓ src/main/droidBrief.test.ts > the analyst prompt > says when no row matches 0ms
+ ✓ src/main/droidBrief.test.ts > the answer schema > requires every property it declares, at every level 1ms
+ ✓ src/main/daytona.test.ts > createSandbox > turns the network off at creation, ephemeral, with Aegis labels 6ms
+ ✓ src/main/daytona.test.ts > createSandbox > retries a failed start once 1ms
+ ✓ src/main/daytona.test.ts > createSandbox > deletes and refuses a sandbox that comes back with the network on 1ms
+ ✓ src/main/daytona.test.ts > withSandbox > deletes the sandbox when the job succeeds 0ms
+ ✓ src/main/daytona.test.ts > withSandbox > deletes the sandbox when the job throws, and reports the error 1ms
+ ✓ src/main/daytona.test.ts > SandboxSession.upload > uploads the sample and meta, and checks the hash inside the sandbox 1ms
+ ✓ src/main/daytona.test.ts > SandboxSession.upload > fails when the sandbox holds different bytes 0ms
+ ✓ src/main/daytona.test.ts > probeCommand > runs every tool for every host at once, each capped, wget trying once 0ms
+ ✓ src/main/daytona.test.ts > networkIsOff > passes when nothing got through, with one log step 1ms
+ ✓ src/main/daytona.test.ts > networkIsOff > fails and names what got through 1ms
+ ✓ src/main/daytona.test.ts > running a sample > runs it with a scratch HOME, AEGIS_SANDBOX=1, sh -x and a time limit 0ms
+ ✓ src/main/daytona.test.ts > running a sample > parses commands, files written and network attempts 1ms
+ ✓ src/main/daytona.test.ts > running a sample > handles empty output sections and marks a timeout 0ms
+ ✓ src/main/daytona.test.ts > running a sample > throws when the sandbox printed nothing usable 0ms
+ ✓ src/main/daytona.test.ts > running a sample > logs the run with what the sample did 0ms
+ ✓ src/main/scans.test.ts > the download pipeline > stops at the daily budget 39ms
+ ✓ src/main/scans.test.ts > the download pipeline > delivers in warn mode 22ms
+ ✓ src/main/scans.test.ts > the download pipeline > quarantines a file from ~/Downloads at once, and puts a clean one back 18ms
+ ✓ src/main/scans.test.ts > the download pipeline > keeps a risky file from ~/Downloads in quarantine 12ms
+ ✓ src/main/scans.test.ts > the download pipeline > takes Chrome's quarantine copy, and restores it to ~/Downloads by its real name 11ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > runs Droid locked down, with the reference and the tools for the file type 11ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > runs every check for the type that Droid skipped 3ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > a fooled Droid saying "clean" can not clear what the checks found 3ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > Droid can raise the severity of a finding it confirms, never lower it 6ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > a wrong SHA-256 or a tool cited but not called lowers confidence and says so 2ms
+ ✓ src/main/droidAgent.test.ts > a Droid review > notices when the file changed in the sandbox before the review 1ms
+ ✓ src/main/droidAgent.test.ts > when Droid can not answer > refuses to run if a built-in tool stays on, and the rules decide 2ms
+ ✓ src/main/droidAgent.test.ts > when Droid can not answer > a failed session or an answer outside the schema falls back to the rules 6ms
+ ✓ src/main/droidAgent.test.ts > when Droid can not answer > interrupts a session that runs out of time 23ms
+ ✓ src/main/droidAgent.test.ts > when Droid can not answer > without the droid CLI, the rules decide and no session starts 1ms
+ ✓ src/main/droidAgent.test.ts > rules from the inspector > keep weaknesses together and below Suspicious, however many there are 1ms
+ ✓ src/main/droidAgent.test.ts > rules from the inspector > carry hard rules, and keep the most severe finding per code 1ms
+ ✓ src/main/droidAgent.test.ts > rules from the inspector > don't count a strings hit twice when the file's own check already scored it 0ms
+ ✓ src/main/droidAgent.test.ts > rules from the inspector > count network attempts the findings do not explain 0ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > puts the scan in the store at once, then opens, reviews and reports it 21ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > shows the desktop, opens the file there in a terminal, and sends pictures 13ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > streams the trace while the file runs, marking network attempts as blocked 13ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > falls back to the recorded trace when the side reads see nothing 13ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > still reaches a verdict without a desktop 7ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > never opens the file when the network turns out to be on 1ms
+ ✓ src/main/sandboxScan.test.ts > startSandboxScan > reports Unknown, never Clean, when no sandbox can be made 1ms
+ ✓ src/main/sandboxScan.test.ts > desktopOpenCommand > shows the recorded run in a terminal titled with a name the shell can't misread 0ms
+ ✓ src/main/sandboxScan.test.ts > fileKind > names the kinds a person would recognise 1ms
+ ✓ src/main/live.test.ts > LiveBus > stamps events in order and pushes each one 3ms
+ ✓ src/main/live.test.ts > LiveBus > keeps only the latest frame, outside the event list, with a fresh seq 1ms
+ ✓ src/main/live.test.ts > LiveBus > marks the run finished at the end event 0ms
+ ✓ src/main/live.test.ts > LiveBus > ignores events for runs it does not know 1ms
+ ✓ src/main/live.test.ts > LiveBus > forgets the oldest run beyond 5 0ms
+ ✓ src/main/live.test.ts > LineSplitter > returns whole lines and keeps the partial one for the next chunk 0ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > proceeds once for Aegis's sandbox tools 1ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > cancels shell commands on this Mac 0ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > cancels edits, new files and patches 0ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > cancels MCP tools from any other server, or with no server named 0ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > cancels a batch if any tool use in it is not a sandbox tool 0ms
+ ✓ src/main/droidLockdown.test.ts > permission handler > cancels an empty request 0ms
+ ✓ src/main/droidLockdown.test.ts > built-in tools > disables every built-in tool, including the one that can not be disabled 0ms
+ ✓ src/main/droidLockdown.test.ts > built-in tools > allows exactly one exception, ToolSearch 0ms
+ ✓ src/main/droidLockdown.test.ts > built-in tools > reports any other built-in tool that stays on 0ms
+ ✓ src/main/droidLockdown.test.ts > sandbox tools > have unique names 0ms
+ ✓ src/main/droidLockdown.test.ts > sandbox tools > run only read-only programs, with no writes, substitution or chaining tricks 1ms
+ ✓ src/main/droidLockdown.test.ts > sandbox tools > touch only the sample folder 0ms
+ ✓ src/main/droidLockdown.test.ts > inspector tools > are each one fixed command: the inspector, one check, the sample 1ms
+ ✓ src/main/droidLockdown.test.ts > inspector tools > run only checks the inspector has, and every check it has 0ms
+ ✓ src/main/droidLockdown.test.ts > inspector tools > have names that never clash with the general tools 0ms
+ ✓ src/main/droidLockdown.test.ts > inspector tools > follow the file type: the general three, plus the checks for its rows 0ms
+ ✓ src/main/droidLockdown.test.ts > inspector tools > each have a time limit 0ms
+ ✓ src/main/droidLockdown.test.ts > direct tool calls (droid 0.244+) > asks for direct calls when a session starts 0ms
+ ✓ src/main/droidLockdown.test.ts > direct tool calls (droid 0.244+) > leaves every other message, and anything not JSON, exactly as it was 0ms
+ ✓ src/main/droidLockdown.test.ts > direct tool calls (droid 0.244+) > wraps a transport without changing anything else it does 0ms
+ ✓ src/main/droidLockdown.test.ts > tool output > never shows Droid a secret, whichever tool printed it 1ms
+ ✓ src/main/droidLockdown.test.ts > tool output > leaves code that reads a secret from elsewhere, and what's already masked, alone 0ms
+ ✓ src/main/droidLockdown.test.ts > tool output > always starts with the untrusted fence 0ms
+ ✓ src/main/droidLockdown.test.ts > tool output > shows Droid at most 8192 characters of the sample 0ms
+ ✓ src/main/droidLockdown.test.ts > prompt injection > a sample that talks Droid into "clean" can not lower the verdict 0ms
+ ✓ src/main/verdict.test.ts > verdictFromScore > uses the 0–29 / 30–69 / 70–100 bands 1ms
+ ✓ src/main/verdict.test.ts > combine > sums weights and caps at 100 1ms
+ ✓ src/main/verdict.test.ts > combine > ignores negative weights 0ms
+ ✓ src/main/verdict.test.ts > combine > a hard rule makes it malicious regardless of score 0ms
+ ✓ src/main/verdict.test.ts > combine > incomplete evidence turns clean into unknown, never into clean 0ms
+ ✓ src/main/verdict.test.ts > AI can only raise > raises clean → unknown → suspicious → malicious 0ms
+ ✓ src/main/verdict.test.ts > AI can only raise > never lowers a verdict 0ms
+ ✓ src/main/verdict.test.ts > wording > uses the four design-system words and never says "safe" 0ms
+ ✓ src/main/droidToolkit.test.ts > preparing the tools > stops leftovers, uploads the inspector to a fresh folder, and picks tools by the bytes 183ms
+ ✓ src/main/droidToolkit.test.ts > preparing the tools > gives each scan its own folder 1ms
+ ✓ src/main/droidToolkit.test.ts > preparing the tools > offers only the general tools if the inspector arrives changed 0ms
+ ✓ src/main/droidToolkit.test.ts > preparing the tools > chooses by name when identify says nothing 0ms
+ ✓ src/main/scans.test.ts > the download pipeline > keeps the name the user expects when Chrome renamed its copy 12ms
+ ✓ src/main/scans.test.ts > the download pipeline > refuses paths outside the downloads folder, and takes a file only once 11ms
+ ✓ src/main/scans.test.ts > the download pipeline > runs at most `concurrency` sandboxes at once 68ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > runs both workers on the same bytes; B can raise the verdict 9ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > B's clean answer alone clears the file, marked partial (Worker A missing) 7ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > identify trusts the bytes over the name 337ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > B can't lower a hard rule 7ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > a known-malware hash quarantines the file through the hard rule 7ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > a rules-only or failed Worker B leaves it Unknown and held 12ms
+ ✓ src/main/scans.test.ts > the download pipeline > with Worker B (Chalk) > never sends a cleared document to Worker B 7ms
+ ✓ src/main/fileTypes.test.ts > the reference > parses every row of the table 2ms
+ ✓ src/main/fileTypes.test.ts > the reference > is what the app bundles 0ms
+ ✓ src/main/fileTypes.test.ts > the reference > ties every row to a family with a dedicated inspector tool 1ms
+ ✓ src/main/fileTypes.test.ts > the reference > keeps a row Aegis has no check for, without a family 0ms
+ ✓ src/main/fileTypes.test.ts > the reference > maps first extensions onto families the tools know 1ms
+ ✓ src/main/fileTypes.test.ts > matching a file to rows > reads extensions, including dotfiles 0ms
+ ✓ src/main/fileTypes.test.ts > matching a file to rows > uses the name when the bytes are not known 0ms
+ ✓ src/main/fileTypes.test.ts > matching a file to rows > adds what the bytes are, and calls out a disguise 0ms
+ ✓ src/main/fileTypes.test.ts > matching a file to rows > doesn't call a weak guess a disguise 0ms
+ ✓ src/main/fileTypes.test.ts > matching a file to rows > falls back to the inspector's wider extension list 0ms
+ ✓ src/main/fileTypes.test.ts > the inspector's result line > parses the last line 0ms
+ ✓ src/main/fileTypes.test.ts > the inspector's result line > drops malformed findings and ignores anything that is not the last line 0ms
+ ✓ src/main/fileTypes.test.ts > the inspector's result line > is removed from what Droid sees 0ms
+ ✓ src/main/fileTypes.test.ts > the inspector's result line > carries the identify verdict 0ms
+ ✓ src/main/liveAgent.test.ts > findPatterns > finds every pattern in the fake installer, in source order, never on comment lines 2ms
+ ✓ src/main/liveAgent.test.ts > findPatterns > finds nothing in the terminal demo 0ms
+ ✓ src/main/liveAgent.test.ts > findPatterns > flags network use that no pattern explains 0ms
+ ✓ src/main/liveAgent.test.ts > summarize > makes the fake installer malicious through the download-and-run hard rule 1ms
+ ✓ src/main/liveAgent.test.ts > summarize > calls a quiet run Clean, and says what it did 0ms
+ ✓ src/main/liveAgent.test.ts > summarize > never says Clean when the file could not run 0ms
+ ✓ src/main/liveAgent.test.ts > scriptedAgent > uses only the fixed tools, narrates each call, and marks its report as scripted 1ms
+ ✓ src/main/liveAgent.test.ts > excerpt > keeps the first lines and cuts long output 0ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > archive finds Zip Slip without extracting anything 182ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > pdf sees JavaScript hidden behind name escapes and compressed streams 172ms
+ ✓ src/main/watcher.test.ts > the watcher > reports a file once, after it stops growing 899ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > xml lists external entities and expansion bombs without resolving them 178ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > image finds script in an SVG and a payload after a PNG 342ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > yaml finds unsafe tags and CI script injection 172ms
+ ✓ src/main/linkService.test.ts > LinkService.check > answers within the budget and marks slow lookups as timed out 1502ms
+ ✓ src/main/linkService.test.ts > LinkService.check > ignores a feed listing elsewhere on a known site, but not on an unknown one 1ms
+ ✓ src/main/linkService.test.ts > LinkService.check > records failed lookups as errors without failing the page 2ms
+ ✓ src/main/linkService.test.ts > LinkService.check > checks the destination of a redirect wrapper and keeps the worse verdict 2ms
+ ✓ src/main/linkService.test.ts > LinkService.check > returns nothing to act on while protection is paused 1ms
+ ✓ src/main/linkService.test.ts > LinkService.check > starts the counts again when the tab moves to another page 1ms
+ ✓ src/main/linkService.test.ts > LinkService.click > records a held click, then updates the same entry when the user decides 4ms
+ ✓ src/main/linkService.test.ts > LinkService.click > keeps the verdict the user saw when they then trust the site 1ms
+ ✓ src/main/linkService.test.ts > LinkService.click > scores a link it has not seen before recording it 0ms
+ ✓ src/main/linkService.test.ts > report details > lists the checks that ran in plain words 0ms
+ ✓ src/main/linkService.test.ts > report details > names Gmail and Outlook pages 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > reads URLhaus CSV and OpenPhish lines 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > matches feed URLs exactly and by host 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > reads the registration date from RDAP 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > tells loopback and private addresses from public ones 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > spots fast flux but not ordinary CDNs 0ms
+ ✓ src/main/linkService.test.ts > lookup parsers > finds the oldest valid certificate 0ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > config finds secrets and never prints them whole 181ms
+ ✓ src/main/watcher.test.ts > the watcher > waits for a partial download to get its real name 790ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > shell marks download-and-run as a hard rule 170ms
+ ✓ src/main/watcher.test.ts > the watcher > reports media too, marked as not needing a scan 191ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > source checks tell malware from vulnerabilities 550ms
+ ✓ src/main/watcher.test.ts > the watcher > reports a bundle as one item 791ms
+ ✓ src/main/watcher.test.ts > the watcher > ignores ordinary folders, hidden files and empty files 603ms
+ ✓ src/main/watcher.test.ts > the watcher > skips files Aegis delivered, unless they've changed 788ms
+ ✓ src/main/watcher.test.ts > the watcher > doesn't report an old file that changes 2407ms
+ ✓ src/main/watcher.test.ts > the watcher > at start, picks up only what arrived since the given time 892ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > a hostile or broken file never stops a check 6202ms
+ ✓ src/main/inspector.test.ts > aegis_inspect.py > keeps what Droid reads under its tool window 201ms
+
+ Test Files  22 passed (22)
+      Tests  292 passed (292)
+   Start at  02:57:38
+   Duration  9.19s (transform 1.46s, setup 0ms, import 4.39s, tests 18.76s, environment 2ms)
+

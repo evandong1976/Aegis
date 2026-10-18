@@ -1,0 +1,41 @@
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 45 modules transformed.
+rendering chunks...
+out/main/index.js  378.13 kB
+
+✓ built in 35ms
+
+electron main process built successfully
+
+-----
+
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 3 modules transformed.
+rendering chunks...
+out/preload/index.js  1.29 kB
+
+✓ built in 7ms
+
+electron preload scripts built successfully
+
+-----
+
+2:57:55 AM [vite] (client) Re-optimizing dependencies because vite config has changed
+dev server running for the electron renderer process at:
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+starting electron app...
+
+[capture] wrote panel.png
+[capture] wrote overview.png
+[capture] wrote links.png
+[capture] wrote downloads.png
+[capture] wrote report.png
+[capture] wrote accuracy.png
+[capture] wrote messages.png
+[capture] wrote settings.png
+[capture] wrote status.json, log.json

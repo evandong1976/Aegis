@@ -1,0 +1,109 @@
+{
+  "protection": "degraded",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "ok",
+      "detail": "Listening on 127.0.0.1:47398; extension seen 1 s ago."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "unconfigured",
+      "detail": "DAYTONA_API_KEY not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); no local Docker image aegis-sandbox."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "ok",
+      "detail": "Docker 29.2.1 is running.",
+      "latencyMs": 176
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "unconfigured",
+      "detail": "FACTORY_API_KEY not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "unconfigured",
+      "detail": "PHOTON_* not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "unconfigured",
+      "detail": "CHALK_* not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "unconfigured",
+      "detail": "SAFE_BROWSING_KEY not set. Add it to .env.local, then restart Aegis."
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-18T06:57:57.352Z",
+      "state": "degraded",
+      "detail": "Input Monitoring is not granted. Allow Electron (under pnpm dev) in System Settings › Privacy & Security › Input Monitoring, then Check again. ⌃⌥A works meanwhile."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": "2026-10-18T06:57:56.510Z",
+  "demo": false,
+  "page": {
+    "url": "https://example.com/",
+    "counts": {
+      "clean": 1,
+      "unknown": 0,
+      "suspicious": 0,
+      "malicious": 0
+    },
+    "top": null
+  }
+}
