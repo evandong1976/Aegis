@@ -57,7 +57,8 @@ def evidence_verified(output: str) -> EvaluationScorerResult:
     return EvaluationScorerResult(score=s.evidence_verified(output))
 
 
-valid_json = chalkcompute.scorers.json_valid(name="aegis-valid-json")
+# Same image as the rest: its container imports this module, which needs the playbook (function.py).
+valid_json = chalkcompute.scorers.json_valid(name="aegis-valid-json", image=image)
 SCORERS = [verdict_match, found_planted, evidence_verified, valid_json]
 SCORE_COLUMNS = ["aegis-verdict-match", "aegis-found-planted", "aegis-evidence-verified", "aegis-valid-json"]
 
