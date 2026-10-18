@@ -28,3 +28,8 @@ idea
 # Git artifacts
 .git
 .github
+
+# Worker B's Chalk Compute code (Functions, sandboxes, evals, MCP server) deploys through its own
+# scripts, and importing function.py or evals.py deploys Functions. `chalk apply` must not load it.
+aegis_worker_b
+try_chalk.py

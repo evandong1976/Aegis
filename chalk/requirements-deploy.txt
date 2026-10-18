@@ -1,0 +1,4 @@
+# What `chalk apply` installs next to Chalk's engine (chalk.yaml). Only the feature server's needs:
+# Worker B's packages (openai, mcp, chalkcompute) ship in their own Function and sandbox images, and
+# mcp's pydantic>=2.12 can't install alongside the engine (it pins pydantic<2).
+chalkpy

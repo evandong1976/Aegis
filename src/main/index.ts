@@ -37,6 +37,7 @@ import { findDroidCli } from './sponsors'
 import { WORKER_TIMEOUT_MS, type SandboxAnalysis } from './scans'
 import { FAKE_INSTALLER } from './testSamples'
 import { ScanService } from './scans'
+import { runWorkerB, workerBConfigured } from './workerB'
 import { createQuarantine } from './quarantine'
 import { createDeliveredLedger, startWatcher, type Watcher } from './watcher'
 
@@ -305,6 +306,14 @@ app.whenReady().then(async () => {
     analyze: analyzeDownload,
     // Droid's review (DROID_TIMEOUT_MS) comes on top of the sandbox's own steps.
     workerTimeoutMs: WORKER_TIMEOUT_MS + 120_000,
+    // Worker B: Chalk sandbox + GPT through Chalk's Model Gateway (chalk/aegis_worker_b).
+    workerB: workerBConfigured()
+      ? (bytes, meta) =>
+          runWorkerB(bytes, meta, {
+            root: app.getAppPath(),
+            onLine: (line) => status.record(null, `worker B ${line}`)
+          })
+      : undefined,
     log: (level, text) => status.record(level, text),
     onActive: (count) => {
       status.activeScans = count

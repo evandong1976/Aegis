@@ -1,0 +1,29 @@
+{
+  "worker": "B",
+  "provider": "chalk",
+  "filename": "zoom-update.sh",
+  "sha256": "f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79",
+  "size": 129,
+  "known_bad": {
+    "error": "Chalk SQL: SQLError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"query.online\" in environment \"gswl7f3494e1\" for endpoint \"chalk.protosql.v1.SqlService.ExecuteSqlQuery\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"qu",
+    "query": "SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = 'f085bd883c31f9f88f945598a26a7c59c9816d7bb720727506e27e36eee2fe79' LIMIT 5"
+  },
+  "error": "ConnectError: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"deploy.redeploy\" in environment \"gswl7f3494e1\" for endpoint \"chalk.sandbox.v2.SandboxProcessService.OpenSession\". Found environment permission(s) \"agents.read\", \"deploy.create\", \"deploy.read\", \"query.offline\", \"query.offline_read\", and \"secrets.write\". You can change the permissions for this service token in the Chalk dashboard.",
+  "sandbox_log": [
+    {
+      "at": "2026-10-18T04:59:51Z",
+      "step": "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied)",
+      "ok": true,
+      "ms": 5542,
+      "detail": "sandbox 5c3ddfc7-cae7-49c9-9d15-5ce554944494"
+    },
+    {
+      "at": "2026-10-18T04:59:51Z",
+      "step": "terminate",
+      "ok": false,
+      "ms": 189,
+      "detail": "5c3ddfc7-cae7-49c9-9d15-5ce554944494: service account \"token-f484b190b658840f7c351f2bb69857e4\" in environment \"gswl7f3494e1\" does not have permission \"deploy.redeploy\" in environment \"gswl7f3494e1\" for endpoint \"chalk.volume.v2.VolumeService.DeleteVolume\". Found environment permission(s) \"agents.rea"
+    }
+  ],
+  "ms": 5888
+}

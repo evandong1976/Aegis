@@ -11,8 +11,22 @@ wrote (Zach, 2026-10-17), moved out of the repo root.
 | `.chalkignore`              | What `chalk apply` leaves out (it also respects `.gitignore`)                                                    |
 | `CLAUDE.md`                 | Chalk's generated guide for coding agents. Reference only: where it disagrees with `docs/PLAN.md`, the plan wins |
 
-Coming here: the `Domain` / `Url` features and resolvers (link scoring), the Worker B helper (a
-Chalk Compute sandbox per risky file), and the eval datasets and scorers behind the Accuracy tab.
+**Worker B** lives in `aegis_worker_b/` (PLAN.md decision 33): the playbook
+(`docs/file_types_vulnerabilities.md`) → fixed tools in a network-off Chalk sandbox → Claude through
+the Model Gateway → a report whose every finding is checked against the tool output.
+
+| File                                   | What                                                                                               |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `sandbox_tools.py`                     | The playbook's methods as fixed tools; runs inside the sandbox; never runs the sample              |
+| `playbook.py`                          | Reads the md; picks rows and tools by real type and name                                           |
+| `agent.py`                             | The tool loop (GPT via the Model Gateway), `submit_report`, evidence check; rules-only baseline |
+| `chalk_sandbox.py`                     | Network-off sandbox (no hosts, all routes denied), proven off, upload + SHA-256, terminate         |
+| `worker.py`                            | One file in, one result out; what the app runs (`python -m aegis_worker_b.worker`)                 |
+| `function.py`                          | Worker B as a Chalk Function (agent code on Chalk Compute)                                         |
+| `mcp_server.py`, `mcp_gateway.py`      | The tools over MCP, and the agent calling them through the MCP Gateway                             |
+| `samples.py`, `scoring.py`, `evals.py` | Labeled harmless samples, scorers, Chalk Evaluations (agent vs rules)                              |
+
+`pnpm test:chalk` runs the tests locally; `pnpm try:chalk` checks the account end to end.
 
 **Why here and not at the repo root:** `chalk apply` uploads the folder that holds `chalk.yaml`. At
 the root that would be the whole repository.
@@ -26,6 +40,13 @@ the root that would be the whole repository.
    the Chalk CLI's own config and never goes in `.env.local`.
 
 A leaked `.env.local` then can't change the Chalk project.
+
+**Optional: a router key.** `CHALK_ROUTER_API_KEY` (`ck-...`) with its own `CHALK_ROUTER_ENV_ID`, in
+`.env.local`, is used for the Model Gateway instead of the service token. It only reaches the router.
+The current key is limited to `openai/gpt-6.1-sol` at 1,000,000 tokens a day (one scan is about
+7,500). That model rejects function tools on Chat Completions, so `agent.chat_api` sends gpt-6.x
+calls through `/v1/responses`. The gateway's quota also needs an output cap on every request, so
+nothing calls it without `max_completion_tokens`.
 
 ## Setup
 

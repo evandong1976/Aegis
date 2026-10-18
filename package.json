@@ -34,7 +34,9 @@
     "try:droid": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-droid.mts",
     "try:analyst": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-analyst.mts",
     "try:sandbox": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-sandbox.mts",
-    "try:desktop": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-desktop.mts"
+    "try:desktop": "node --experimental-strip-types --no-warnings=ExperimentalWarning --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/try-desktop.mts",
+    "try:chalk": "cd chalk && uv run --env-file ../.env.local python try_chalk.py",
+    "test:chalk": "cd chalk && uv run python -m pytest tests -q"
   },
   "dependencies": {
     "@daytona/sdk": "0.220.0",

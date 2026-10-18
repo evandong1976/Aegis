@@ -1,0 +1,58 @@
+[
+  {
+    "step": "1 auth (service token)",
+    "ok": true,
+    "s": 0.4,
+    "detail": {
+      "api_server": "https://api.chalk.ai",
+      "environment": "gswl7f3494e1",
+      "token": true
+    }
+  },
+  {
+    "step": "2 Model Gateway: GPT",
+    "ok": true,
+    "s": 2.2,
+    "detail": {
+      "models": [
+        "openai/gpt-6.1-sol"
+      ],
+      "using": "openai/gpt-6.1-sol",
+      "reply": "ok"
+    }
+  },
+  {
+    "step": "3 MCP Gateway answers",
+    "ok": true,
+    "s": 0.2,
+    "detail": {
+      "server": true
+    }
+  },
+  {
+    "step": "3b federated query: feed into Chalk, Chalk SQL lookup",
+    "ok": false,
+    "s": 1.2,
+    "detail": "AssertionError: ({'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\\' LIMIT 5'}, {'error': 'Chalk SQL: SQLError: ', 'query': 'SELECT sha256, first_seen, file_name, file_type, signature, reporter, source FROM \"chalk.datasets.aegis_known_bad_hashes\" WHERE sha256 = \\'0000000000000000000000000000000000000000000000000000000000000000\\' LIMIT 5'})"
+  },
+  {
+    "step": "4 sandbox: network off (proven), upload, one tool, terminate",
+    "ok": false,
+    "s": 6.4,
+    "detail": "SandboxFileSystemError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)"
+  },
+  {
+    "step": "5 Worker B end to end (sh-dropper, harmless)",
+    "ok": false,
+    "s": 5.4,
+    "detail": "AssertionError: SandboxFileSystemError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)"
+  },
+  {
+    "step": "6 leak check: no Aegis sandboxes left",
+    "ok": true,
+    "s": 3.1,
+    "detail": {
+      "left": 0
+    }
+  }
+]

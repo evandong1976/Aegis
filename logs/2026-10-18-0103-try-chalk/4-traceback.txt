@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 33, in wrap
+    detail = fn()
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 101, in _
+    with chalk_sandbox.sample_sandbox(s.data, log=log) as box:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/evandong/Downloads/Aegis/chalk/aegis_worker_b/chalk_sandbox.py", line 165, in sample_sandbox
+    if not box.prove_network_off():
+           ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/evandong/Downloads/Aegis/chalk/aegis_worker_b/chalk_sandbox.py", line 106, in prove_network_off
+    r = self.exec("sh", "-c", probe_command(), timeout=40)
+  File "/Users/evandong/Downloads/Aegis/chalk/aegis_worker_b/chalk_sandbox.py", line 102, in exec
+    return self.sandbox.exec(*cmd, timeout_secs=timeout)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_tracing.py", line 603, in sync_wrapper
+    return func(*args, **kwargs)
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_sandbox.py", line 1431, in exec
+    return process.wait(auto_reattach=auto_reattach)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_sandbox.py", line 464, in wait
+    for response in self._response_iterator:
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_interceptor_sync.py", line 240, in intercept_bidi_stream_sync
+    yield from call_next(request, ctx)
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_client_sync.py", line 421, in _send_request_bidi_stream
+    reader.handle_response_complete(resp)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_protocol_grpc.py", line 376, in handle_response_complete
+    raise ConnectError(connect_code, urllib.parse.unquote(message))
+connectrpc.errors.ConnectError: service account "token-f484b190b658840f7c351f2bb69857e4" in environment "gswl7f3494e1" does not have permission "deploy.redeploy" in environment "gswl7f3494e1" for endpoint "chalk.sandbox.v2.SandboxProcessService.OpenSession". Found environment permission(s) "agents.read", "deploy.create", "deploy.read", "query.offline", "query.offline_read", and "secrets.write". You can change the permissions for this service token in the Chalk dashboard.

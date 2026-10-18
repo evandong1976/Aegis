@@ -18,3 +18,7 @@ native/fn-key/build
 !logs/**/*.log
 logs/**/profile/
 logs/**/profile-*/
+
+# Python (chalk/)
+__pycache__/
+.pytest_cache/

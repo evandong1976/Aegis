@@ -1,0 +1,945 @@
+{
+  "generated_at": "2026-10-18T05:40:45Z",
+  "worker_b": [
+    {
+      "evaluation": "worker-b rules",
+      "run_id": "afcac00b-50e4-408b-a16d-2a36cfd6c840",
+      "status": "EvaluationRunStatus.SUCCEEDED",
+      "rows": 35,
+      "row_errors": 0,
+      "means": {
+        "aegis-verdict-match": 0.8,
+        "aegis-found-planted": 1.0,
+        "aegis-evidence-verified": 1.0,
+        "aegis-valid-json": 1.0
+      },
+      "per_sample": [
+        {
+          "sample": "xml-xxe",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-bomb",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "svg-script",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "c-overflow",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "png-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "js-dropper",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "json-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-slip",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "tar-symlink",
+          "expected": "suspicious",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "ps1-download",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-macro",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-template",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pem-private",
+          "expected": "suspicious",
+          "got": "malicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sql-grant",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "ini-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-pickle",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "json-proto",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "js-xss",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sh-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "elf-tiny",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "xml-bomb",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "yaml-pyobject",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "jpg-polyglot",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "c-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "js-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "yaml-unsafe",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pdf-js",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pdf-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "env-secrets",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-cmd-injection",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "php-sqli",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sh-dropper",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "evaluation": "worker-b agent",
+      "run_id": "47802f06-0f6a-4394-a449-95023b5b9bcd",
+      "status": "EvaluationRunStatus.SUCCEEDED",
+      "rows": 35,
+      "row_errors": 0,
+      "means": {
+        "aegis-verdict-match": 0.886,
+        "aegis-found-planted": 0.743,
+        "aegis-evidence-verified": 0.757,
+        "aegis-valid-json": 1.0
+      },
+      "per_sample": [
+        {
+          "sample": "js-xss",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "xml-xxe",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-cmd-injection",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "js-dropper",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "tar-symlink",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "c-overflow",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sql-grant",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-slip",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "rules",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-bomb",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "png-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-template",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "json-proto",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-macro",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "env-secrets",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 0.5,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "json-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "jpg-polyglot",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "php-sqli",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pem-private",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "zip-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pdf-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "py-pickle",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "pdf-js",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "ini-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sh-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "c-clean",
+          "expected": "clean",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "yaml-pyobject",
+          "expected": "malicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.5,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "ps1-download",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "js-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "yaml-unsafe",
+          "expected": "suspicious",
+          "got": "suspicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "docx-clean",
+          "expected": "clean",
+          "got": "clean",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "svg-script",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "sh-dropper",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 1.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "elf-tiny",
+          "expected": "suspicious",
+          "got": "unknown",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 0.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 1.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        },
+        {
+          "sample": "xml-bomb",
+          "expected": "malicious",
+          "got": "malicious",
+          "analyst": "agent",
+          "scores": {
+            "aegis-verdict-match": 1.0,
+            "aegis-found-planted": 0.0,
+            "aegis-evidence-verified": 0.0,
+            "aegis-valid-json": 1.0
+          },
+          "error": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 33, in wrap
+    detail = fn()
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 115, in _
+    assert not res.get("error"), res.get("error")
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConnectError: service account "token-f484b190b658840f7c351f2bb69857e4" in environment "gswl7f3494e1" does not have permission "deploy.redeploy" in environment "gswl7f3494e1" for endpoint "chalk.sandbox.v2.SandboxProcessService.OpenSession". Found environment permission(s) "agents.read", "deploy.create", "deploy.read", "query.offline", "query.offline_read", and "secrets.write". You can change the permissions for this service token in the Chalk dashboard.

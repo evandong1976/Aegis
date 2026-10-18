@@ -44,6 +44,7 @@ import { precheck, type Precheck } from './precheck'
 import { freePath, type Quarantine } from './quarantine'
 import { applyAiSuggestion, combine } from './verdict'
 import type { DeliveredLedger } from './watcher'
+import { workerBReport, type WorkerBResult } from './workerB'
 
 /** Whole sandbox job, start included (architectural.md §4.6). */
 export const WORKER_TIMEOUT_MS = 120_000
@@ -85,6 +86,12 @@ export interface ScanServiceDeps {
    * checked and the sandbox deleted, and the verdict stays Unknown.
    */
   analyze?: (session: SandboxSession, sample: SampleMeta) => Promise<SandboxAnalysis>
+  /**
+   * Worker B (Chalk): the same bytes, examined independently in a Chalk sandbox by Claude through
+   * the Model Gateway (workerB.ts). Not set when Chalk isn't configured.
+   */
+  workerB?: (bytes: Buffer, meta: { filename: string; scanId: string }) => Promise<WorkerBResult>
+  workerBTimeoutMs?: number
   /** Marks a delivered file as downloaded from the internet (Gatekeeper checks it). */
   markDownloaded?: (path: string, url: string | null) => Promise<void>
   workerTimeoutMs?: number
@@ -138,6 +145,8 @@ export class ScanService {
   private readonly reports = new Map<string, ScanReport>()
   /** Paths being taken into quarantine, so the watcher and the extension don't both take one. */
   private readonly claimed = new Set<string>()
+  /** Which engine raised a scan to Malicious, for the Downloads screen's "What caught them". */
+  private readonly caughtBy = new Map<string, string>()
   private active = 0
   private running = 0
   private readonly waiting: Array<() => void> = []
@@ -242,7 +251,7 @@ export class ScanService {
     this.reports.set(r.id, r)
     this.deps.putScan(r, {
       fileCategory: pc?.category ?? null,
-      caughtBy: r.verdict === 'malicious' ? 'Local pre-check' : null
+      caughtBy: r.verdict === 'malicious' ? (this.caughtBy.get(r.id) ?? 'Local pre-check') : null
     })
   }
 
@@ -334,25 +343,43 @@ export class ScanService {
         `precheck scan=${r.id} type=${pc.realType} sha256=${pc.sha256.slice(0, 12)} cloud=${pc.needsCloud} why="${pc.why}"`
       )
 
+      // Both workers at once, each on its own copy (decision 17): Worker A's Daytona path and
+      // Worker B in Chalk.
       let analysis: SandboxAnalysis | null = null
-      if (pc.needsCloud) analysis = await this.sandbox(r, pc, bytes, intake)
+      let b: ReturnType<typeof workerBReport> | null = null
+      if (pc.needsCloud) {
+        ;[analysis, b] = await Promise.all([
+          this.sandbox(r, pc, bytes, intake),
+          this.workerB(r, pc, bytes, intake)
+        ])
+      }
 
       const a = analysis
-      let verdict = combine([...pc.reasons, ...(a?.reasons ?? [])], {
-        confident: !pc.needsCloud || a !== null
+      const analysed = a !== null || (b?.analysed ?? false)
+      let verdict = combine([...pc.reasons, ...(a?.reasons ?? []), ...(b?.reasons ?? [])], {
+        confident: !pc.needsCloud || analysed
       })
       if (a) verdict = applyAiSuggestion(verdict, a.verdict)
+      if (b?.verdict) {
+        const before = verdict.verdict
+        verdict = applyAiSuggestion(verdict, b.verdict)
+        if (verdict.verdict !== before && verdict.verdict === 'malicious') {
+          this.caughtBy.set(r.id, 'Worker B (Chalk)')
+        }
+      }
       const top = [...verdict.reasons].sort((x, y) => y.weight - x.weight)[0]
+      const workerSummary = a?.summary ?? (b?.verdict === verdict.verdict ? b.summary : null)
       Object.assign(r, {
         status: 'verdict',
         verdict: verdict.verdict,
         score: verdict.score,
         reasons: verdict.reasons,
         reason: top?.text ?? (pc.needsCloud ? 'Not analysed yet' : 'Checked on this Mac'),
-        summary: a?.summary ?? this.summary(r, pc, verdict.verdict)
+        summary: workerSummary ?? this.summary(r, pc, verdict.verdict)
       })
       if (a?.droid) r.droid = a.droid
-      if (a?.code?.length) r.code = a.code
+      // Worker B's excerpts are already in r.code; Worker A's go first.
+      if (a?.code?.length) r.code = [...a.code, ...r.code]
       if (a?.findings) {
         r.stage1 = {
           file: { name: intake.name, realType: pc.realType, sha256: pc.sha256, size: pc.size },
@@ -383,6 +410,53 @@ export class ScanService {
       r.durationMs = Date.now() - started
       this.save(r, pc)
       this.setActive(-1)
+    }
+  }
+
+  /** Worker B in Chalk. Never throws: a missing worker is recorded and the other one decides. */
+  private async workerB(
+    r: ScanReport,
+    pc: Precheck,
+    bytes: Buffer,
+    intake: Intake
+  ): Promise<ReturnType<typeof workerBReport> | null> {
+    if (!this.deps.workerB) return null
+    this.deps.log(null, `worker B start scan=${r.id} (Chalk sandbox, network off)`)
+    let timer: NodeJS.Timeout | undefined
+    try {
+      const res = await Promise.race([
+        this.deps.workerB(bytes, { filename: intake.name, scanId: r.id }),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error('timed out')),
+            this.deps.workerBTimeoutMs ?? WORKER_TIMEOUT_MS
+          )
+        })
+      ])
+      const rep = workerBReport(res, intake.name)
+      r.checks.push(...rep.checks)
+      r.code.push(...rep.code)
+      if (rep.sandbox) r.sandbox.push(rep.sandbox)
+      this.deps.log(
+        rep.verdict === 'malicious' ? 'block' : rep.verdict === 'suspicious' ? 'warn' : null,
+        `worker B done scan=${r.id} verdict=${rep.verdict ?? 'none'} analyst=${res.analysis?.analyst ?? 'none'} ` +
+          `findings=${rep.reasons.length} sandbox=${res.sandbox_id ?? '-'} ms=${res.ms}` +
+          (res.error ? ` error="${res.error}"` : '')
+      )
+      if (!rep.analysed) r.partial = true
+      return rep
+    } catch (err) {
+      r.checks.push({
+        name: 'Chalk sandbox (Worker B)',
+        state: 'fail',
+        result: explain(err).slice(0, 80)
+      })
+      r.partial = true
+      this.deps.log('warn', `worker B failed scan=${r.id} error=${explain(err)}`)
+      return null
+    } finally {
+      clearTimeout(timer)
+      this.save(r, pc)
     }
   }
 

@@ -1,0 +1,58 @@
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_sandbox_fs.py", line 148, in _upload
+    response = client._filesystem_stub.upload_file(
+        requests(),
+        headers=client._headers,
+        timeout_ms=timeout_ms,
+    )
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_gen/chalk/sandbox/v2/filesystem_service_connect.py", line 32, in upload_file
+    return self.execute_client_stream(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        request=request,
+        ^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        timeout_ms=timeout_ms,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_client_sync.py", line 248, in execute_client_stream
+    return self._execute_client_stream(request, ctx)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_interceptor_sync.py", line 208, in intercept_client_stream_sync
+    return call_next(request, ctx)
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_client_sync.py", line 360, in _send_request_client_stream
+    return _consume_single_response(self._send_request_bidi_stream(request, ctx))
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_client_sync.py", line 464, in _consume_single_response
+    for message in stream:
+                   ^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_client_sync.py", line 421, in _send_request_bidi_stream
+    reader.handle_response_complete(resp)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/connectrpc/_protocol_grpc.py", line 372, in handle_response_complete
+    raise ConnectError(connect_code, status.message, details=status.details)
+connectrpc.errors.ConnectError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 33, in wrap
+    detail = fn()
+  File "/Users/evandong/Downloads/Aegis/chalk/try_chalk.py", line 101, in _
+    with chalk_sandbox.sample_sandbox(s.data, log=log) as box:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/evandong/Downloads/Aegis/chalk/aegis_worker_b/chalk_sandbox.py", line 167, in sample_sandbox
+    box.upload(data)
+    ~~~~~~~~~~^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/aegis_worker_b/chalk_sandbox.py", line 115, in upload
+    self.sandbox.fs.write_bytes(SAMPLE_PATH, data, mode=0o600)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_tracing.py", line 603, in sync_wrapper
+    return func(*args, **kwargs)
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_sandbox_fs.py", line 204, in write_bytes
+    self._upload((data,), path, mode=mode, timeout_secs=timeout_secs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evandong/Downloads/Aegis/chalk/.venv/lib/python3.14/site-packages/chalkcompute/_sandbox_fs.py", line 154, in _upload
+    raise _rpc_error(error) from error
+chalkcompute._sandbox_fs.SandboxFileSystemError: finishing hypervisor file upload: rpc error: code = NotFound desc = sandbox filesystem operation failed (errno 2, phase validation, publication unchanged)
