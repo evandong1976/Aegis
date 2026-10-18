@@ -1,7 +1,7 @@
 // Typed IPC between the main process and the renderer (via the preload API).
 
 import type { LiveEvent, LiveRun, LiveSampleKey } from './live'
-import type { AppStatus, LogEntry, ScanReport, ScanSummary, ServiceHealth } from './types'
+import type { AppStatus, LogEntry, ScanReport, ScanSummary, ServiceHealth, Verdict } from './types'
 
 export interface Settings {
   mode: 'block' | 'warn'
@@ -19,16 +19,23 @@ export interface TrustedSite {
   addedAt: string
 }
 
+/** One Chalk Evaluation run of Worker B over the labeled samples (chalk/aegis_worker_b/evals.py). */
+export interface EvalRun {
+  /** "worker-b rules" or "worker-b agent". */
+  name: string
+  runId: string
+  status: string
+  rows: number
+  rowErrors: number
+  /** Mean score per scorer, 0–1, keyed by scorer name (aegis-verdict-match, …). */
+  means: Record<string, number>
+  samples: Array<{ sample: string; expected: Verdict; got: Verdict | null; error: string | null }>
+}
+
+/** evals/results.json, mapped from the file evals.py writes (see src/main/ipc.ts). */
 export interface EvalResults {
   ranAt: string
-  datasets: Record<string, { size: number }>
-  configurations: Array<{
-    name: string
-    precision: number
-    recall: number
-    falseAlarmRate: number
-    msPerVerdict: number
-  }>
+  runs: EvalRun[]
 }
 
 export type LinkTab = 'held' | 'blocked' | 'allowed' | 'all'

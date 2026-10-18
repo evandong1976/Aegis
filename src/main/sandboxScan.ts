@@ -196,16 +196,8 @@ async function run(
 ): Promise<ScanReport> {
   const t0 = Date.now()
   const scanId = base.id
-  const emit = (body: LiveEventBody): void => deps.bus.emit(scanId, body)
-  const term = (source: TermSource, stream: TermStream, text: string): void =>
-    emit({ kind: 'term', source, stream, text })
-  let stage: LiveStage = 'caught'
-  const enter = (next: LiveStage, detail: string): void => {
-    stage = next
-    emit({ kind: 'stage', stage: next, state: 'active', detail })
-  }
-  const finish = (s: LiveStage, detail: string): void =>
-    emit({ kind: 'stage', stage: s, state: 'done', detail })
+  const em = liveEmitters((body) => deps.bus.emit(scanId, body))
+  const { emit, term, enter, finish } = em
 
   finish(
     'caught',
@@ -221,7 +213,7 @@ async function run(
     outcome = await withSandbox(
       client,
       { labels: { job: 'scan', scan: shortId(scanId) }, snapshot: deps.snapshot },
-      (session) => inSandbox(deps, input, session, { emit, term, enter, finish })
+      (session) => inSandbox(deps, input, session, em)
     )
   } catch (err) {
     outcome = { error: message(err), log: [], deleted: true }
@@ -250,7 +242,7 @@ async function run(
       `sandbox scan id=${shortId(scanId)} verdict=${report.verdict} score=${report.score} ms=${report.durationMs}`
     )
   } else {
-    emit({ kind: 'stage', stage, state: 'failed', detail: outcome.error ?? 'failed' })
+    emit({ kind: 'stage', stage: em.current(), state: 'failed', detail: outcome.error ?? 'failed' })
     deps.log('warn', `sandbox scan id=${shortId(scanId)} failed error=${outcome.error}`)
   }
   deps.putScan(report)
@@ -264,27 +256,38 @@ async function run(
   return report
 }
 
-interface Emitters {
+/** One run's live events, by kind. Downloads (scans.ts) use the same ones. */
+export interface Emitters {
   emit: (body: LiveEventBody) => void
   term: (source: TermSource, stream: TermStream, text: string) => void
   enter: (stage: LiveStage, detail: string) => void
   finish: (stage: LiveStage, detail: string) => void
+  /** The stage in progress, for a failure. */
+  current: () => LiveStage
+}
+
+export function liveEmitters(emit: (body: LiveEventBody) => void): Emitters {
+  let stage: LiveStage = 'caught'
+  return {
+    emit,
+    term: (source, stream, text) => emit({ kind: 'term', source, stream, text }),
+    enter: (next, detail) => {
+      stage = next
+      emit({ kind: 'stage', stage: next, state: 'active', detail })
+    },
+    finish: (done, detail) => emit({ kind: 'stage', stage: done, state: 'done', detail }),
+    current: () => stage
+  }
 }
 
 async function inSandbox(
   deps: SandboxScanDeps,
   input: SandboxScanInput,
   session: SandboxSession,
-  { emit, term, enter, finish }: Emitters
+  em: Emitters
 ): Promise<RunResult> {
-  const startupMs = session.log[0]?.ms ?? 0
-  emit({ kind: 'sandbox', provider: 'daytona', sandboxId: session.id, network: 'off', startupMs })
-  term(
-    'aegis',
-    'note',
-    `sandbox ${shortId(session.id)} ready in ${seconds(startupMs)} · network off at creation`
-  )
-
+  const { emit, term, enter, finish } = em
+  const startupMs = announceSandbox(session, em)
   term('aegis', 'cmd', `upload ${input.filename} → ~/${SAMPLE_PATH}`)
   const meta = await session.upload(input.bytes, {
     filename: input.filename,
@@ -292,50 +295,12 @@ async function inSandbox(
     referrer: input.referrer,
     contentType: input.contentType
   })
-  term('aegis', 'cmd', `sha256sum ${SAMPLE_PATH}`)
-  term('aegis', 'out', `${meta.sha256}  ${SAMPLE_PATH}`)
-  term('aegis', 'note', 'matches the download')
+  announceUpload(meta, em)
 
-  const hosts = PROBE_URLS.map((u) => new URL(u).host)
-  term('aegis', 'cmd', `probe ${hosts.join(', ')} with curl, wget and python3`)
-  if (!(await session.networkIsOff())) {
-    throw new Error('the sandbox could reach the network, so Aegis did not open the file')
-  }
-  term('aegis', 'blocked', `all ${hosts.length * 3} attempts blocked: no network`)
-  finish('sandbox', `Sandbox ${shortId(session.id)} · network off, checked`)
-
-  // Starting the desktop is part of opening the file the way a Mac would (in a window).
-  enter('opened', `Opening ${input.filename} the way your Mac would, inside the sandbox`)
-  const desktop = await startDesktop(session, emit, deps)
+  const opened = await openInSandbox(session, input.filename, em, { ...deps, run: true })
   try {
-    if (desktop) await openOnDesktop(session, input.filename)
-    term(
-      'sample',
-      'note',
-      `sh -x ${input.filename}  (limit ${RUN_TIMEOUT_S} s, scratch home, empty environment)`
-    )
-    const trace = streamTrace(session, term, deps.traceEveryMs ?? TRACE_EVERY_MS)
-    let observation: Observation
-    try {
-      observation = await runSample(session)
-    } finally {
-      await trace.stop()
-    }
-    if (trace.commands() === 0) {
-      // The side reads saw nothing (or failed): show the recorded trace instead.
-      for (const c of observation.commands)
-        term('sample', NETWORK_TOOLS.test(c) ? 'blocked' : 'cmd', c)
-      for (const l of observation.stdout.split('\n').filter(Boolean)) term('sample', 'out', l)
-    }
-    for (const f of observation.filesWritten) term('sample', 'file', f)
-    const ran =
-      `exit ${observation.exitCode}${observation.timedOut ? ' (ran out of time)' : ''} · ` +
-      `${count(observation.commands.length, 'command')} · ${count(observation.filesWritten.length, 'file')} written · ` +
-      `${count(observation.networkAttempts.length, 'network attempt')}${observation.networkAttempts.length ? ', all blocked' : ''}`
-    term('sample', 'note', ran)
-    if (desktop) await sleep(deps.desktopDwellMs ?? DESKTOP_DWELL_MS)
-    finish('opened', ran)
-
+    const observation = opened.observation
+    if (!observation) throw new Error('the file was not run')
     enter(
       'agent',
       deps.agent.info.mode === 'scripted'
@@ -362,21 +327,172 @@ async function inSandbox(
       tools,
       match: kit?.match,
       notes: kit?.problem ? [kit.problem] : [],
-      runTool: async (name) => {
-        const spec = tools.find((t) => t.name === name)
-        if (!spec) throw new Error(`no tool named ${name}`)
-        term('agent', 'cmd', spec.command)
-        const res = await session.exec(`agent tool ${name}`, spec.command, spec.timeoutS ?? 15)
-        for (const line of res.result.split('\n').slice(0, 3)) if (line) term('agent', 'out', line)
-        return { exitCode: res.exitCode, output: res.result }
-      },
+      runTool: toolRunner(session, tools, term),
       emit
     })
     finish('agent', agent.report.summary)
-    return { meta, observation, agent, desktop: desktop !== null, sandboxId: session.id, startupMs }
+    return { meta, observation, agent, desktop: opened.desktop, sandboxId: session.id, startupMs }
   } finally {
+    await opened.stop()
+  }
+}
+
+/** The sandbox is up: its card in the live view and a terminal line. Returns its start time. */
+export function announceSandbox(session: SandboxSession, { emit, term }: Emitters): number {
+  const startupMs = session.log[0]?.ms ?? 0
+  emit({ kind: 'sandbox', provider: 'daytona', sandboxId: session.id, network: 'off', startupMs })
+  term(
+    'aegis',
+    'note',
+    `sandbox ${shortId(session.id)} ready in ${seconds(startupMs)} · network off at creation`
+  )
+  return startupMs
+}
+
+/** The upload's SHA-256 check, in the terminal. */
+export function announceUpload(meta: SampleMeta, { term }: Emitters): void {
+  term('aegis', 'cmd', `sha256sum ${SAMPLE_PATH}`)
+  term('aegis', 'out', `${meta.sha256}  ${SAMPLE_PATH}`)
+  term('aegis', 'note', 'matches the download')
+}
+
+/** Runs the agent's fixed tools by name inside the sandbox, each shown in the terminal. */
+export function toolRunner(
+  session: SandboxSession,
+  tools: Array<{ name: string; command: string; timeoutS?: number }>,
+  term: Emitters['term']
+): (name: string) => Promise<{ exitCode: number; output: string }> {
+  return async (name) => {
+    const spec = tools.find((t) => t.name === name)
+    if (!spec) throw new Error(`no tool named ${name}`)
+    term('agent', 'cmd', spec.command)
+    const res = await session.exec(`agent tool ${name}`, spec.command, spec.timeoutS ?? 15)
+    for (const line of res.result.split('\n').slice(0, 3)) if (line) term('agent', 'out', line)
+    return { exitCode: res.exitCode, output: res.result }
+  }
+}
+
+// ── Opening the file ────────────────────────────────────────────────────────────────────────────
+
+export interface OpenOptions {
+  /** Run it under `sh -x` (shell scripts, `runsAsShell`). Anything else is shown, not run. */
+  run: boolean
+  /** What it is, for people: "PDF", "Archive". */
+  kind?: string
+  frameEveryMs?: number
+  traceEveryMs?: number
+  desktopStartS?: number
+  desktopDwellMs?: number
+}
+
+export interface Opened {
+  /** What the run did; null when the file was shown, not run. */
+  observation: Observation | null
+  desktop: boolean
+  /** Stops the desktop pictures (after the agent's review, so they cover it too). */
+  stop(): Promise<void>
+}
+
+/**
+ * After the upload: proves the network is off (or throws, so the file is never opened on a
+ * network), starts the sandbox desktop, and opens the file there in a terminal window titled with
+ * its name. A shell script runs under `sh -x` with its trace streamed; anything else is only read
+ * (type, first bytes, strings), since running it as a script would show nothing. The test samples
+ * (`startSandboxScan`) and every download sent to the sandbox (scans.ts) go through here.
+ */
+export async function openInSandbox(
+  session: SandboxSession,
+  filename: string,
+  { emit, term, enter, finish }: Emitters,
+  opts: OpenOptions
+): Promise<Opened> {
+  const hosts = PROBE_URLS.map((u) => new URL(u).host)
+  term('aegis', 'cmd', `probe ${hosts.join(', ')} with curl, wget and python3`)
+  if (!(await session.networkIsOff())) {
+    throw new Error('the sandbox could reach the network, so Aegis did not open the file')
+  }
+  term('aegis', 'blocked', `all ${hosts.length * 3} attempts blocked: no network`)
+  finish('sandbox', `Sandbox ${shortId(session.id)} · network off, checked`)
+
+  // Starting the desktop is part of opening the file the way a Mac would (in a window).
+  enter(
+    'opened',
+    opts.run
+      ? `Opening ${filename} the way your Mac would, inside the sandbox`
+      : `Opening ${filename} in the sandbox to look inside it`
+  )
+  const desktop = await startDesktop(session, emit, opts)
+  const stop = async (): Promise<void> => {
     await desktop?.stop()
   }
+  try {
+    if (!opts.run) {
+      const shown = await session.exec('show file', showCommand(), 20)
+      if (desktop) await openOnDesktop(session, filename)
+      term('sample', 'cmd', `file -b ${filename} · first 256 bytes · strings`)
+      for (const l of shown.result.split('\n').filter(Boolean).slice(0, 14))
+        term('sample', 'out', l)
+      const why = `Not run: ${opts.kind ? `a ${opts.kind.toLowerCase()}` : 'this file'} isn't a shell script, so it was opened for reading only`
+      term('sample', 'note', why)
+      if (desktop) await sleep(opts.desktopDwellMs ?? DESKTOP_DWELL_MS)
+      finish('opened', why)
+      return { observation: null, desktop: desktop !== null, stop }
+    }
+    if (desktop) await openOnDesktop(session, filename)
+    term(
+      'sample',
+      'note',
+      `sh -x ${filename}  (limit ${RUN_TIMEOUT_S} s, scratch home, empty environment)`
+    )
+    const trace = streamTrace(session, term, opts.traceEveryMs ?? TRACE_EVERY_MS)
+    let observation: Observation
+    try {
+      observation = await runSample(session)
+    } finally {
+      await trace.stop()
+    }
+    if (trace.commands() === 0) {
+      // The side reads saw nothing (or failed): show the recorded trace instead.
+      for (const c of observation.commands)
+        term('sample', NETWORK_TOOLS.test(c) ? 'blocked' : 'cmd', c)
+      for (const l of observation.stdout.split('\n').filter(Boolean)) term('sample', 'out', l)
+    }
+    for (const f of observation.filesWritten) term('sample', 'file', f)
+    const ran =
+      `exit ${observation.exitCode}${observation.timedOut ? ' (ran out of time)' : ''} · ` +
+      `${count(observation.commands.length, 'command')} · ${count(observation.filesWritten.length, 'file')} written · ` +
+      `${count(observation.networkAttempts.length, 'network attempt')}${observation.networkAttempts.length ? ', all blocked' : ''}`
+    term('sample', 'note', ran)
+    if (desktop) await sleep(opts.desktopDwellMs ?? DESKTOP_DWELL_MS)
+    finish('opened', ran)
+    return { observation, desktop: desktop !== null, stop }
+  } catch (err) {
+    await stop()
+    throw err
+  }
+}
+
+/** True for files that run as shell scripts: by extension, or a `#!` line naming a shell. */
+export function runsAsShell(filename: string, bytes: Buffer): boolean {
+  if (/\.(sh|command|bash|zsh|ksh|tool)$/i.test(filename)) return true
+  const first = bytes.subarray(0, 128).toString('latin1').split('\n')[0]
+  return /^#!\s*\S*\/(env\s+)?(sh|bash|zsh|dash|ksh)\b/.test(first)
+}
+
+/**
+ * Reads the uploaded file without running it, into the run's output file, so the desktop window
+ * (which tails it) shows it: its type, its first bytes and its printable strings.
+ */
+export function showCommand(): string {
+  const R = RUN_DIR
+  return [
+    `rm -rf ${R} && mkdir -p ${R}/out && : >${R}/out/stderr`,
+    `{ echo "type: $(file -b ${SAMPLE_PATH} 2>/dev/null || echo unknown)"; echo "size: $(wc -c <${SAMPLE_PATH}) bytes"; echo; ` +
+      `echo "first 256 bytes:"; head -c 256 ${SAMPLE_PATH} | od -A x -t x1z -v | head -16; echo; ` +
+      `echo "strings:"; (strings -n 6 ${SAMPLE_PATH} 2>/dev/null || tr -cs '[:print:]' '\\n' <${SAMPLE_PATH} | grep -E '.{6,}') | head -20; } >${R}/out/stdout 2>&1`,
+    `touch ${R}/out/marker`,
+    `cat ${R}/out/stdout`
+  ].join('; ')
 }
 
 // ── The desktop ─────────────────────────────────────────────────────────────────────────────────
@@ -384,7 +500,7 @@ async function inSandbox(
 async function startDesktop(
   session: SandboxSession,
   emit: (body: LiveEventBody) => void,
-  deps: SandboxScanDeps
+  deps: Pick<OpenOptions, 'desktopStartS' | 'frameEveryMs'>
 ): Promise<{ stop(): Promise<void> } | null> {
   const cu = (session.sandbox as Partial<DesktopLike>).computerUse
   if (!cu) {

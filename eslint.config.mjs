@@ -15,7 +15,8 @@ export default defineConfig(
       'design-system/**',
       'figma/**',
       'screens/**',
-      '_to_delete/**'
+      '_to_delete/**',
+      'video/**'
     ]
   },
   tseslint.configs.recommended,

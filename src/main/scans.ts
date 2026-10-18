@@ -7,9 +7,12 @@
 //
 // Then: pre-check on this Mac (bytes only) → if it needs the cloud, upload into a fresh Daytona
 // sandbox created with the network off, check the SHA-256 inside it, hand it to `analyze` (Worker
-// A plugs in there at M4), and delete the sandbox in a `finally` → verdict → act: deliver the exact
-// bytes that were scanned, or hold / quarantine them. Every path ends delivered, held or
-// quarantined; a download is never lost.
+// A: it opens the file there and Droid reviews it), and delete the sandbox in a `finally` →
+// verdict → act: deliver the exact bytes that were scanned, or hold / quarantine them. Every path
+// ends delivered, held or quarantined; a download is never lost.
+//
+// With `live` set (the app), a file that goes to the sandbox is drawn in the live view as it
+// happens, like the "Test the sandbox" samples (decision 30): the main window opens on it.
 //
 // Until an analyst exists, nothing that went to the sandbox can be called Clean (verdict.ts:
 // missing evidence means Unknown), so in block mode those files are held for the user.
@@ -21,6 +24,7 @@ import { basename, join, relative, sep } from 'path'
 import { promisify } from 'util'
 import { QUARANTINE_EXTENSION } from '@shared/constants'
 import type { DownloadMeta, ScanStatusResponse } from '@shared/bridge'
+import type { LiveEventBody, LiveStage } from '@shared/live'
 import type {
   CodeExcerpt,
   DroidReport,
@@ -41,6 +45,13 @@ import {
   type SandboxSession
 } from './daytona'
 import { precheck, type Precheck } from './precheck'
+import {
+  announceSandbox,
+  announceUpload,
+  liveEmitters,
+  runsAsShell,
+  type Emitters
+} from './sandboxScan'
 import { freePath, type Quarantine } from './quarantine'
 import { applyAiSuggestion, combine } from './verdict'
 import type { DeliveredLedger } from './watcher'
@@ -62,6 +73,25 @@ export interface SandboxAnalysis {
   capabilities?: string[]
   code?: CodeExcerpt[]
 }
+
+/** What `analyze` gets besides the sandbox and the sample. */
+export interface AnalyzeContext {
+  /** This scan's live events (they go nowhere without the live view). */
+  live: Emitters
+  /** Run it under `sh -x` (a shell script); otherwise it is only read. */
+  run: boolean
+  /** What it is, for people: "Script", "PDF". */
+  kind: string
+}
+
+/** The live view's side of a download (index.ts: the LiveBus and the main window). */
+export interface ScanLive {
+  /** A file is going to the sandbox: start its run on the bus and show it. */
+  begin(run: { scanId: string; filename: string; size: number; sha256: string }): void
+  emit(scanId: string, body: LiveEventBody): void
+}
+
+const NO_LIVE = (): Emitters => liveEmitters(() => undefined)
 
 export interface ScanServiceDeps {
   putScan(report: ScanReport, extra: { fileCategory: string | null; caughtBy: string | null }): void
@@ -85,7 +115,11 @@ export interface ScanServiceDeps {
    * Runs while the sample is in the sandbox. Not set until Worker A (M4): the file is uploaded,
    * checked and the sandbox deleted, and the verdict stays Unknown.
    */
-  analyze?: (session: SandboxSession, sample: SampleMeta) => Promise<SandboxAnalysis>
+  analyze?: (
+    session: SandboxSession,
+    sample: SampleMeta,
+    ctx: AnalyzeContext
+  ) => Promise<SandboxAnalysis>
   /**
    * Worker B (Chalk): the same bytes, examined independently in a Chalk sandbox by Claude through
    * the Model Gateway (workerB.ts). Not set when Chalk isn't configured.
@@ -95,6 +129,8 @@ export interface ScanServiceDeps {
   /** Marks a delivered file as downloaded from the internet (Gatekeeper checks it). */
   markDownloaded?: (path: string, url: string | null) => Promise<void>
   workerTimeoutMs?: number
+  /** The live view. Not set in tests. */
+  live?: ScanLive
 }
 
 interface Intake {
@@ -310,6 +346,7 @@ export class ScanService {
       heldPath: null
     }
     let pc: Precheck | null = null
+    let live: Emitters | null = null
     this.setActive(1)
     this.save(r, pc)
     this.deps.log(
@@ -348,9 +385,10 @@ export class ScanService {
       let analysis: SandboxAnalysis | null = null
       let b: ReturnType<typeof workerBReport> | null = null
       if (pc.needsCloud) {
+        live = this.beginLive(r, pc)
         ;[analysis, b] = await Promise.all([
-          this.sandbox(r, pc, bytes, intake),
-          this.workerB(r, pc, bytes, intake)
+          this.sandbox(r, pc, bytes, intake, live),
+          this.workerB(r, pc, bytes, intake, live)
         ])
       }
 
@@ -409,8 +447,27 @@ export class ScanService {
     } finally {
       r.durationMs = Date.now() - started
       this.save(r, pc)
+      if (live) endLive(live, r)
       this.setActive(-1)
     }
+  }
+
+  /** Starts the live view for a file going to the sandbox; no-op emitters without it. */
+  private beginLive(r: ScanReport, pc: Precheck): Emitters {
+    const hooks = this.deps.live
+    if (!hooks) return NO_LIVE()
+    hooks.begin({
+      scanId: r.id,
+      filename: r.filename ?? 'download',
+      size: pc.size,
+      sha256: pc.sha256
+    })
+    const em = liveEmitters((body) => hooks.emit(r.id, body))
+    em.finish(
+      'caught',
+      `Held before it reached your Mac · ${pc.size} bytes · SHA-256 ${pc.sha256.slice(0, 12)}…`
+    )
+    return em
   }
 
   /** Worker B in Chalk. Never throws: a missing worker is recorded and the other one decides. */
@@ -418,10 +475,12 @@ export class ScanService {
     r: ScanReport,
     pc: Precheck,
     bytes: Buffer,
-    intake: Intake
+    intake: Intake,
+    live: Emitters
   ): Promise<ReturnType<typeof workerBReport> | null> {
     if (!this.deps.workerB) return null
     this.deps.log(null, `worker B start scan=${r.id} (Chalk sandbox, network off)`)
+    live.term('aegis', 'note', 'worker B (Chalk) is examining its own copy in a Chalk sandbox')
     let timer: NodeJS.Timeout | undefined
     try {
       const res = await Promise.race([
@@ -444,6 +503,11 @@ export class ScanService {
           (res.error ? ` error="${res.error}"` : '')
       )
       if (!rep.analysed) r.partial = true
+      live.term(
+        'aegis',
+        rep.verdict === 'malicious' || rep.verdict === 'suspicious' ? 'err' : 'note',
+        `worker B (Chalk): ${rep.verdict ?? 'no verdict'}${res.error ? ` · ${res.error}` : ''}`
+      )
       return rep
     } catch (err) {
       r.checks.push({
@@ -453,6 +517,7 @@ export class ScanService {
       })
       r.partial = true
       this.deps.log('warn', `worker B failed scan=${r.id} error=${explain(err)}`)
+      live.term('aegis', 'err', `worker B (Chalk) failed: ${explain(err)}`)
       return null
     } finally {
       clearTimeout(timer)
@@ -465,13 +530,18 @@ export class ScanService {
     r: ScanReport,
     pc: Precheck,
     bytes: Buffer,
-    intake: Intake
+    intake: Intake,
+    live: Emitters
   ): Promise<SandboxAnalysis | null> {
+    // A failure before the sandbox stage starts is still the sandbox's.
+    const failed = (detail: string): void =>
+      live.emit({ kind: 'stage', stage: stageOf(live), state: 'failed', detail })
     const client = await this.deps.sandboxClient().catch(() => null)
     if (!client) {
       r.checks.push({ name: 'Daytona sandbox', state: 'skipped', result: 'not set up' })
       r.partial = true
       this.deps.log('warn', `sandbox skipped scan=${r.id} reason=daytona-not-configured`)
+      failed("Daytona isn't set up (DAYTONA_API_KEY), so Worker A can't open it")
       return null
     }
     const release = await this.slot()
@@ -480,10 +550,13 @@ export class ScanService {
         r.checks.push({ name: 'Daytona sandbox', state: 'skipped', result: 'daily budget used' })
         r.partial = true
         this.deps.log('warn', `sandbox skipped scan=${r.id} reason=budget`)
+        failed("Today's sandbox budget is used up, so Worker A can't open it")
         return null
       }
       Object.assign(r, { status: 'analyzing' })
       this.save(r, pc)
+      live.enter('sandbox', 'Starting a fresh Daytona sandbox with the network off')
+      live.term('aegis', 'cmd', 'daytona create --network-block-all --ephemeral')
       let sandboxId = ''
       let analysis: SandboxAnalysis | null = null
       const job = withSandbox(
@@ -491,6 +564,8 @@ export class ScanService {
         { labels: { purpose: 'download', scan: r.id }, snapshot: this.deps.snapshot },
         async (session) => {
           sandboxId = session.id
+          announceSandbox(session, live)
+          live.term('aegis', 'cmd', `upload ${intake.name} → ~/${SAMPLE_PATH}`)
           const sample = await session.upload(bytes, {
             filename: intake.name,
             url: intake.url,
@@ -503,12 +578,21 @@ export class ScanService {
             'allow',
             `sandbox upload scan=${r.id} sandbox=${session.id} network=off sha256=verified`
           )
-          // What the sandbox thinks the file is. Reads it; never runs it.
-          await session.exec(
+          announceUpload(sample, live)
+          // What the sandbox thinks the file is. Reads it; doesn't run it.
+          const identified = await session.exec(
             'identify',
             `(command -v file >/dev/null && file -b ${SAMPLE_PATH}) || head -c 32 ${SAMPLE_PATH} | od -An -tx1`
           )
-          if (this.deps.analyze) analysis = await this.deps.analyze(session, sample)
+          live.term('aegis', 'cmd', `file -b ${SAMPLE_PATH}`)
+          live.term('aegis', 'out', identified.result.trim())
+          if (this.deps.analyze) {
+            analysis = await this.deps.analyze(session, sample, {
+              live,
+              run: runsAsShell(intake.name, bytes),
+              kind: pc.fileKind
+            })
+          }
           return sample
         }
       )
@@ -525,16 +609,28 @@ export class ScanService {
         r.checks.push({ name: 'Daytona sandbox', state: 'fail', result: 'timed out' })
         r.partial = true
         this.deps.log('warn', `sandbox timed out scan=${r.id} after=${timeoutMs}ms`)
+        failed(`Worker A ran out of time after ${secs(timeoutMs)}`)
         // withSandbox still deletes it when the job settles.
         void job.then((late) => this.recordSandbox(r, sandboxId, late.log, late.deleted))
         return null
       }
       this.recordSandbox(r, sandboxId, out.log, out.deleted)
+      if (out.log.length) {
+        live.term('aegis', 'cmd', 'daytona delete')
+        live.term(
+          'aegis',
+          out.deleted ? 'note' : 'err',
+          out.deleted
+            ? `sandbox ${sandboxId.slice(0, 8)} deleted`
+            : 'could not confirm the sandbox was deleted; check the Daytona dashboard'
+        )
+      }
       const create = out.log.find((e) => e.step === 'create')
       if (out.error) {
         r.checks.push({ name: 'Daytona sandbox', state: 'fail', result: out.error.slice(0, 80) })
         r.partial = true
         this.deps.log('warn', `sandbox failed scan=${r.id} error=${out.error}`)
+        failed(`Worker A couldn't finish: ${out.error}`)
         return null
       }
       // Assigned inside the job above, which TypeScript can't see.
@@ -649,6 +745,26 @@ export class ScanService {
 }
 
 const secs = (ms: number): string => `${(ms / 1000).toFixed(1)} s`
+
+const stageOf = (live: Emitters): LiveStage =>
+  live.current() === 'caught' ? 'sandbox' : live.current()
+
+/** The verdict stage and the end of the run; the Report then replaces the live view. */
+function endLive(live: Emitters, r: ScanReport): void {
+  const summary = r.summary ?? ''
+  if (r.status === 'failed') {
+    live.emit({ kind: 'stage', stage: stageOf(live), state: 'failed', detail: summary })
+  } else {
+    live.finish('verdict', summary)
+  }
+  live.emit({
+    kind: 'end',
+    ok: r.status !== 'failed',
+    verdict: r.verdict,
+    summary,
+    sandboxDeleted: r.sandbox.every((s) => s.provider !== 'daytona' || s.destroyedAt !== null)
+  })
+}
 
 function explain(err: unknown): string {
   return err instanceof Error ? err.message : String(err)

@@ -28,13 +28,13 @@ import { registeredDomain } from './links'
 import { SHORTENERS } from './linkLists'
 import { LiveBus } from './live'
 import { scriptedAgent, type LiveAgent } from './liveAgent'
-import { startSandboxScan, type SandboxScanInput } from './sandboxScan'
+import { openInSandbox, startSandboxScan, toolRunner, type SandboxScanInput } from './sandboxScan'
 import type { SandboxClient, SandboxSession, SampleMeta } from './daytona'
 import { droidAgent } from './droidAgent'
 import { FILE_TYPE_REFERENCE, INSPECTOR_SOURCE, REFERENCE_ROWS } from './droidAssets'
 import { prepareToolkit } from './droidToolkit'
 import { findDroidCli } from './sponsors'
-import { WORKER_TIMEOUT_MS, type SandboxAnalysis } from './scans'
+import { WORKER_TIMEOUT_MS, type AnalyzeContext, type SandboxAnalysis } from './scans'
 import { FAKE_INSTALLER } from './testSamples'
 import { ScanService } from './scans'
 import { runWorkerB, workerBConfigured } from './workerB'
@@ -86,42 +86,57 @@ function analyst(execPath: string | null): LiveAgent {
 }
 
 /**
- * Worker A for downloads: Droid reviews the file in its sandbox with the tools for its type. The
- * sample isn't run here, only read. Without Droid, the inspector's checks still decide (never
- * Clean on their own).
+ * Worker A for downloads, drawn in the live view like a test run (decision 30): the file is opened
+ * in its network-off sandbox (a shell script runs under `sh -x`; anything else is only read), with
+ * the sandbox desktop on screen, then Droid reviews it with the tools for its type. Without Droid,
+ * the inspector's checks still decide (never Clean on their own).
  */
 async function analyzeDownload(
   session: SandboxSession,
-  sample: SampleMeta
+  sample: SampleMeta,
+  { live: em, run, kind }: AnalyzeContext
 ): Promise<SandboxAnalysis> {
-  const kit = await prepareToolkit(session, {
-    filename: sample.filename,
-    inspector: INSPECTOR_SOURCE,
-    rows: REFERENCE_ROWS
-  })
-  const result = await analyst(await droidPath()).review({
-    filename: sample.filename,
-    meta: sample,
-    observation: null,
-    tools: kit.tools,
-    match: kit.match,
-    notes: kit.problem ? [kit.problem] : [],
-    runTool: async (name) => {
-      const spec = kit.tools.find((t) => t.name === name)
-      if (!spec) throw new Error(`no tool named ${name}`)
-      const res = await session.exec(`droid tool ${name}`, spec.command, spec.timeoutS ?? 15)
-      return { exitCode: res.exitCode, output: res.result }
-    },
-    emit: () => undefined
-  })
-  return {
-    verdict: result.report.verdict,
-    summary: result.report.summary,
-    reasons: result.reasons,
-    droid: result.report,
-    findings: result.findings,
-    capabilities: result.capabilities,
-    code: result.code
+  const opened = await openInSandbox(session, sample.filename, em, { run, kind })
+  try {
+    const agent = analyst(await droidPath())
+    em.enter(
+      'agent',
+      `${agent.info.name} is reverse engineering it from this Mac, through read-only tools`
+    )
+    const kit = await prepareToolkit(session, {
+      filename: sample.filename,
+      inspector: INSPECTOR_SOURCE,
+      rows: REFERENCE_ROWS
+    })
+    const rows = kit.match.rows.map((r) => r.extensions.map((e) => `.${e}`).join(' '))
+    em.term(
+      'aegis',
+      'note',
+      `${kit.match.label} · reference rows: ${rows.join(', ') || 'none'} · ${kit.tools.length} tools for the agent`
+    )
+    if (kit.problem) em.term('aegis', 'err', kit.problem)
+    const result = await agent.review({
+      filename: sample.filename,
+      meta: sample,
+      observation: opened.observation,
+      tools: kit.tools,
+      match: kit.match,
+      notes: kit.problem ? [kit.problem] : [],
+      runTool: toolRunner(session, kit.tools, em.term),
+      emit: em.emit
+    })
+    em.finish('agent', result.report.summary)
+    return {
+      verdict: result.report.verdict,
+      summary: result.report.summary,
+      reasons: result.reasons,
+      droid: result.report,
+      findings: result.findings,
+      capabilities: result.capabilities,
+      code: result.code
+    }
+  } finally {
+    await opened.stop()
   }
 }
 
@@ -314,6 +329,14 @@ app.whenReady().then(async () => {
             onLine: (line) => status.record(null, `worker B ${line}`)
           })
       : undefined,
+    // Every file sent to the sandbox opens the main window on its live view (decision 30).
+    live: {
+      begin: (run) => {
+        live.begin({ ...run, agent: analyst(null).info })
+        openMainWindow('report', run.scanId)
+      },
+      emit: (scanId, body) => live.emit(scanId, body)
+    },
     log: (level, text) => status.record(level, text),
     onActive: (count) => {
       status.activeScans = count

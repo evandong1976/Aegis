@@ -10,7 +10,14 @@ import {
 } from './daytona'
 import { LiveBus } from './live'
 import { scriptedAgent } from './liveAgent'
-import { desktopOpenCommand, fileKind, startSandboxScan, type DesktopLike } from './sandboxScan'
+import {
+  desktopOpenCommand,
+  fileKind,
+  runsAsShell,
+  showCommand,
+  startSandboxScan,
+  type DesktopLike
+} from './sandboxScan'
 import { FAKE_INSTALLER } from './testSamples'
 
 const b64 = (s: string): string => Buffer.from(s).toString('base64')
@@ -277,5 +284,28 @@ describe('fileKind', () => {
     expect(fileKind('ZoomUpdate.command')).toBe('Shell script')
     expect(fileKind('Installer.pkg')).toBe('Installer')
     expect(fileKind('notes')).toBe('File')
+  })
+})
+
+describe('runsAsShell', () => {
+  it('runs shell scripts by name or by their #! line, and nothing else', () => {
+    const none = Buffer.from('')
+    expect(runsAsShell('zoom-update.sh', none)).toBe(true)
+    expect(runsAsShell('ZoomUpdate.command', none)).toBe(true)
+    expect(runsAsShell('install', Buffer.from('#!/bin/bash\necho hi\n'))).toBe(true)
+    expect(runsAsShell('install', Buffer.from('#!/usr/bin/env zsh\n'))).toBe(true)
+    expect(runsAsShell('tool.py', Buffer.from('#!/usr/bin/env python3\n'))).toBe(false)
+    expect(runsAsShell('statement.pdf', Buffer.from('%PDF-1.7\n'))).toBe(false)
+    expect(runsAsShell('setup.exe', Buffer.from('MZ'))).toBe(false)
+  })
+})
+
+describe('showCommand', () => {
+  it('reads the sample into the output the desktop window tails, without running it', () => {
+    const cmd = showCommand()
+    expect(cmd).toContain('file -b sample/file')
+    expect(cmd).toContain('>/tmp/aegis-run/out/stdout')
+    expect(cmd).toContain('touch /tmp/aegis-run/out/marker')
+    expect(cmd).not.toMatch(/sh -x|chmod|\.\/sample/)
   })
 })

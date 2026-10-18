@@ -4,10 +4,11 @@ import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from 'fs/promi
 import { tmpdir } from 'os'
 import { join } from 'path'
 import type { DownloadMeta } from '@shared/bridge'
+import type { LiveEventBody } from '@shared/live'
 import type { ScanReport } from '@shared/types'
 import type { CreateParams, SandboxClient, SandboxLike } from './daytona'
 import { createQuarantine } from './quarantine'
-import { safeName, ScanService, type ScanServiceDeps } from './scans'
+import { safeName, ScanService, type AnalyzeContext, type ScanServiceDeps } from './scans'
 import { createDeliveredLedger } from './watcher'
 import { bResult } from './workerB.test'
 
@@ -454,6 +455,109 @@ describe('the download pipeline', () => {
       })
       await finished(svc, svc.fromChrome(PDF, meta('statement.pdf')))
       expect(calls).toBe(0)
+    })
+  })
+
+  describe('the live view', () => {
+    function watch(): {
+      live: NonNullable<ScanServiceDeps['live']>
+      begun: string[]
+      events: Map<string, LiveEventBody[]>
+    } {
+      const begun: string[] = []
+      const events = new Map<string, LiveEventBody[]>()
+      return {
+        begun,
+        events,
+        live: {
+          begin: (run) => {
+            begun.push(run.filename)
+            events.set(run.scanId, [])
+          },
+          emit: (id, body) => void events.get(id)?.push(body)
+        }
+      }
+    }
+    const stages = (evs: LiveEventBody[]): string[] =>
+      evs.flatMap((e) => (e.kind === 'stage' ? [`${e.stage}:${e.state}`] : []))
+    const lines = (evs: LiveEventBody[]): string[] =>
+      evs.flatMap((e) => (e.kind === 'term' ? [e.text] : []))
+
+    it('draws a download sent to the sandbox from caught to verdict', async () => {
+      const w = watch()
+      let ctx: AnalyzeContext | null = null
+      const svc = service({
+        live: w.live,
+        analyze: async (_session, _sample, c) => {
+          ctx = c
+          c.live.enter('agent', 'reviewing')
+          c.live.finish('agent', 'done')
+          return { verdict: 'malicious', summary: 'Downloads and runs a second file.', reasons: [] }
+        }
+      })
+      const id = svc.fromChrome(SCRIPT, meta('update.sh'))
+      const report = await finished(svc, id)
+      const evs = w.events.get(id)!
+
+      expect(w.begun).toEqual(['update.sh'])
+      expect(ctx).toMatchObject({ run: true, kind: 'Script' })
+      expect(stages(evs)).toEqual([
+        'caught:done',
+        'sandbox:active',
+        'agent:active',
+        'agent:done',
+        'verdict:done'
+      ])
+      expect(evs.find((e) => e.kind === 'sandbox')).toMatchObject({
+        sandboxId: 'sbx-1',
+        network: 'off'
+      })
+      expect(lines(evs)).toEqual(
+        expect.arrayContaining([
+          'daytona create --network-block-all --ephemeral',
+          `${sha(SCRIPT)}  sample/file`,
+          'daytona delete',
+          'sandbox sbx-1 deleted'
+        ])
+      )
+      expect(evs[evs.length - 1]).toEqual({
+        kind: 'end',
+        ok: true,
+        verdict: report.verdict,
+        summary: report.summary,
+        sandboxDeleted: true
+      })
+    })
+
+    it('reads a file that is not a shell script instead of running it', async () => {
+      const w = watch()
+      let ctx: AnalyzeContext | null = null
+      const svc = service({
+        live: w.live,
+        analyze: async (_s, _m, c) => {
+          ctx = c
+          return { verdict: 'unknown', summary: 's', reasons: [] }
+        }
+      })
+      await finished(svc, svc.fromChrome(Buffer.from('MZ\x90\x00binary'), meta('setup.exe')))
+      expect(ctx).toMatchObject({ run: false, kind: 'Executable' })
+    })
+
+    it('leaves a file cleared on this Mac out of the live view', async () => {
+      const w = watch()
+      const svc = service({ live: w.live })
+      await finished(svc, svc.fromChrome(PDF, meta('statement.pdf')))
+      expect(w.begun).toEqual([])
+    })
+
+    it('marks the sandbox stage failed without Daytona, and still ends the run', async () => {
+      const w = watch()
+      const svc = service({ live: w.live, sandboxClient: async () => null })
+      const id = svc.fromChrome(SCRIPT, meta('update.sh'))
+      await finished(svc, id)
+      const evs = w.events.get(id)!
+      expect(stages(evs)).toEqual(['caught:done', 'sandbox:failed', 'verdict:done'])
+      expect(evs[evs.length - 1]).toMatchObject({ kind: 'end', ok: true, verdict: 'unknown' })
     })
   })
 })

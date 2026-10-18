@@ -3,8 +3,10 @@
 import { app, ipcMain, shell } from 'electron'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { z } from 'zod'
 import type { EvalResults, IpcInvoke, InvokeChannel, MainRoute } from '@shared/ipc'
 import type { LiveRun, LiveSampleKey } from '@shared/live'
+import { VerdictSchema } from '@shared/types'
 import { status } from './status'
 import { getSettings, setSettings } from './settings'
 import type { Store } from './store'
@@ -21,12 +23,53 @@ function handle<C extends InvokeChannel>(channel: C, fn: Handler<C>): void {
   ipcMain.handle(channel, (_event, ...args) => fn(...(args as IpcInvoke[C]['args'])))
 }
 
+// The file chalk/aegis_worker_b/evals.py writes. Validated here so a format change shows the
+// empty state instead of crashing the Accuracy view.
+const EvalFileSchema = z.object({
+  generated_at: z.string(),
+  worker_b: z.array(
+    z.object({
+      evaluation: z.string(),
+      run_id: z.string(),
+      status: z.string(),
+      rows: z.number(),
+      row_errors: z.number(),
+      means: z.record(z.string(), z.number()),
+      per_sample: z.array(
+        z.object({
+          sample: z.string(),
+          expected: VerdictSchema,
+          got: VerdictSchema.nullable().catch(null),
+          error: z.string().nullable()
+        })
+      )
+    })
+  )
+})
+
 async function readEvalResults(): Promise<EvalResults | null> {
+  let raw: unknown
   try {
-    const raw = await readFile(join(app.getAppPath(), 'evals', 'results.json'), 'utf8')
-    return JSON.parse(raw) as EvalResults
+    raw = JSON.parse(await readFile(join(app.getAppPath(), 'evals', 'results.json'), 'utf8'))
   } catch {
     return null
+  }
+  const parsed = EvalFileSchema.safeParse(raw)
+  if (!parsed.success) {
+    console.warn('[evals] evals/results.json is not in the expected format:', parsed.error.message)
+    return null
+  }
+  return {
+    ranAt: parsed.data.generated_at,
+    runs: parsed.data.worker_b.map((r) => ({
+      name: r.evaluation,
+      runId: r.run_id,
+      status: r.status.replace(/^EvaluationRunStatus\./, ''),
+      rows: r.rows,
+      rowErrors: r.row_errors,
+      means: r.means,
+      samples: r.per_sample
+    }))
   }
 }
 
