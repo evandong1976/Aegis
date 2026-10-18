@@ -39,8 +39,9 @@ def image() -> Any:
             "file binutils shellcheck libxml2-utils openssl curl wget && rm -rf /var/lib/apt/lists/*"
         )
         .pip_install(["bandit==1.8.6", "oletools==0.60.2"])
-        .add_local_file(str(here / "sandbox_tools.py"), TOOLS_PATH, strategy="copy")
-        .add_local_file(playbook.load_path(), PLAYBOOK_PATH, strategy="copy")
+        # Uploaded when the sandbox starts (strategy "copy" caps files at 32 KiB; the tools are larger).
+        .add_local_file(str(here / "sandbox_tools.py"), TOOLS_PATH)
+        .add_local_file(playbook.load_path(), PLAYBOOK_PATH)
     )
 
 
@@ -107,6 +108,17 @@ class SampleSandbox:
         if not ok:
             raise RuntimeError("the sample's SHA-256 didn't match inside the sandbox")
         return want
+
+    def logged(self, via: str, executor: Any) -> Any:
+        """Wraps another way of running tools (the MCP Gateway) so its calls land in this log too."""
+
+        def run(tool: str, args: list[str]) -> dict:
+            t0 = time.monotonic()
+            out = executor(tool, args)
+            self.record(f"tool {tool} {' '.join(args)} (via {via})".strip(), "error" not in out, t0, f"{len(json.dumps(out, default=str))} bytes")
+            return out
+
+        return run
 
     def run_tool(self, tool: str, args: list[str]) -> dict:
         """One fixed tool from sandbox_tools.py on the sample. The agent never types a command."""

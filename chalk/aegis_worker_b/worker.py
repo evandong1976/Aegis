@@ -16,6 +16,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
 import sys
 import time
 from dataclasses import asdict
@@ -41,6 +42,13 @@ def run(
         with sample_sandbox(data, scan_id=scan_id, log=sandbox_log) as box:
             out["sandbox_id"] = box.id
             log(f"sandbox {box.id} ready, network off, sample verified")
+            run_tool = box.run_tool
+            if os.environ.get("AEGIS_WORKER_B_TOOLS") == "mcp":
+                # Through Chalk's MCP Gateway: each call checked and audit-logged by Chalk.
+                from .mcp_gateway import GatewayTools
+
+                run_tool = box.logged("mcp gateway", GatewayTools(box.id))
+                out["tools_via"] = "mcp-gateway"
             result: agent.AgentResult | None = None
             if use_agent:
                 try:
@@ -48,13 +56,13 @@ def run(
                     model = agent.gateway_model(client)
                     result = agent.analyze(
                         filename=filename, sha256=sha, size=len(data), head=data[:4096],
-                        run_tool=box.run_tool, messages_api=client.messages, model=model, log=log,
+                        run_tool=run_tool, messages_api=client.messages, model=model, log=log,
                     )
                 except Exception as e:  # noqa: BLE001 - the gateway is optional; rules still run
                     out["analyst_error"] = f"{type(e).__name__}: {e}"[:400]
                     log(f"analyst unavailable: {out['analyst_error']}")
             if result is None:
-                result = agent.baseline(filename=filename, head=data[:4096], run_tool=box.run_tool)
+                result = agent.baseline(filename=filename, head=data[:4096], run_tool=run_tool)
             out["analysis"] = asdict(result)
     except Exception as e:  # noqa: BLE001 - Worker B missing is a result the app handles
         out["error"] = f"{type(e).__name__}: {e}"[:500]
