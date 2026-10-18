@@ -97,7 +97,7 @@ def main() -> int:
         # Not imported from function.py: importing that module deploys the Function.
         from chalkcompute import RemoteFunction
 
-        print("calling the Chalk Function aegis_worker_b", file=sys.stderr, flush=True)
+        print("calling the Chalk Function aegis-worker-b", file=sys.stderr, flush=True)
         fn = RemoteFunction.from_name("aegis-worker-b")
         sys.stdout.write(fn.remote(req["filename"], req["data_b64"]))
         return 0

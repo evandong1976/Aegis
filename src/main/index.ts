@@ -236,7 +236,7 @@ app.whenReady().then(async () => {
     mode: () => status.mode,
     takeSandboxJob: () => store?.takeSandboxJob(getSettings(store).sandboxDailyBudget) ?? false,
     concurrency: config.sandboxConcurrency,
-    // Worker B: Chalk sandbox + Claude through Chalk's Model Gateway (chalk/aegis_worker_b).
+    // Worker B: Chalk sandbox + GPT through Chalk's Model Gateway (chalk/aegis_worker_b).
     workerB: workerBConfigured()
       ? (bytes, meta) =>
           runWorkerB(bytes, meta, {
