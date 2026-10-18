@@ -1,0 +1,9 @@
+(node:81458) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  extension loads  — onljkbhkoinihmjibfofcalimkolemam
++3014 ms  opened http://127.0.0.1:8765/setup.exe
+PASS  setup.exe: scanned  — suspicious / held / 73 s; checks: Local pre-check=ok(needs the sandbox), Known-malware lookup (Chalk SQL)=warn(unavailable), Chalk sandbox (Worker B)=fail(ConnectError: no environment "gswl7f3494e1" for team "cmvbqt4x2024j011svm11taq4"), Daytona sandbox=ok(network off, 1.2 s), Upload check (SHA-256)=ok(matched), Analysis=ok(Droid)
+PASS  setup.exe: went to a network-off Daytona sandbox that was deleted  — 8ba76c84-d201-4529-8e6b-a5c20b3f6044 network=off destroyed=2026-10-18T06:42:39.000Z
+PASS  setup.exe: never in the downloads folder before its verdict  — not in the folder
+
+4 / 4 passed

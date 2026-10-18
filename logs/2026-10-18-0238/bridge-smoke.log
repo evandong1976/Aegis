@@ -1,0 +1,42 @@
+PASS  expected 200 got 200  POST /status from the Aegis extension
+      body: {"app":"aegis","version":"0.1.0","protection":"protected","mode":"block"}
+PASS  expected 403 got 403  POST /status with no Origin
+      body: {"error":"Forbidden"}
+PASS  expected 404 got 404  GET /status (reads are POST)
+      body: {"error":"Not found"}
+PASS  expected 403 got 403  POST /status from a web page
+      body: {"error":"Forbidden"}
+PASS  expected 403 got 403  POST /status from another extension
+      body: {"error":"Forbidden"}
+PASS  expected 403 got 403  POST /status with a rebinding Host header
+      body: {"error":"Forbidden"}
+PASS  expected 204 got 204  OPTIONS /status preflight from the extension
+      body: 
+PASS  expected 200 got 200  POST /ping heartbeat
+      body: {"ok":true}
+PASS  expected 200 got 200  POST /trust example.com
+      body: {"ok":true,"domain":"example.com"}
+PASS  expected 400 got 400  POST /trust with an empty domain
+      body: {"error":"[\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"inclusive\": true,\n    \"path\": [\n      \"domain\"\n 
+PASS  expected 200 got 200  POST /page, one link
+      body: {"paused":false,"links":[{"url":"https://github.com/","urlStripped":"https://github.com/","domain":"github.com","verdict":"clean","score":0,"reasons":[],"truste
+PASS  expected 400 got 400  POST /page with a bad body
+      body: {"error":"[\n  {\n    \"expected\": \"number\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"tabId\"\n    ],\n    \"message\": \"Invalid input: ex
+PASS  expected 403 got 403  POST /page from a web page
+      body: {"error":"Forbidden"}
+PASS  expected 400 got 400  POST /click with a bad clickId
+      body: {"error":"[\n  {\n    \"origin\": \"string\",\n    \"code\": \"invalid_format\",\n    \"format\": \"uuid\",\n    \"pattern\": \"/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}
+PASS  expected 400 got 400  POST /trust bit.ly (a shortener)
+      body: {"error":"bit.ly is a link shortener"}
+FAIL  expected 501 got 400  POST /download (milestone 3)
+      body: {"error":"Unexpected end of JSON input"}
+PASS  expected 501 got 501  POST /inspect (milestone 7)
+      body: {"error":"POST /inspect is not implemented yet","notImplemented":true}
+FAIL  expected 501 got 404  POST /scan/abc (milestone 3)
+      body: {"error":"No such scan"}
+PASS  expected 404 got 404  GET /nope
+      body: {"error":"Not found"}
+
+listening sockets on port 47398 (must be 127.0.0.1 only):
+COMMAND    PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+Electron 79912 zach   40u  IPv4 0xf13736abfb991ae4      0t0  TCP 127.0.0.1:47398 (LISTEN)

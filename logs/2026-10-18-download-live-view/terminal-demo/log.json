@@ -1,0 +1,132 @@
+[
+  {
+    "at": "2026-10-18T06:39:57.167Z",
+    "level": null,
+    "text": "watcher started dir=/private/tmp/claude-501/-Users-zach-Desktop-Aegis/66c06d78-caf8-4501-9daf-4c34f283c66e/scratchpad/run-script/Downloads"
+  },
+  {
+    "at": "2026-10-18T06:39:57.176Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47398"
+  },
+  {
+    "at": "2026-10-18T06:39:57.248Z",
+    "level": "warn",
+    "text": "fnkey running=false loaded=true"
+  },
+  {
+    "at": "2026-10-18T06:39:58.100Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27863"
+  },
+  {
+    "at": "2026-10-18T06:39:58.200Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=docker state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=droid state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:59.997Z",
+    "level": null,
+    "text": "health service=fnKey state=degraded"
+  },
+  {
+    "at": "2026-10-18T06:40:04.667Z",
+    "level": "allow",
+    "text": "extension connected"
+  },
+  {
+    "at": "2026-10-18T06:40:06.761Z",
+    "level": "allow",
+    "text": "health service=bridge state=ok"
+  },
+  {
+    "at": "2026-10-18T06:40:07.053Z",
+    "level": null,
+    "text": "download received scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 name=aegis-terminal-demo.command size=524 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-18T06:40:07.053Z",
+    "level": null,
+    "text": "precheck scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 type=script sha256=a332c59fa476 cloud=true why=\"script (script)\""
+  },
+  {
+    "at": "2026-10-18T06:40:07.062Z",
+    "level": null,
+    "text": "worker B start scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 (Chalk sandbox, network off)"
+  },
+  {
+    "at": "2026-10-18T06:40:07.835Z",
+    "level": null,
+    "text": "worker B known-bad lookup: Chalk SQL: SQLError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\""
+  },
+  {
+    "at": "2026-10-18T06:40:08.101Z",
+    "level": null,
+    "text": "worker B done scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 verdict=none analyst=none findings=0 sandbox=- ms=898 error=\"ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\"\""
+  },
+  {
+    "at": "2026-10-18T06:40:10.528Z",
+    "level": "allow",
+    "text": "sandbox upload scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 sandbox=80f8ba5b-1772-4bb7-8c2f-574252163a85 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-18T06:41:06.221Z",
+    "level": null,
+    "text": "sandbox deleted scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 sandbox=80f8ba5b-1772-4bb7-8c2f-574252163a85"
+  },
+  {
+    "at": "2026-10-18T06:41:06.229Z",
+    "level": "allow",
+    "text": "download delivered scan=9fc673b9-d2e3-4805-bc42-4e94759fdbd5 verdict=clean path=/private/tmp/claude-501/-Users-zach-Desktop-Aegis/66c06d78-caf8-4501-9daf-4c34f283c66e/scratchpad/run-script/Downloads/aegis-terminal-demo.command"
+  }
+]

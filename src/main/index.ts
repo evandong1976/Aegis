@@ -186,6 +186,15 @@ function send(channel: string, payload: unknown): void {
 // The live view (feature/visualization): every sandbox scan's events, pushed to the windows.
 const live = new LiveBus((scanId, event) => send('live:event', { scanId, event }))
 
+// The first download drawn in the live view, for AEGIS_CAPTURE_LIVE=download (devcapture.ts).
+let downloadRunBegun: (scanId: string) => void = () => undefined
+const firstDownloadRun = new Promise<string>((resolve) => {
+  downloadRunBegun = (scanId) => {
+    resolve(scanId)
+    downloadRunBegun = () => undefined
+  }
+})
+
 /**
  * Opens a caught file in a real network-off sandbox with the live view on screen. Milestone 3's
  * `/download` route will call this with the intercepted bytes; until then the Downloads screen's
@@ -334,6 +343,7 @@ app.whenReady().then(async () => {
       begin: (run) => {
         live.begin({ ...run, agent: analyst(null).info })
         openMainWindow('report', run.scanId)
+        downloadRunBegun(run.scanId)
       },
       emit: (scanId, body) => live.emit(scanId, body)
     },
@@ -453,13 +463,22 @@ app.whenReady().then(async () => {
       pick ? store?.listScans({ kind: 'any', search: pick, limit: 1 })[0]?.id : undefined
     openMainWindow('overview')
     showPanel()
-    const sample = process.env.AEGIS_CAPTURE_LIVE as LiveSampleKey | undefined
+    // AEGIS_CAPTURE_LIVE: a test sample to send, or `download` for the first real download.
+    const sample = process.env.AEGIS_CAPTURE_LIVE as LiveSampleKey | 'download' | undefined
+    const start = (): Promise<{ scanId: string } | { error: string }> =>
+      sample === 'download'
+        ? firstDownloadRun.then((scanId) => ({ scanId }))
+        : startTestRun(sample as LiveSampleKey)
     scheduleCapture({
       main: getMainWindow,
       panel: getPanel,
       reportId,
       live: sample
-        ? { start: () => startTestRun(sample), finished: (id) => live.get(id)?.finished ?? false }
+        ? {
+            start,
+            finished: (id) => live.get(id)?.finished ?? false,
+            run: (id) => live.get(id)
+          }
         : undefined
     })
   }

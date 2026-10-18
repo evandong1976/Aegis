@@ -9,6 +9,7 @@ import { writeFile } from 'fs/promises'
 import { join } from 'path'
 import type { BrowserWindow } from 'electron'
 import type { MainRoute } from '@shared/ipc'
+import type { LiveRun } from '@shared/live'
 import { status } from './status'
 
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
@@ -25,10 +26,15 @@ export function scheduleCapture(opts: {
   panel: () => BrowserWindow | null
   /** Looked up when the report is captured, so it can be a scan made after launch. */
   reportId?: () => string | undefined
-  /** With AEGIS_CAPTURE_LIVE: starts a test run through a real sandbox (uses Daytona credits). */
+  /**
+   * With AEGIS_CAPTURE_LIVE: starts a test run through a real sandbox (uses Daytona credits), or
+   * waits for the first download sent to one (`download`).
+   */
   live?: {
     start: () => Promise<{ scanId: string } | { error: string }>
     finished: (scanId: string) => boolean
+    /** The run's events, saved as live-events.json (frames left out). */
+    run?: (scanId: string) => LiveRun | null
   }
 }): void {
   const dir = process.env.AEGIS_CAPTURE_DIR
@@ -97,4 +103,9 @@ async function captureLive(
     )
   await wait(500)
   await save(dir, 'live-report-scrolled', opts.main())
+  const run = live.run?.(res.scanId)
+  if (run) {
+    await writeFile(join(dir, 'live-events.json'), JSON.stringify({ ...run, frame: null }, null, 2))
+    console.log('[capture] wrote live-events.json')
+  }
 }

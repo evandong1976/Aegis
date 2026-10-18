@@ -1,0 +1,103 @@
+{
+  "protection": "protected",
+  "pausedUntil": null,
+  "mode": "block",
+  "health": [
+    {
+      "key": "bridge",
+      "name": "Bridge",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Listening on 127.0.0.1:47398; extension seen 25 s ago."
+    },
+    {
+      "key": "sqlite",
+      "name": "Local store",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Opened and migrated."
+    },
+    {
+      "key": "daytona",
+      "name": "Daytona",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "API reachable and the key works. The live test runs at start and on Check now.",
+      "latencyMs": 482
+    },
+    {
+      "key": "sandboxImage",
+      "name": "Sandbox image",
+      "required": false,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "pending",
+      "detail": "No Daytona snapshot set yet (pnpm build:sandbox, milestone 3; then AEGIS_DAYTONA_SNAPSHOT); no local Docker image aegis-sandbox."
+    },
+    {
+      "key": "docker",
+      "name": "Docker (fallback)",
+      "required": false,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Docker 29.2.1 is running.",
+      "latencyMs": 100
+    },
+    {
+      "key": "droid",
+      "name": "Droid",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Key works (67 models) through /opt/homebrew/bin/droid. The live test runs at start and on Check now.",
+      "latencyMs": 2459
+    },
+    {
+      "key": "photon",
+      "name": "Photon",
+      "required": false,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "pending",
+      "detail": "Key set. The live Photon check arrives with milestone 5."
+    },
+    {
+      "key": "chalk",
+      "name": "Chalk",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "pending",
+      "detail": "Key set. The live Chalk check arrives with milestone 6."
+    },
+    {
+      "key": "safeBrowsing",
+      "name": "Safe Browsing",
+      "required": true,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Test URL matched as expected.",
+      "latencyMs": 184
+    },
+    {
+      "key": "downloads",
+      "name": "Downloads folder",
+      "required": false,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "ok",
+      "detail": "Aegis can read ~/Downloads."
+    },
+    {
+      "key": "fnKey",
+      "name": "fn key",
+      "required": false,
+      "checkedAt": "2026-10-18T06:41:02.468Z",
+      "state": "degraded",
+      "detail": "Input Monitoring is not granted. Allow Electron (under pnpm dev) in System Settings › Privacy & Security › Input Monitoring, then Check again. ⌃⌥A works meanwhile."
+    }
+  ],
+  "activeScans": 0,
+  "extensionLastSeen": "2026-10-18T06:41:04.668Z",
+  "demo": false,
+  "page": null
+}

@@ -31,6 +31,25 @@ disagree, PLAN.md › Decisions wins.
     `PRIVACY_COPY` and the README's Privacy section now say what Droid reads.
   - **Flaky, not from this branch:** `store.test.ts › computes the overview counts` fails just
     after midnight (demo rows are "N minutes ago", so some land in yesterday).
+- **Branch `feature/download-live-view`, from `main` (0427c74): every real download gets the
+  live view** (PLAN.md decision 30), not only Downloads › **Test the sandbox**. A file
+  `ScanService` sends to the sandbox opens the main window on its run: caught → sandbox (network
+  off, probed) → opened on the sandbox's own desktop → Droid's read-only tool calls → verdict,
+  then the Report. Shell scripts (`runsAsShell`) run under `sh -x` as the test samples do; any
+  other file is only read there (`showCommand`: type, first bytes, strings), never run.
+  - **Code:** `sandboxScan.ts` splits out `openInSandbox`, `toolRunner`, `liveEmitters`,
+    `announceSandbox` / `announceUpload`; `scans.ts` gains `ScanServiceDeps.live` and passes
+    `AnalyzeContext` (`live`, `run`, `kind`) to `analyze`; `index.ts › analyzeDownload` draws
+    it. A Droid-reviewed file with no reasons now says "Reviewed in the sandbox", not "Not
+    analysed yet". `AEGIS_CAPTURE_LIVE=download` screenshots the first download's live view.
+  - **Evidence:** `logs/2026-10-18-download-live-view/SUMMARY.md`: real Chrome downloads
+    (headless, built extension) from `demo/` served as in `demo/README.md`, real Daytona and Droid,
+    screenshots every 2 s, the run's events in `live-events.json`, 0 sandboxes left.
+  - **Also on this branch** (from its first "mid-session" commit, not part of this feature): the
+    Accuracy view reads Chalk Evaluations' `evals/results.json`; a copy of `video/` and
+    `tsconfig.node.tsbuildinfo`. Check `video/` against `main`'s before merging.
+  - **Worker B** showed `ConnectError: no environment "…" for team "…"` in these runs: the Chalk
+    environment in `.env` doesn't exist for that team. Unrelated to this branch.
 - **In progress — branch `feature/visualization` (Zach), not committed (Zach asked not to yet):
   the live view (PLAN.md decision 30).** A caught file is opened in a real network-off Daytona
   sandbox while the main window shows it happening: five stages; Droid on the left, on this Mac,
@@ -64,7 +83,7 @@ disagree, PLAN.md › Decisions wins.
   What it took:
   1. **Model Gateway through a router key** (`ck-…`): `CHALK_ROUTER_API_KEY` and
      `CHALK_ROUTER_ENV_ID` in `.env.local`, limited to `openai/gpt-6.1-sol` at 1,000,000 tokens a
-     day (one scan ≈ 7,500). The `ck-` key is for *calling* the router, not an OpenAI key for a
+     day (one scan ≈ 7,500). The `ck-` key is for _calling_ the router, not an OpenAI key for a
      connection. gpt-6.1-sol rejects function tools on Chat Completions, so `agent.chat_api` sends
      it through `/v1/responses` (`ResponsesChat`).
   2. **Token permissions** `deploy.redeploy` and `query.online`, added by Evan.
@@ -79,10 +98,10 @@ disagree, PLAN.md › Decisions wins.
   - Still to do: **rotate** the older service token (its secret was printed in a session on
     2026-10-17).
   - Next: deploy the Function (`cd chalk && uv run --env-file ../.env.local python
-     -m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
-     MCP server and register it in the MCP Gateway (`mcp_server.py deploy`). The app runs Worker B
-     whenever `CHALK_CLIENT_ID/SECRET/ENVIRONMENT` are set (`local` mode by default;
-     `AEGIS_WORKER_B_VIA=function` after deploying).
+ -m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
+    MCP server and register it in the MCP Gateway (`mcp_server.py deploy`). The app runs Worker B
+    whenever `CHALK_CLIENT_ID/SECRET/ENVIRONMENT` are set (`local` mode by default;
+    `AEGIS_WORKER_B_VIA=function` after deploying).
 
 - **Merged into `main` (not pushed) — branch `feature/download` (Evan): milestone 3's intake and
   sandbox half** (PLAN.md decision 31). Zach's `watcher` branch is merged into it (docs kept from `main`).
@@ -272,7 +291,6 @@ Everything in this table was checked by `pnpm verify` on 2026-10-16 at 23:39 EDT
 | The click-guard overlay                                                        | Checked by eye in the browser pane during development, not in a logged run                                                                                                            |
 | The Daylight (light) theme                                                     | The Mac was in dark mode                                                                                                                                                              |
 | Packaging `Aegis.app` (`pnpm app`)                                             | Not run                                                                                                                                                                               |
-| The live view with a real download or the real Droid session                   | M3 (interception) and M4 (`workerA.ts`) aren't built; the test button and the scripted stand-in take their place (`logs/2026-10-17-1834-live-view/`)                                  |
 | Sponsor integrations in the app (Daytona, Droid, Chalk, Photon, Safe Browsing) | Not built yet. Daytona and Droid were checked on their own by `pnpm try:daytona` / `pnpm try:droid` (passing, evidence in `logs/2026-10-17-*`); Chalk and Photon only from their docs |
 
 ## Open issues

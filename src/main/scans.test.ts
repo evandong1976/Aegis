@@ -501,6 +501,8 @@ describe('the download pipeline', () => {
 
       expect(w.begun).toEqual(['update.sh'])
       expect(ctx).toMatchObject({ run: true, kind: 'Script' })
+      // Reviewed, with no reasons of its own: never "Not analysed yet".
+      expect(report.reason).toBe('Reviewed in the sandbox')
       expect(stages(evs)).toEqual([
         'caught:done',
         'sandbox:active',

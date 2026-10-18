@@ -1,0 +1,132 @@
+[
+  {
+    "at": "2026-10-18T06:41:19.584Z",
+    "level": null,
+    "text": "watcher started dir=/private/tmp/claude-501/-Users-zach-Desktop-Aegis/66c06d78-caf8-4501-9daf-4c34f283c66e/scratchpad/run-exe/Downloads"
+  },
+  {
+    "at": "2026-10-18T06:41:19.596Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47398"
+  },
+  {
+    "at": "2026-10-18T06:41:19.665Z",
+    "level": "warn",
+    "text": "fnkey running=false loaded=true"
+  },
+  {
+    "at": "2026-10-18T06:41:20.440Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27864"
+  },
+  {
+    "at": "2026-10-18T06:41:20.452Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=docker state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=droid state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:21.969Z",
+    "level": null,
+    "text": "health service=fnKey state=degraded"
+  },
+  {
+    "at": "2026-10-18T06:41:26.682Z",
+    "level": "allow",
+    "text": "extension connected"
+  },
+  {
+    "at": "2026-10-18T06:41:28.654Z",
+    "level": "allow",
+    "text": "health service=bridge state=ok"
+  },
+  {
+    "at": "2026-10-18T06:41:29.085Z",
+    "level": null,
+    "text": "download received scan=3428957e-af68-466a-98ae-5e69be143a5b name=setup.exe size=4096 from=chrome (in memory, not on disk)"
+  },
+  {
+    "at": "2026-10-18T06:41:29.085Z",
+    "level": null,
+    "text": "precheck scan=3428957e-af68-466a-98ae-5e69be143a5b type=pe sha256=8eb228f90384 cloud=true why=\"executable (pe)\""
+  },
+  {
+    "at": "2026-10-18T06:41:29.088Z",
+    "level": null,
+    "text": "worker B start scan=3428957e-af68-466a-98ae-5e69be143a5b (Chalk sandbox, network off)"
+  },
+  {
+    "at": "2026-10-18T06:41:29.852Z",
+    "level": null,
+    "text": "worker B known-bad lookup: Chalk SQL: SQLError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\""
+  },
+  {
+    "at": "2026-10-18T06:41:30.093Z",
+    "level": null,
+    "text": "worker B done scan=3428957e-af68-466a-98ae-5e69be143a5b verdict=none analyst=none findings=0 sandbox=- ms=878 error=\"ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\"\""
+  },
+  {
+    "at": "2026-10-18T06:41:30.788Z",
+    "level": "allow",
+    "text": "sandbox upload scan=3428957e-af68-466a-98ae-5e69be143a5b sandbox=8ba76c84-d201-4529-8e6b-a5c20b3f6044 network=off sha256=verified"
+  },
+  {
+    "at": "2026-10-18T06:42:39.104Z",
+    "level": null,
+    "text": "sandbox deleted scan=3428957e-af68-466a-98ae-5e69be143a5b sandbox=8ba76c84-d201-4529-8e6b-a5c20b3f6044"
+  },
+  {
+    "at": "2026-10-18T06:42:39.107Z",
+    "level": "warn",
+    "text": "download held scan=3428957e-af68-466a-98ae-5e69be143a5b verdict=suspicious path=/private/tmp/claude-501/-Users-zach-Desktop-Aegis/66c06d78-caf8-4501-9daf-4c34f283c66e/scratchpad/run-exe/app/quarantine/3428957e-af68-466a-98ae-5e69be143a5b/setup.exe.aegis"
+  }
+]

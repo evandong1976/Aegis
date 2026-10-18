@@ -412,7 +412,13 @@ export class ScanService {
         verdict: verdict.verdict,
         score: verdict.score,
         reasons: verdict.reasons,
-        reason: top?.text ?? (pc.needsCloud ? 'Not analysed yet' : 'Checked on this Mac'),
+        reason:
+          top?.text ??
+          (!pc.needsCloud
+            ? 'Checked on this Mac'
+            : analysed
+              ? 'Reviewed in the sandbox'
+              : 'Not analysed yet'),
         summary: workerSummary ?? this.summary(r, pc, verdict.verdict)
       })
       if (a?.droid) r.droid = a.droid

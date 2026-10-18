@@ -1,0 +1,107 @@
+[
+  {
+    "at": "2026-10-18T05:04:23.861Z",
+    "level": "allow",
+    "text": "file name=statement-sept.pdf verdict=clean checked=local uploaded=no"
+  },
+  {
+    "at": "2026-10-18T05:43:23.861Z",
+    "level": "allow",
+    "text": "link url=docs.vendor.com/api/auth verdict=clean cached=true"
+  },
+  {
+    "at": "2026-10-18T06:02:23.861Z",
+    "level": "warn",
+    "text": "file name=Q3-summary.xlsm source=watcher verdict=suspicious reason=macro-autoexec"
+  },
+  {
+    "at": "2026-10-18T06:19:23.861Z",
+    "level": "warn",
+    "text": "link url=cdn-assets-delivery.top/pkg.js verdict=suspicious reason=obfuscated-js"
+  },
+  {
+    "at": "2026-10-18T06:29:23.861Z",
+    "level": "block",
+    "text": "file name=invoice_oct.iso sha256=9c1f…04ab verdict=malicious engine=sandbox"
+  },
+  {
+    "at": "2026-10-18T06:33:23.861Z",
+    "level": "block",
+    "text": "link url=login-northwlnd-io.sbs/sso verdict=malicious rule=newly-registered+brand-match"
+  },
+  {
+    "at": "2026-10-18T06:39:23.872Z",
+    "level": null,
+    "text": "bridge listening host=127.0.0.1 port=47399"
+  },
+  {
+    "at": "2026-10-18T06:39:23.939Z",
+    "level": "warn",
+    "text": "fnkey running=false loaded=true"
+  },
+  {
+    "at": "2026-10-18T06:39:24.709Z",
+    "level": null,
+    "text": "feed loaded name=OpenPhish urls=300"
+  },
+  {
+    "at": "2026-10-18T06:39:24.837Z",
+    "level": null,
+    "text": "feed loaded name=URLhaus urls=27863"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": "warn",
+    "text": "health service=bridge state=degraded"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": "allow",
+    "text": "health service=sqlite state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": "allow",
+    "text": "health service=daytona state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": null,
+    "text": "health service=sandboxImage state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": "allow",
+    "text": "health service=docker state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.425Z",
+    "level": "allow",
+    "text": "health service=droid state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.426Z",
+    "level": null,
+    "text": "health service=photon state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:26.426Z",
+    "level": "warn",
+    "text": "health service=chalk state=pending"
+  },
+  {
+    "at": "2026-10-18T06:39:26.426Z",
+    "level": "allow",
+    "text": "health service=safeBrowsing state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.426Z",
+    "level": "allow",
+    "text": "health service=downloads state=ok"
+  },
+  {
+    "at": "2026-10-18T06:39:26.426Z",
+    "level": null,
+    "text": "health service=fnKey state=degraded"
+  }
+]

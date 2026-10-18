@@ -1,0 +1,674 @@
+{
+  "scanId": "9fc673b9-d2e3-4805-bc42-4e94759fdbd5",
+  "filename": "aegis-terminal-demo.command",
+  "size": 524,
+  "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+  "agent": {
+    "name": "Droid",
+    "mode": "droid",
+    "where": "mac"
+  },
+  "startedAt": "2026-10-18T06:40:07.053Z",
+  "events": [
+    {
+      "kind": "stage",
+      "stage": "caught",
+      "state": "done",
+      "detail": "Held before it reached your Mac · 524 bytes · SHA-256 a332c59fa476…",
+      "seq": 1,
+      "at": "2026-10-18T06:40:07.061Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "worker B (Chalk) is examining its own copy in a Chalk sandbox",
+      "seq": 2,
+      "at": "2026-10-18T06:40:07.062Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "sandbox",
+      "state": "active",
+      "detail": "Starting a fresh Daytona sandbox with the network off",
+      "seq": 3,
+      "at": "2026-10-18T06:40:07.064Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "daytona create --network-block-all --ephemeral",
+      "seq": 4,
+      "at": "2026-10-18T06:40:07.064Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "worker B (Chalk): no verdict · ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\"",
+      "seq": 5,
+      "at": "2026-10-18T06:40:08.101Z"
+    },
+    {
+      "kind": "sandbox",
+      "provider": "daytona",
+      "sandboxId": "80f8ba5b-1772-4bb7-8c2f-574252163a85",
+      "network": "off",
+      "startupMs": 2928,
+      "seq": 6,
+      "at": "2026-10-18T06:40:09.993Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "sandbox 80f8ba5b ready in 2.9 s · network off at creation",
+      "seq": 7,
+      "at": "2026-10-18T06:40:09.993Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "upload aegis-terminal-demo.command → ~/sample/file",
+      "seq": 8,
+      "at": "2026-10-18T06:40:09.993Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "sha256sum sample/file",
+      "seq": 9,
+      "at": "2026-10-18T06:40:10.528Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "out",
+      "text": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689  sample/file",
+      "seq": 10,
+      "at": "2026-10-18T06:40:10.528Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "matches the download",
+      "seq": 11,
+      "at": "2026-10-18T06:40:10.529Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "file -b sample/file",
+      "seq": 12,
+      "at": "2026-10-18T06:40:10.591Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "out",
+      "text": "POSIX shell script, ASCII text executable",
+      "seq": 13,
+      "at": "2026-10-18T06:40:10.591Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "probe example.com, registry.npmjs.org with curl, wget and python3",
+      "seq": 14,
+      "at": "2026-10-18T06:40:10.592Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "blocked",
+      "text": "all 6 attempts blocked: no network",
+      "seq": 15,
+      "at": "2026-10-18T06:40:18.669Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "sandbox",
+      "state": "done",
+      "detail": "Sandbox 80f8ba5b · network off, checked",
+      "seq": 16,
+      "at": "2026-10-18T06:40:18.669Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "opened",
+      "state": "active",
+      "detail": "Opening aegis-terminal-demo.command the way your Mac would, inside the sandbox",
+      "seq": 17,
+      "at": "2026-10-18T06:40:18.670Z"
+    },
+    {
+      "kind": "desktop",
+      "state": "starting",
+      "detail": "Starting the sandbox desktop",
+      "seq": 18,
+      "at": "2026-10-18T06:40:18.670Z"
+    },
+    {
+      "kind": "desktop",
+      "state": "on",
+      "detail": "Desktop ready in 2.8 s",
+      "seq": 19,
+      "at": "2026-10-18T06:40:21.497Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "note",
+      "text": "sh -x aegis-terminal-demo.command  (limit 30 s, scratch home, empty environment)",
+      "seq": 20,
+      "at": "2026-10-18T06:40:21.675Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "cmd",
+      "text": "printf %s\\n ============================================================ AEGIS DEMO: A downloaded script was executed. An untrusted script could have performed harmful actions here. This demo only prints this message. It makes no changes. AEGIS_DEMO_EXECUTED ============================================================",
+      "seq": 22,
+      "at": "2026-10-18T06:40:22.445Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "cmd",
+      "text": "exit 0",
+      "seq": 23,
+      "at": "2026-10-18T06:40:22.445Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "============================================================",
+      "seq": 24,
+      "at": "2026-10-18T06:40:22.532Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "AEGIS DEMO: A downloaded script was executed.",
+      "seq": 25,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "An untrusted script could have performed harmful actions here.",
+      "seq": 26,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "This demo only prints this message. It makes no changes.",
+      "seq": 27,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "AEGIS_DEMO_EXECUTED",
+      "seq": 28,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "out",
+      "text": "============================================================",
+      "seq": 29,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "term",
+      "source": "sample",
+      "stream": "note",
+      "text": "exit 0 · 2 commands · 0 files written · 0 network attempts",
+      "seq": 30,
+      "at": "2026-10-18T06:40:22.533Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "opened",
+      "state": "done",
+      "detail": "exit 0 · 2 commands · 0 files written · 0 network attempts",
+      "seq": 33,
+      "at": "2026-10-18T06:40:24.534Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "agent",
+      "state": "active",
+      "detail": "Droid is reverse engineering it from this Mac, through read-only tools",
+      "seq": 34,
+      "at": "2026-10-18T06:40:24.534Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "shell script (sh) · reference rows: .sh .bash .ps1 · 7 tools for the agent",
+      "seq": 35,
+      "at": "2026-10-18T06:40:25.145Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I'm Droid, on this Mac. aegis-terminal-demo.command is in a Daytona sandbox with no network; I reach it through 7 read-only tools chosen for its type (shell).",
+      "seq": 36,
+      "at": "2026-10-18T06:40:25.145Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll first verify the file’s type and hash, then review its shell code for harmful behavior and vulnerabilities.",
+      "seq": 42,
+      "at": "2026-10-18T06:40:30.637Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll check whether the bytes match the shell-script filename.",
+      "seq": 47,
+      "at": "2026-10-18T06:40:34.441Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "identify_file",
+      "command": "python3 -I .aegis-ebde287b8081/aegis_inspect.py identify sample/file",
+      "text": "What the file really is: magic bytes against the name it arrived with, entropy, disguised extensions. Start here.",
+      "seq": 48,
+      "at": "2026-10-18T06:40:34.447Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "python3 -I .aegis-ebde287b8081/aegis_inspect.py identify sample/file",
+      "seq": 49,
+      "at": "2026-10-18T06:40:34.448Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "== What the file really is (identify) ==",
+      "seq": 50,
+      "at": "2026-10-18T06:40:34.648Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Findings: none",
+      "seq": 51,
+      "at": "2026-10-18T06:40:34.648Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Facts:",
+      "seq": 52,
+      "at": "2026-10-18T06:40:34.649Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "identify_file",
+      "exitCode": 0,
+      "bytes": 1054,
+      "text": "== What the file really is (identify) ==\nFindings: none\nFacts:\n  name it arrived with: aegis-terminal-demo.command",
+      "seq": 53,
+      "at": "2026-10-18T06:40:34.649Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll verify the sample’s size and SHA-256 for the report.",
+      "seq": 56,
+      "at": "2026-10-18T06:40:37.049Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "describe_sample",
+      "command": "wc -c < sample/file && sha256sum sample/file",
+      "text": "Size and SHA-256 of the sample file.",
+      "seq": 57,
+      "at": "2026-10-18T06:40:37.055Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "wc -c < sample/file && sha256sum sample/file",
+      "seq": 58,
+      "at": "2026-10-18T06:40:37.055Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "524",
+      "seq": 59,
+      "at": "2026-10-18T06:40:37.160Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689  sample/file",
+      "seq": 60,
+      "at": "2026-10-18T06:40:37.160Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "describe_sample",
+      "exitCode": 0,
+      "bytes": 82,
+      "text": "524\na332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689  sample/file\n",
+      "seq": 61,
+      "at": "2026-10-18T06:40:37.160Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll run the shell review for dangerous commands, injection paths, permission issues, and unsafe temporary files.",
+      "seq": 64,
+      "at": "2026-10-18T06:40:40.015Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "review_shell",
+      "command": "python3 -I .aegis-ebde287b8081/aegis_inspect.py shell sample/file",
+      "text": "Shell and PowerShell review: download-and-run, encoded commands, persistence, protection bypasses, unsafe permissions and temp files (ShellCheck when installed).",
+      "seq": 65,
+      "at": "2026-10-18T06:40:40.022Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "python3 -I .aegis-ebde287b8081/aegis_inspect.py shell sample/file",
+      "seq": 66,
+      "at": "2026-10-18T06:40:40.022Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "== Shell / PowerShell review (shell) ==",
+      "seq": 68,
+      "at": "2026-10-18T06:40:40.235Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Findings: none",
+      "seq": 69,
+      "at": "2026-10-18T06:40:40.235Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Facts:",
+      "seq": 70,
+      "at": "2026-10-18T06:40:40.235Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "review_shell",
+      "exitCode": 0,
+      "bytes": 421,
+      "text": "== Shell / PowerShell review (shell) ==\nFindings: none\nFacts:\n  language: POSIX shell",
+      "seq": 71,
+      "at": "2026-10-18T06:40:40.235Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll read the complete script to verify its behavior and trace any inputs.",
+      "seq": 74,
+      "at": "2026-10-18T06:40:43.201Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "read_sample",
+      "command": "head -c 65536 sample/file",
+      "text": "The first 64 KB of the sample file, as text.",
+      "seq": 75,
+      "at": "2026-10-18T06:40:43.205Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "head -c 65536 sample/file",
+      "seq": 76,
+      "at": "2026-10-18T06:40:43.205Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "#!/bin/sh",
+      "seq": 77,
+      "at": "2026-10-18T06:40:43.269Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "# Harmless execution fixture. Finder opens executable .command files in Terminal.",
+      "seq": 78,
+      "at": "2026-10-18T06:40:43.269Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "# In a headless sandbox, run with sh and capture stdout instead.",
+      "seq": 79,
+      "at": "2026-10-18T06:40:43.269Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "read_sample",
+      "exitCode": 0,
+      "bytes": 524,
+      "text": "#!/bin/sh\n# Harmless execution fixture. Finder opens executable .command files in Terminal.\n# In a headless sandbox, run with sh and capture stdout instead.\n",
+      "seq": 80,
+      "at": "2026-10-18T06:40:43.269Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll check the strings for hidden destinations, persistence paths, or other suspicious content.",
+      "seq": 86,
+      "at": "2026-10-18T06:40:48.752Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "extract_strings",
+      "command": "python3 -I .aegis-ebde287b8081/aegis_inspect.py strings sample/file",
+      "text": "Readable strings with URLs, IPs and suspicious ones (shells, autostart paths, wallets, evasion) called out.",
+      "seq": 87,
+      "at": "2026-10-18T06:40:48.757Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "python3 -I .aegis-ebde287b8081/aegis_inspect.py strings sample/file",
+      "seq": 88,
+      "at": "2026-10-18T06:40:48.757Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "== Readable strings (strings) ==",
+      "seq": 89,
+      "at": "2026-10-18T06:40:48.955Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Findings: none",
+      "seq": 90,
+      "at": "2026-10-18T06:40:48.955Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Facts:",
+      "seq": 91,
+      "at": "2026-10-18T06:40:48.955Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "extract_strings",
+      "exitCode": 0,
+      "bytes": 448,
+      "text": "== Readable strings (strings) ==\nFindings: none\nFacts:\n  strings: 11 of 6+ characters",
+      "seq": 92,
+      "at": "2026-10-18T06:40:48.955Z"
+    },
+    {
+      "kind": "agent",
+      "step": "thought",
+      "text": "I’ll scan for embedded credentials and private keys.",
+      "seq": 96,
+      "at": "2026-10-18T06:40:51.669Z"
+    },
+    {
+      "kind": "agent",
+      "step": "tool",
+      "tool": "scan_secrets",
+      "command": "python3 -I .aegis-ebde287b8081/aegis_inspect.py secrets sample/file",
+      "text": "Secret scanning: API keys, tokens, private keys and passwords in the file (values masked).",
+      "seq": 97,
+      "at": "2026-10-18T06:40:51.674Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "cmd",
+      "text": "python3 -I .aegis-ebde287b8081/aegis_inspect.py secrets sample/file",
+      "seq": 98,
+      "at": "2026-10-18T06:40:51.674Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "== Secret scanning (secrets) ==",
+      "seq": 99,
+      "at": "2026-10-18T06:40:51.879Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Findings: none",
+      "seq": 100,
+      "at": "2026-10-18T06:40:51.879Z"
+    },
+    {
+      "kind": "term",
+      "source": "agent",
+      "stream": "out",
+      "text": "Facts:",
+      "seq": 101,
+      "at": "2026-10-18T06:40:51.879Z"
+    },
+    {
+      "kind": "agent",
+      "step": "result",
+      "tool": "scan_secrets",
+      "exitCode": 0,
+      "bytes": 203,
+      "text": "== Secret scanning (secrets) ==\nFindings: none\nFacts:\n  secrets scanned: 14 lines, 0 hits",
+      "seq": 102,
+      "at": "2026-10-18T06:40:51.879Z"
+    },
+    {
+      "kind": "agent",
+      "step": "verdict",
+      "verdict": "clean",
+      "text": "The script only prints a fixed message and exits; no malware or vulnerabilities were found.",
+      "seq": 114,
+      "at": "2026-10-18T06:41:05.802Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "agent",
+      "state": "done",
+      "detail": "The script only prints a fixed message and exits; no malware or vulnerabilities were found.",
+      "seq": 115,
+      "at": "2026-10-18T06:41:05.802Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "cmd",
+      "text": "daytona delete",
+      "seq": 118,
+      "at": "2026-10-18T06:41:06.221Z"
+    },
+    {
+      "kind": "term",
+      "source": "aegis",
+      "stream": "note",
+      "text": "sandbox 80f8ba5b deleted",
+      "seq": 119,
+      "at": "2026-10-18T06:41:06.221Z"
+    },
+    {
+      "kind": "stage",
+      "stage": "verdict",
+      "state": "done",
+      "detail": "The script only prints a fixed message and exits; no malware or vulnerabilities were found.",
+      "seq": 120,
+      "at": "2026-10-18T06:41:06.230Z"
+    },
+    {
+      "kind": "end",
+      "ok": true,
+      "verdict": "clean",
+      "summary": "The script only prints a fixed message and exits; no malware or vulnerabilities were found.",
+      "sandboxDeleted": true,
+      "seq": 121,
+      "at": "2026-10-18T06:41:06.230Z"
+    }
+  ],
+  "frame": null,
+  "finished": true
+}

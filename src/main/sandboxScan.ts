@@ -432,7 +432,7 @@ export async function openInSandbox(
       term('sample', 'cmd', `file -b ${filename} · first 256 bytes · strings`)
       for (const l of shown.result.split('\n').filter(Boolean).slice(0, 14))
         term('sample', 'out', l)
-      const why = `Not run: ${opts.kind ? `a ${opts.kind.toLowerCase()}` : 'this file'} isn't a shell script, so it was opened for reading only`
+      const why = `Not run: ${opts.kind ? withArticle(opts.kind.toLowerCase()) : 'this file'} isn't a shell script, so it was opened for reading only`
       term('sample', 'note', why)
       if (desktop) await sleep(opts.desktopDwellMs ?? DESKTOP_DWELL_MS)
       finish('opened', why)
@@ -471,6 +471,10 @@ export async function openInSandbox(
     throw err
   }
 }
+
+/** "an executable", "a pdf". */
+export const withArticle = (noun: string): string =>
+  `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
 
 /** True for files that run as shell scripts: by extension, or a `#!` line naming a shell. */
 export function runsAsShell(filename: string, bytes: Buffer): boolean {

@@ -1,0 +1,41 @@
+npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+gyp info it worked if it ends with ok
+gyp info using node-gyp@10.2.0
+gyp info using node@22.16.0 | darwin | arm64
+gyp info find Python using Python version 3.11.9 found at "/Users/zach/.pyenv/versions/3.11.9/bin/python3"
+
+gyp http GET https://electronjs.org/headers/v44.8.0/node-v44.8.0-headers.tar.gz
+gyp http 200 https://artifacts.electronjs.org/headers/dist/v44.8.0/node-v44.8.0-headers.tar.gz
+gyp http GET https://electronjs.org/headers/v44.8.0/SHASUMS256.txt
+gyp http 200 https://artifacts.electronjs.org/headers/dist/v44.8.0/SHASUMS256.txt
+gyp info spawn /Users/zach/.pyenv/versions/3.11.9/bin/python3
+gyp info spawn args [
+gyp info spawn args '/Users/zach/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp/gyp/gyp_main.py',
+gyp info spawn args 'binding.gyp',
+gyp info spawn args '-f',
+gyp info spawn args 'make',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/zach/Desktop/Aegis/.claude/worktrees/download-live-view/native/fn-key/build/config.gypi',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/zach/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp/addon.gypi',
+gyp info spawn args '-I',
+gyp info spawn args '/Users/zach/Library/Caches/node-gyp/44.8.0/include/node/common.gypi',
+gyp info spawn args '-Dlibrary=shared_library',
+gyp info spawn args '-Dvisibility=default',
+gyp info spawn args '-Dnode_root_dir=/Users/zach/Library/Caches/node-gyp/44.8.0',
+gyp info spawn args '-Dnode_gyp_dir=/Users/zach/.npm/_npx/4216b522ce75ecca/node_modules/node-gyp',
+gyp info spawn args '-Dnode_lib_file=/Users/zach/Library/Caches/node-gyp/44.8.0/<(target_arch)/node.lib',
+gyp info spawn args '-Dmodule_root_dir=/Users/zach/Desktop/Aegis/.claude/worktrees/download-live-view/native/fn-key',
+gyp info spawn args '-Dnode_engine=v8',
+gyp info spawn args '--depth=.',
+gyp info spawn args '--no-parallel',
+gyp info spawn args '--generator-output',
+gyp info spawn args 'build',
+gyp info spawn args '-Goutput_dir=.'
+gyp info spawn args ]
+gyp info spawn make
+gyp info spawn args [ 'BUILDTYPE=Release', '-C', 'build' ]
+  CC(target) Release/obj.target/fn_key/src/fn_key.o
+  SOLINK_MODULE(target) Release/fn_key.node
+gyp info ok 

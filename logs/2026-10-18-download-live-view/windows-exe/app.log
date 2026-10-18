@@ -1,0 +1,74 @@
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 44 modules transformed.
+rendering chunks...
+out/main/index.js  385.02 kB
+
+✓ built in 35ms
+
+electron main process built successfully
+
+-----
+
+vite v8.3.4 building ssr environment for development...
+transforming...
+✓ 3 modules transformed.
+rendering chunks...
+out/preload/index.js  1.29 kB
+
+✓ built in 7ms
+
+electron preload scripts built successfully
+
+-----
+
+dev server running for the electron renderer process at:
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+starting electron app...
+
+[capture] wrote panel.png
+[capture] wrote downloads.png
+[capture] live run 3428957e-af68-466a-98ae-5e69be143a5b
+[capture] wrote live-01.png
+[capture] wrote live-02.png
+[capture] wrote live-03.png
+[capture] wrote live-04.png
+[capture] wrote live-05.png
+[capture] wrote live-06.png
+[capture] wrote live-panel.png
+[capture] wrote live-07.png
+[capture] wrote live-08.png
+[capture] wrote live-09.png
+[capture] wrote live-10.png
+[capture] wrote live-11.png
+[capture] wrote live-12.png
+[capture] wrote live-13.png
+[capture] wrote live-14.png
+[capture] wrote live-15.png
+[capture] wrote live-16.png
+[capture] wrote live-17.png
+[capture] wrote live-18.png
+[capture] wrote live-19.png
+[capture] wrote live-20.png
+[capture] wrote live-21.png
+[capture] wrote live-22.png
+[capture] wrote live-23.png
+[capture] wrote live-24.png
+[capture] wrote live-25.png
+[capture] wrote live-26.png
+[capture] wrote live-27.png
+[capture] wrote live-28.png
+[capture] wrote live-29.png
+[capture] wrote live-30.png
+[capture] wrote live-31.png
+[capture] wrote live-32.png
+[capture] wrote live-33.png
+[capture] wrote live-34.png
+[capture] wrote live-35.png
+[capture] wrote live-36.png
+[capture] wrote live-report-scrolled.png
+[capture] wrote live-events.json
+[capture] wrote status.json, log.json

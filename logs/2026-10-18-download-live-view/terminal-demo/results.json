@@ -1,0 +1,22 @@
+[
+  {
+    "name": "extension loads",
+    "ok": true,
+    "detail": "onljkbhkoinihmjibfofcalimkolemam"
+  },
+  {
+    "name": "aegis-terminal-demo.command: scanned",
+    "ok": true,
+    "detail": "clean / delivered / 63 s; checks: Local pre-check=ok(needs the sandbox), Known-malware lookup (Chalk SQL)=warn(unavailable), Chalk sandbox (Worker B)=fail(ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\"), Daytona sandbox=ok(network off, 2.9 s), Upload check (SHA-256)=ok(matched), Analysis=ok(Droid)"
+  },
+  {
+    "name": "aegis-terminal-demo.command: went to a network-off Daytona sandbox that was deleted",
+    "ok": true,
+    "detail": "80f8ba5b-1772-4bb7-8c2f-574252163a85 network=off destroyed=2026-10-18T06:41:05.930Z"
+  },
+  {
+    "name": "aegis-terminal-demo.command: never in the downloads folder before its verdict",
+    "ok": true,
+    "detail": "appeared at +62600 ms (action delivered)"
+  }
+]

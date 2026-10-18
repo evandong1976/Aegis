@@ -1,0 +1,113 @@
+{
+  "id": "3428957e-af68-466a-98ae-5e69be143a5b",
+  "kind": "download",
+  "source": "chrome",
+  "seen_in": "Chrome",
+  "url": "http://127.0.0.1:8765/setup.exe",
+  "filename": "setup.exe",
+  "file_kind": "Executable",
+  "file_category": "Installer",
+  "sha256": "8eb228f903843fb8700913e07803f3870c8a7a56b25ad6fceb24eb65c4c4ca77",
+  "size": 4096,
+  "real_type": "pe",
+  "status": "done",
+  "action": "held",
+  "verdict": "suspicious",
+  "score": 30,
+  "reason": "MZ header without a valid PE header",
+  "summary": "The file has a malformed executable header flagged by Aegis, but no harmful behavior or exploitable vulnerability was confirmed.",
+  "reasons": [
+    {
+      "code": "pe_bad_header",
+      "text": "MZ header without a valid PE header",
+      "weight": 10,
+      "hard": false
+    }
+  ],
+  "stage1": "{\"file\":{\"name\":\"setup.exe\",\"realType\":\"pe\",\"sha256\":\"8eb228f903843fb8700913e07803f3870c8a7a56b25ad6fceb24eb65c4c4ca77\",\"size\":4096},\"findings\":[{\"severity\":\"medium\",\"title\":\"Malformed executable header\",\"detail\":\"Malware sign. Aegis flagged an MZ header without a valid PE header. This structural anomaly supports caution but does not establish malicious intent or an exploit payload. No readable strings or secrets were detected. (Droid, from analyze_binary)\"}],\"iocs\":[],\"capabilities\":[\"MZ header without a valid PE header\"],\"score\":30,\"partial\":false}",
+  "droid": "{\"timeline\":[{\"step\":1,\"tone\":\"warning\",\"title\":\"No native macOS execution expected\",\"detail\":\"macOS would not natively execute this MZ-format file. Opening behavior and any compatibility-layer handling were not tested; no subsequent malicious actions were established.\",\"evidence\":[]}],\"verdict\":\"suspicious\",\"summary\":\"The file has a malformed executable header flagged by Aegis, but no harmful behavior or exploitable vulnerability was confirmed.\",\"confidence\":\"medium\",\"unknowns\":[\"capa was not installed, so capability analysis did not run.\",\"The malformed header prevented meaningful confirmation of imports, exports, hardening, dependencies, or component versions.\",\"Fuzzing was not performed because no execution or fuzzing harness was available.\",\"Whether the malformed header was intentional, and whether any particular parser mishandles it, remain unconfirmed.\"],\"reviewer\":\"droid\"}",
+  "report": {
+    "indicators": {
+      "sha256": "8eb228f903843fb8700913e07803f3870c8a7a56b25ad6fceb24eb65c4c4ca77",
+      "realType": "pe",
+      "claimedType": "exe",
+      "signature": null,
+      "size": 4096,
+      "firstSeen": "2026-10-18T06:41:29.082Z"
+    },
+    "code": [],
+    "checks": [
+      {
+        "name": "Local pre-check",
+        "state": "ok",
+        "result": "needs the sandbox"
+      },
+      {
+        "name": "Known-malware lookup (Chalk SQL)",
+        "state": "warn",
+        "result": "unavailable"
+      },
+      {
+        "name": "Chalk sandbox (Worker B)",
+        "state": "fail",
+        "result": "ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\""
+      },
+      {
+        "name": "Daytona sandbox",
+        "state": "ok",
+        "result": "network off, 1.2 s"
+      },
+      {
+        "name": "Upload check (SHA-256)",
+        "state": "ok",
+        "result": "matched"
+      },
+      {
+        "name": "Analysis",
+        "state": "ok",
+        "result": "Droid"
+      }
+    ],
+    "sandbox": [
+      {
+        "provider": "daytona",
+        "sandboxId": "8ba76c84-d201-4529-8e6b-a5c20b3f6044",
+        "image": "Daytona default",
+        "network": "off",
+        "startupMs": 1218,
+        "runMs": 15713,
+        "ran": [
+          "ok · create: 8ba76c84-d201-4529-8e6b-a5c20b3f6044 from the default snapshot, 1 attempt, networkBlockAll=true (1.2 s)",
+          "ok · upload: sample/file + sample/meta.json (0.4 s)",
+          "ok · check upload: exit 0 (0.1 s)",
+          "ok · identify: exit 0 (0.1 s)",
+          "ok · network probe (2 hosts × 3 tools, in parallel): all blocked (8.1 s)",
+          "ok · desktop start: Xvfb + xfce4 + VNC (4.1 s)",
+          "ok · show file: exit 0 (0.3 s)",
+          "ok · open on desktop: exit 0 (0.1 s)",
+          "ok · stop what the sample left running: exit 0 (0.2 s)",
+          "ok · upload inspector: .aegis-2bfe32140a02/aegis_inspect.py (0.3 s)",
+          "ok · check inspector: exit 0 (0.1 s)",
+          "ok · identify: exit 0 (0.1 s)",
+          "ok · agent tool identify_file: exit 0 (0.1 s)",
+          "ok · agent tool describe_sample: exit 0 (0.1 s)",
+          "ok · agent tool analyze_binary: exit 0 (0.2 s)",
+          "ok · agent tool read_sample: exit 0 (0.2 s)",
+          "ok · agent tool run_capa: exit 0 (0.4 s)",
+          "ok · agent tool scan_secrets: exit 0 (0.4 s)",
+          "ok · agent tool extract_strings: exit 0 (0.4 s)",
+          "ok · delete: 8ba76c84-d201-4529-8e6b-a5c20b3f6044 (0.1 s)"
+        ],
+        "destroyedAt": "2026-10-18T06:42:39.000Z"
+      }
+    ]
+  },
+  "caught_by": null,
+  "sandboxed": 1,
+  "partial": 1,
+  "held_path": "/private/tmp/claude-501/-Users-zach-Desktop-Aegis/66c06d78-caf8-4501-9daf-4c34f283c66e/scratchpad/run-exe/app/quarantine/3428957e-af68-466a-98ae-5e69be143a5b/setup.exe.aegis",
+  "user_decision": null,
+  "duration_ms": 70025,
+  "created_at": "2026-10-18T06:41:29.082Z",
+  "updated_at": "2026-10-18T06:42:39.107Z"
+}

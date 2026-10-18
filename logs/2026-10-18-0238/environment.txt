@@ -1,0 +1,17 @@
+date:      Sun Oct 18 02:38:41 EDT 2026
+git:       f60a25b on feature/download-live-view
+node:      v22.16.0
+pnpm:      10.30.1
+electron:  44.8.0
+macOS:     26.6.2 (arm64)
+uncommitted changes:
+ M docs/PROGRESS.md
+ M docs/architectural.md
+ M src/main/devcapture.ts
+ M src/main/index.ts
+ M src/main/sandboxScan.test.ts
+ M src/main/sandboxScan.ts
+ M src/main/scans.test.ts
+ M src/main/scans.ts
+?? logs/2026-10-18-0238/
+?? logs/2026-10-18-download-live-view/

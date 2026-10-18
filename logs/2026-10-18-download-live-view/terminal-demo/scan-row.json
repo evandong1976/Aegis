@@ -1,0 +1,128 @@
+{
+  "id": "9fc673b9-d2e3-4805-bc42-4e94759fdbd5",
+  "kind": "download",
+  "source": "chrome",
+  "seen_in": "Chrome",
+  "url": "http://127.0.0.1:8765/aegis-terminal-demo.command",
+  "filename": "aegis-terminal-demo.command",
+  "file_kind": "Script",
+  "file_category": "Script",
+  "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+  "size": 524,
+  "real_type": "script",
+  "status": "done",
+  "action": "delivered",
+  "verdict": "clean",
+  "score": 0,
+  "reason": "Reviewed in the sandbox",
+  "summary": "The script only prints a fixed message and exits; no malware or vulnerabilities were found.",
+  "reasons": [],
+  "stage1": "{\"file\":{\"name\":\"aegis-terminal-demo.command\",\"realType\":\"script\",\"sha256\":\"a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689\",\"size\":524},\"findings\":[],\"iocs\":[],\"capabilities\":[],\"score\":0,\"partial\":false}",
+  "droid": "{\"timeline\":[{\"step\":1,\"tone\":\"warning\",\"title\":\"Prints a fixed message\",\"detail\":\"If executed, printf displays literal text without reading external input or executing additional commands.\",\"evidence\":[{\"path\":\"aegis-terminal-demo.command\",\"line\":5,\"code\":\"printf '%s\\\\n' \\\\\"}]},{\"step\":2,\"tone\":\"warning\",\"title\":\"Exits successfully\",\"detail\":\"The script exits with status 0. No download, persistence, credential access, or file modification appears in the code.\",\"evidence\":[{\"path\":\"aegis-terminal-demo.command\",\"line\":13,\"code\":\"exit 0\"}]}],\"verdict\":\"clean\",\"summary\":\"The script only prints a fixed message and exits; no malware or vulnerabilities were found.\",\"confidence\":\"high\",\"unknowns\":[\"ShellCheck was not installed; shell inspection used static analysis and input-flow review instead.\"],\"reviewer\":\"droid\"}",
+  "report": {
+    "indicators": {
+      "sha256": "a332c59fa4763e7ca5067845f1146f885a39263c8136c4c44260170130a7e689",
+      "realType": "script",
+      "claimedType": "command",
+      "signature": null,
+      "size": 524,
+      "firstSeen": "2026-10-18T06:40:07.050Z"
+    },
+    "code": [
+      {
+        "path": "aegis-terminal-demo.command",
+        "origin": "read inside the sandbox",
+        "startLine": 1,
+        "lines": [
+          "#!/bin/sh",
+          "# Harmless execution fixture. Finder opens executable .command files in Terminal.",
+          "# In a headless sandbox, run with sh and capture stdout instead.",
+          "",
+          "printf '%s\\n' \\",
+          "  '============================================================' \\",
+          "  'AEGIS DEMO: A downloaded script was executed.' \\",
+          "  'An untrusted script could have performed harmful actions here.' \\",
+          "  'This demo only prints this message. It makes no changes.' \\",
+          "  'AEGIS_DEMO_EXECUTED' \\",
+          "  '============================================================'",
+          "",
+          "exit 0",
+          ""
+        ],
+        "flags": []
+      }
+    ],
+    "checks": [
+      {
+        "name": "Local pre-check",
+        "state": "ok",
+        "result": "needs the sandbox"
+      },
+      {
+        "name": "Known-malware lookup (Chalk SQL)",
+        "state": "warn",
+        "result": "unavailable"
+      },
+      {
+        "name": "Chalk sandbox (Worker B)",
+        "state": "fail",
+        "result": "ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\""
+      },
+      {
+        "name": "Daytona sandbox",
+        "state": "ok",
+        "result": "network off, 2.9 s"
+      },
+      {
+        "name": "Upload check (SHA-256)",
+        "state": "ok",
+        "result": "matched"
+      },
+      {
+        "name": "Analysis",
+        "state": "ok",
+        "result": "Droid"
+      }
+    ],
+    "sandbox": [
+      {
+        "provider": "daytona",
+        "sandboxId": "80f8ba5b-1772-4bb7-8c2f-574252163a85",
+        "image": "Daytona default",
+        "network": "off",
+        "startupMs": 2928,
+        "runMs": 13678,
+        "ran": [
+          "ok · create: 80f8ba5b-1772-4bb7-8c2f-574252163a85 from the default snapshot, 1 attempt, networkBlockAll=true (2.9 s)",
+          "ok · upload: sample/file + sample/meta.json (0.4 s)",
+          "ok · check upload: exit 0 (0.2 s)",
+          "ok · identify: exit 0 (0.1 s)",
+          "ok · network probe (2 hosts × 3 tools, in parallel): all blocked (8.1 s)",
+          "ok · desktop start: Xvfb + xfce4 + VNC (2.8 s)",
+          "ok · open on desktop: exit 0 (0.2 s)",
+          "ok · run sample: sample exit 0; 2 commands, 0 files written, 0 network attempts (blocked) (0.1 s)",
+          "ok · stop what the sample left running: exit 0 (0.1 s)",
+          "ok · upload inspector: .aegis-ebde287b8081/aegis_inspect.py (0.2 s)",
+          "ok · check inspector: exit 0 (0.1 s)",
+          "ok · identify: exit 0 (0.2 s)",
+          "ok · agent tool identify_file: exit 0 (0.2 s)",
+          "ok · agent tool describe_sample: exit 0 (0.1 s)",
+          "ok · agent tool review_shell: exit 0 (0.2 s)",
+          "ok · agent tool read_sample: exit 0 (0.1 s)",
+          "ok · agent tool extract_strings: exit 0 (0.2 s)",
+          "ok · agent tool scan_secrets: exit 0 (0.2 s)",
+          "ok · delete: 80f8ba5b-1772-4bb7-8c2f-574252163a85 (0.3 s)"
+        ],
+        "destroyedAt": "2026-10-18T06:41:05.930Z"
+      }
+    ]
+  },
+  "caught_by": null,
+  "sandboxed": 1,
+  "partial": 1,
+  "held_path": null,
+  "user_decision": null,
+  "duration_ms": 59179,
+  "created_at": "2026-10-18T06:40:07.050Z",
+  "updated_at": "2026-10-18T06:41:06.229Z"
+}

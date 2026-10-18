@@ -341,7 +341,7 @@ come from a scripted stand-in, while its tool calls are Droid's real fixed tools
 
 ```mermaid
 flowchart LR
-  IN["Caught file<br/>(M3: /download · today: Test the sandbox)"] --> SS["sandboxScan.ts<br/>daytona.ts steps + live events"]
+  IN["Caught file<br/>(scans.ts downloads · Test the sandbox)"] --> SS["sandboxScan.ts openInSandbox<br/>daytona.ts steps + live events"]
   SS -->|"create (network off) · upload · probe ·<br/>sh -x · delete"| SB["Daytona sandbox<br/>network off"]
   SS -->|"computerUse.start ·<br/>screenshot every 1 s"| SB
   AG["LiveAgent<br/>scripted stand-in → workerA.ts (M4)<br/>on this Mac"] -->|"read-only tools only"| SB
@@ -367,9 +367,14 @@ flowchart LR
   VNC URLs are not used).
 - **Droid is drawn on this Mac**, outside the sandbox, with a "read-only tools" line between them
   that lights up during each call (decision 19).
-- **Trigger:** `sandboxScan()` in `index.ts` opens the main window on the new scan. M3's
-  `/download` route calls it with the intercepted bytes; until then Downloads › **Test the
-  sandbox** sends a built-in harmless sample. The mini panel shows one live line with **Watch**.
+- **Trigger:** every download `ScanService` (`scans.ts`) sends to the sandbox (Chrome's
+  `/download`, the `~/Downloads` watcher) opens the main window on its live view
+  (`ScanServiceDeps.live`), and Downloads › **Test the sandbox** sends a built-in harmless sample
+  through `sandboxScan()`. Both open the file with `openInSandbox()` (`sandboxScan.ts`): network
+  probe, desktop, then a shell script (`runsAsShell`: by name or `#!` line) runs under `sh -x`,
+  while any other file is only read there (type, first bytes, strings) in the same desktop window.
+  Worker B's (Chalk) start and result show as terminal lines. The mini panel shows one live line
+  with **Watch**.
 - **If something fails:** no desktop → the run goes on, the tab says why; the network turns out to
   be on → the file is never opened, Unknown; no sandbox → Unknown, never Clean.
 

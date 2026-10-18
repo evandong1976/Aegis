@@ -1,0 +1,22 @@
+[
+  {
+    "name": "extension loads",
+    "ok": true,
+    "detail": "onljkbhkoinihmjibfofcalimkolemam"
+  },
+  {
+    "name": "setup.exe: scanned",
+    "ok": true,
+    "detail": "suspicious / held / 73 s; checks: Local pre-check=ok(needs the sandbox), Known-malware lookup (Chalk SQL)=warn(unavailable), Chalk sandbox (Worker B)=fail(ConnectError: no environment \"gswl7f3494e1\" for team \"cmvbqt4x2024j011svm11taq4\"), Daytona sandbox=ok(network off, 1.2 s), Upload check (SHA-256)=ok(matched), Analysis=ok(Droid)"
+  },
+  {
+    "name": "setup.exe: went to a network-off Daytona sandbox that was deleted",
+    "ok": true,
+    "detail": "8ba76c84-d201-4529-8e6b-a5c20b3f6044 network=off destroyed=2026-10-18T06:42:39.000Z"
+  },
+  {
+    "name": "setup.exe: never in the downloads folder before its verdict",
+    "ok": true,
+    "detail": "not in the folder"
+  }
+]

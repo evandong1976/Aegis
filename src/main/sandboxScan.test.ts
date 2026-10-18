@@ -16,6 +16,7 @@ import {
   runsAsShell,
   showCommand,
   startSandboxScan,
+  withArticle,
   type DesktopLike
 } from './sandboxScan'
 import { FAKE_INSTALLER } from './testSamples'
@@ -307,5 +308,13 @@ describe('showCommand', () => {
     expect(cmd).toContain('>/tmp/aegis-run/out/stdout')
     expect(cmd).toContain('touch /tmp/aegis-run/out/marker')
     expect(cmd).not.toMatch(/sh -x|chmod|\.\/sample/)
+  })
+})
+
+describe('withArticle', () => {
+  it('picks a or an', () => {
+    expect(withArticle('executable')).toBe('an executable')
+    expect(withArticle('archive')).toBe('an archive')
+    expect(withArticle('pdf')).toBe('a pdf')
   })
 })
