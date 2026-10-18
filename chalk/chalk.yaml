@@ -2,4 +2,4 @@ project: Default
 environments:
     default:
         runtime: python312
-        requirements: pyproject.toml
+        requirements: requirements-deploy.txt

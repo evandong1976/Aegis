@@ -28,7 +28,7 @@ DATASET = "aegis-worker-b-samples"
 SUITE = "Aegis Worker B"
 
 
-@chalkcompute.function(name="aegis_worker_b_rules", image=image, chalk_identity=True, cpu="1", memory="2Gi", concurrency=3)
+@chalkcompute.function(name="aegis-worker-b-rules", image=image, chalk_identity=True, cpu="1", memory="2Gi", concurrency=3)
 def aegis_worker_b_rules(filename: str, data_b64: str) -> str:
     """The baseline: the playbook's tools and rules in the same sandbox, no model."""
     from aegis_worker_b.worker import run

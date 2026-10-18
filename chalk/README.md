@@ -19,7 +19,7 @@ the Model Gateway → a report whose every finding is checked against the tool o
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `sandbox_tools.py`                     | The playbook's methods as fixed tools; runs inside the sandbox; never runs the sample              |
 | `playbook.py`                          | Reads the md; picks rows and tools by real type and name                                           |
-| `agent.py`                             | The tool loop (Claude via the Model Gateway), `submit_report`, evidence check; rules-only baseline |
+| `agent.py`                             | The tool loop (GPT via the Model Gateway), `submit_report`, evidence check; rules-only baseline |
 | `chalk_sandbox.py`                     | Network-off sandbox (no hosts, all routes denied), proven off, upload + SHA-256, terminate         |
 | `worker.py`                            | One file in, one result out; what the app runs (`python -m aegis_worker_b.worker`)                 |
 | `function.py`                          | Worker B as a Chalk Function (agent code on Chalk Compute)                                         |
@@ -40,6 +40,13 @@ the root that would be the whole repository.
    the Chalk CLI's own config and never goes in `.env.local`.
 
 A leaked `.env.local` then can't change the Chalk project.
+
+**Optional: a router key.** `CHALK_ROUTER_API_KEY` (`ck-...`) with its own `CHALK_ROUTER_ENV_ID`, in
+`.env.local`, is used for the Model Gateway instead of the service token. It only reaches the router.
+The current key is limited to `openai/gpt-6.1-sol` at 1,000,000 tokens a day (one scan is about
+7,500). That model rejects function tools on Chat Completions, so `agent.chat_api` sends gpt-6.x
+calls through `/v1/responses`. The gateway's quota also needs an output cap on every request, so
+nothing calls it without `max_completion_tokens`.
 
 ## Setup
 

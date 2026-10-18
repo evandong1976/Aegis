@@ -12,13 +12,14 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 from pathlib import Path
 
 import chalkcompute
 
 from aegis_worker_b import playbook
 
-FUNCTION_NAME = "aegis_worker_b"
+FUNCTION_NAME = "aegis-worker-b"
 
 _here = Path(__file__).resolve().parent
 image = (
@@ -28,11 +29,19 @@ image = (
     .add_local_file(playbook.load_path(), "/opt/aegis/playbook.md", strategy="copy")
 )
 
+# With a router key in the deploying shell (.env.local), the Function uses it too: the key goes up
+# as a Chalk secret, never into the image. Without one it uses the workload identity.
+_router = os.environ.get("CHALK_ROUTER_API_KEY")
+router_secrets = [chalkcompute.Secret.from_local_env("CHALK_ROUTER_API_KEY")] if _router else []
+router_env = {k: os.environ[k] for k in ("CHALK_ROUTER_ENV_ID", "AEGIS_CHALK_MODEL") if _router and os.environ.get(k)}
+
 
 @chalkcompute.function(
     name=FUNCTION_NAME,
     image=image,
     chalk_identity=True,
+    secrets=router_secrets,
+    env=router_env,
     cpu="1",
     memory="2Gi",
     concurrency=3,
@@ -44,7 +53,7 @@ def aegis_worker_b(filename: str, data_b64: str) -> str:
     return json.dumps(run(filename, base64.b64decode(data_b64)))
 
 
-@chalkcompute.function(name="aegis_refresh_known_hashes", image=image, chalk_identity=True, schedule="1h")
+@chalkcompute.function(name="aegis-refresh-known-hashes", image=image, chalk_identity=True, schedule="1h")
 def aegis_refresh_known_hashes() -> None:
     """Hourly: MalwareBazaar's recent samples → the aegis_known_bad_hashes dataset (threat_intel.py)."""
     from aegis_worker_b.threat_intel import refresh

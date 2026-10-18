@@ -1,0 +1,84 @@
+[
+  {
+    "step": "1 auth (service token)",
+    "ok": true,
+    "s": 0.4,
+    "detail": {
+      "api_server": "https://api.chalk.ai",
+      "environment": "gswl7f3494e1",
+      "token": true
+    }
+  },
+  {
+    "step": "2 Model Gateway: GPT",
+    "ok": true,
+    "s": 2.1,
+    "detail": {
+      "models": [
+        "openai/gpt-6.1-sol"
+      ],
+      "using": "openai/gpt-6.1-sol",
+      "reply": "ok"
+    }
+  },
+  {
+    "step": "3 MCP Gateway answers",
+    "ok": true,
+    "s": 0.2,
+    "detail": {
+      "server": true
+    }
+  },
+  {
+    "step": "3b federated query: feed into Chalk, Chalk SQL lookup",
+    "ok": true,
+    "s": 3.0,
+    "detail": {
+      "loaded": {
+        "dataset": "aegis_known_bad_hashes",
+        "from_feed": 798,
+        "earlier": 799,
+        "uploaded": 799,
+        "at": "2026-10-18T05:25:08Z"
+      },
+      "eicar": "EICAR-Test-File (not a virus)",
+      "lookup_ms": 269
+    }
+  },
+  {
+    "step": "4 sandbox: network off (proven), upload, one tool, terminate",
+    "ok": true,
+    "s": 5.3,
+    "detail": {
+      "sandbox": "51821125-9a3e-4d42-b57b-f7c23710de97",
+      "steps": [
+        "create (Chalk sandbox, gVisor, network policy: no hosts, all routes denied): sandbox 51821125-9a3e-4d42-b57b-f7c23710de97",
+        "network probe (5 hosts \u00d7 curl, python): all blocked",
+        "upload + SHA-256 check: 129 bytes, sha256 f085bd883c31f9f8\u2026",
+        "tool identify: exit 0, 194 bytes",
+        "terminate: None"
+      ]
+    }
+  },
+  {
+    "step": "5 Worker B end to end (sh-dropper, harmless)",
+    "ok": true,
+    "s": 22.2,
+    "detail": {
+      "verdict": "malicious",
+      "analyst": "agent",
+      "analyst_error": null,
+      "verified": 2,
+      "summary": "Do not run this script: it pipes a downloaded script directly into a shell and queries a Chrome-related macOS Keychain entry. The download address uses the reserved .invalid domain, so that download should fail as written.",
+      "ms": 22036
+    }
+  },
+  {
+    "step": "6 leak check: no Aegis sandboxes left",
+    "ok": true,
+    "s": 3.1,
+    "detail": {
+      "left": 0
+    }
+  }
+]

@@ -112,6 +112,8 @@ class SampleSandbox:
     def upload(self, data: bytes) -> str:
         t0 = time.monotonic()
         want = hashlib.sha256(data).hexdigest()
+        # Chalk's upload won't create parent folders (NotFound, errno 2).
+        self.exec("mkdir", "-p", "-m", "700", SAMPLE_PATH.rsplit("/", 1)[0], timeout=30)
         self.sandbox.fs.write_bytes(SAMPLE_PATH, data, mode=0o600)
         got = (self.exec("sha256sum", SAMPLE_PATH, timeout=30).stdout_text or "").split()
         ok = bool(got) and got[0] == want

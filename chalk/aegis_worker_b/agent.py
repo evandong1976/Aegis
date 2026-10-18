@@ -252,7 +252,86 @@ def verify(report: dict, outputs: dict[str, list[str]]) -> list[dict]:
 
 def _reasoning(model: str) -> bool:
     name = model.split("/")[-1]
-    return name.startswith(("gpt-5", "o3", "o4"))
+    return name.startswith(("gpt-5", "gpt-6", "o3", "o4"))
+
+
+def _needs_responses(model: str) -> bool:
+    # gpt-6.x rejects function tools with reasoning on /v1/chat/completions, and won't run without reasoning.
+    return model.split("/")[-1].startswith("gpt-6")
+
+
+def chat_api(client: Any, model: str) -> ChatAPI:
+    """The `create(**chat_kwargs)` the loop calls: Chat Completions, or Responses for models that need it."""
+    return ResponsesChat(client.responses) if _needs_responses(model) else client.chat.completions
+
+
+class ResponsesChat:
+    """Chat Completions' `create` over the Responses API (`client.responses`), so the loop is unchanged.
+
+    Nothing is stored server-side (the gateway's token quota needs the whole history inline). Each
+    turn's reasoning comes back encrypted and is sent again before that turn's tool calls, keyed by
+    the first call's id, since the loop's messages only carry text and tool calls."""
+
+    def __init__(self, responses: Any):
+        self.responses = responses
+        self._reasoning: dict[str, list[dict]] = {}
+
+    def _input(self, messages: list[dict]) -> list[dict]:
+        items: list[dict] = []
+        for m in messages:
+            if m["role"] == "tool":
+                items.append({"type": "function_call_output", "call_id": m["tool_call_id"], "output": m["content"]})
+                continue
+            if m["role"] == "assistant":
+                calls = m.get("tool_calls") or []
+                if calls:
+                    items.extend(self._reasoning.get(calls[0]["id"], []))
+                if m.get("content"):
+                    items.append({"role": "assistant", "content": m["content"]})
+                items.extend({"type": "function_call", "call_id": c["id"], "name": c["function"]["name"],
+                              "arguments": c["function"]["arguments"]} for c in calls)
+                continue
+            items.append({"role": m["role"], "content": m["content"]})
+        return items
+
+    def create(self, *, model: str, messages: list[dict], tools: list[dict], tool_choice: Any = "auto",
+               parallel_tool_calls: bool = True, max_completion_tokens: int = 16000,
+               reasoning_effort: str | None = None) -> Any:
+        from types import SimpleNamespace as NS
+
+        resp = self.responses.create(
+            model=model,
+            input=self._input(messages),
+            tools=[{"type": "function", **t["function"]} for t in tools],
+            tool_choice=tool_choice,
+            parallel_tool_calls=parallel_tool_calls,
+            max_output_tokens=max_completion_tokens,
+            store=False,
+            **({"reasoning": {"effort": reasoning_effort}, "include": ["reasoning.encrypted_content"]} if reasoning_effort else {}),
+        )
+        output = list(resp.output or [])
+        calls = [o for o in output if o.type == "function_call"]
+        texts = [c.text for o in output if o.type == "message" for c in o.content if c.type == "output_text"]
+        refusals = [c.refusal for o in output if o.type == "message" for c in o.content if c.type == "refusal"]
+        if calls:
+            self._reasoning[calls[0].call_id] = [o.model_dump(exclude_none=True) for o in output if o.type == "reasoning"]
+        incomplete = getattr(getattr(resp, "incomplete_details", None), "reason", None)
+        finish = {"max_output_tokens": "length", "content_filter": "content_filter"}.get(incomplete or "", incomplete) \
+            or ("tool_calls" if calls else "stop")
+        u = getattr(resp, "usage", None)
+        return NS(
+            model=resp.model,
+            choices=[NS(finish_reason=finish, message=NS(
+                content="".join(texts) or None,
+                refusal="".join(refusals) or None,
+                tool_calls=[NS(id=c.call_id, function=NS(name=c.name, arguments=c.arguments)) for c in calls],
+            ))],
+            usage=None if u is None else NS(
+                prompt_tokens=u.input_tokens,
+                completion_tokens=u.output_tokens,
+                prompt_tokens_details=NS(cached_tokens=getattr(getattr(u, "input_tokens_details", None), "cached_tokens", 0)),
+            ),
+        )
 
 
 def analyze(

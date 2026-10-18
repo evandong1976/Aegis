@@ -165,3 +165,49 @@ def test_gateway_client_uses_the_router_key_when_set(monkeypatch):
     c = agent.gateway_client()
     assert c.api_key == "ck-test" and str(c.base_url).rstrip("/").endswith("/v1/router")
     assert c.default_headers["X-Chalk-Env-Id"] == "env-test"
+
+
+class FakeResponses:
+    """`client.responses`: replays Responses API outputs and records each request."""
+
+    def __init__(self, outputs):
+        self.outputs, self.calls = list(outputs), []
+
+    def create(self, **kw):
+        self.calls.append(kw)
+        usage = NS(input_tokens=100, output_tokens=10, input_tokens_details=NS(cached_tokens=80))
+        return NS(model="gpt-6.1-sol", output=self.outputs.pop(0), usage=usage, incomplete_details=None)
+
+
+class Reasoning(NS):
+    type = "reasoning"
+
+    def model_dump(self, exclude_none=False):
+        return {"type": "reasoning", "id": self.id, "encrypted_content": self.encrypted_content, "summary": []}
+
+
+def fcall(call_id, name, args):
+    return NS(type="function_call", call_id=call_id, name=name, arguments=json.dumps(args))
+
+
+def test_responses_adapter_runs_the_loop_and_replays_reasoning(sample_file):
+    s, path = sample_file("sh-dropper")
+    fake = FakeResponses([
+        [Reasoning(id="rs_1", encrypted_content="enc1"), fcall("c1", "identify", {})],
+        [fcall("c2", "submit_report", {**REPORT, "vulnerabilities": []})],
+    ])
+    chat = agent.chat_api(NS(responses=fake, chat=None), "openai/gpt-6.1-sol")
+    res = run(chat, s, path, model="openai/gpt-6.1-sol")
+    assert res.stop == "submitted" and res.model == "gpt-6.1-sol"
+    assert res.usage == {"prompt_tokens": 200, "completion_tokens": 20, "cached_tokens": 160}
+    first, second = fake.calls
+    assert first["store"] is False and first["reasoning"] == {"effort": "medium"}
+    assert first["tools"][0]["type"] == "function" and "name" in first["tools"][0] and first["max_output_tokens"] == 16000
+    assert [i.get("type") or i["role"] for i in second["input"]] == ["system", "user", "reasoning", "function_call", "function_call_output"]
+    assert second["input"][2]["encrypted_content"] == "enc1" and second["input"][4]["call_id"] == "c1"
+
+
+def test_only_gpt6_goes_through_responses():
+    client = NS(responses=object(), chat=NS(completions="cc"))
+    assert isinstance(agent.chat_api(client, "openai/gpt-6.1-sol"), agent.ResponsesChat)
+    assert agent.chat_api(client, "openai/gpt-5") == "cc"

@@ -66,7 +66,7 @@ def run(
                     model = agent.gateway_model(client)
                     result = agent.analyze(
                         filename=filename, sha256=sha, size=len(data), head=data[:4096],
-                        run_tool=run_tool, chat=client.chat.completions, model=model, log=log,
+                        run_tool=run_tool, chat=agent.chat_api(client, model), model=model, log=log,
                     )
                 except Exception as e:  # noqa: BLE001 - the gateway is optional; rules still run
                     out["analyst_error"] = f"{type(e).__name__}: {e}"[:400]
@@ -98,7 +98,7 @@ def main() -> int:
         from chalkcompute import RemoteFunction
 
         print("calling the Chalk Function aegis_worker_b", file=sys.stderr, flush=True)
-        fn = RemoteFunction.from_name("aegis_worker_b")
+        fn = RemoteFunction.from_name("aegis-worker-b")
         sys.stdout.write(fn.remote(req["filename"], req["data_b64"]))
         return 0
     data = base64.b64decode(req["data_b64"])

@@ -526,11 +526,15 @@ false})` turns a would-be Clean into Unknown, never the reverse. "AI can only ra
       every route denied (Chalk is open by default), proven off by probes before the upload; the
       agent outside it (a Chalk Function, or this Mac in `local` mode), driving it through
       `exec`. _Cost:_ two hops per tool call.
-    - **GPT through Chalk's Model Gateway** (team choice, 2026-10-18; was Claude): the OpenAI
-      connection's `openai/gpt-5` (else `gpt-5-mini`, `gpt-4.1`; `AEGIS_CHALK_MODEL` overrides),
-      OpenAI-style strict function tools with `tool_choice: required`, reasoning effort `medium`.
-      Auth is the environment's Chalk token or workload identity: the provider key stays in the
-      gateway's connection, never in Aegis.
+    - **GPT through Chalk's Model Gateway** (team choice, 2026-10-18; was Claude): with a router
+      key (`CHALK_ROUTER_API_KEY`, `ck-…`, and its `CHALK_ROUTER_ENV_ID`) it's `openai/gpt-6.1-sol`
+      at 1,000,000 tokens a day; without one, the environment's token or workload identity and the
+      first of `gpt-6.1-sol`, `gpt-5`, `gpt-5-mini`, `gpt-4.1` the gateway lists
+      (`AEGIS_CHALK_MODEL` overrides). OpenAI-style strict function tools with `tool_choice:
+      required`, reasoning effort `medium`. gpt-6.x calls go through the Responses API (it rejects
+      tools on Chat Completions), with nothing stored server-side. The provider key stays in the
+      gateway, never in Aegis; the router key is a Chalk key, uploaded to the Function as a Chalk
+      secret.
     - **Federated query: known-bad hashes.** MalwareBazaar's recent-samples export (abuse.ch,
       public) is merged hourly into the Chalk dataset `aegis_known_bad_hashes` (rolling 30 days,
       plus EICAR) by a scheduled Chalk Function, and each file's SHA-256 is looked up with one Chalk

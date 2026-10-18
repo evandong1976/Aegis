@@ -36,20 +36,29 @@ disagree, PLAN.md › Decisions wins.
     `.claude/` in `eslint.config.mjs`.
 
 - **In progress — branch `feature/chalk` (Evan): milestone 6, Worker B** (PLAN.md decision 32).
-  Built and unit-tested (61 Python tests, `pnpm test:chalk`; 220 TS tests); **not yet run
-  against Chalk**. `pnpm try:chalk` (2026-10-18 00:17) passes auth and the MCP Gateway, and fails
-  on two account settings only Evan can change:
-  1. The service token has only `agents.read` and `query.offline`; it needs `deploy.create` and
-     `deploy.read` (image builds, sandboxes) and whatever running Functions/Evaluations needs.
-     **Rotate it**: its secret was printed in a session on 2026-10-17.
-  2. The Model Gateway's OpenAI connection ("GPT") holds a `ck-…` key, which OpenAI rejects; it
-     needs an OpenAI `sk-…` key. Worker B uses GPT (switched from Claude at Evan's request).
-  3. The new token (`token-f484…`, 2026-10-18) still lacks `deploy.redeploy` ("Redeploy an existing
-     deployment": running commands in a sandbox, deleting its volume) and `query.online` ("Query
-     online features": Chalk SQL). The feed upload already works: 799 hashes in
-     `aegis_known_bad_hashes` (04:52 UTC).
-     Then: `pnpm try:chalk` → deploy the Function (`cd chalk && uv run --env-file ../.env.local python
--m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
+  Built and unit-tested (74 Python tests, `pnpm test:chalk`). **`pnpm try:chalk` passes 7/7**
+  (2026-10-18 01:25, `logs/2026-10-18-0125-try-chalk/`): auth, the Model Gateway, the MCP Gateway,
+  the feed into Chalk plus the Chalk SQL lookup (EICAR matched in 269 ms), the network-off sandbox,
+  Worker B end to end (sh-dropper → malicious, 2 verified findings, gpt-6.1-sol) and the leak check.
+  What it took:
+  1. **Model Gateway through a router key** (`ck-…`): `CHALK_ROUTER_API_KEY` and
+     `CHALK_ROUTER_ENV_ID` in `.env.local`, limited to `openai/gpt-6.1-sol` at 1,000,000 tokens a
+     day (one scan ≈ 7,500). The `ck-` key is for *calling* the router, not an OpenAI key for a
+     connection. gpt-6.1-sol rejects function tools on Chat Completions, so `agent.chat_api` sends
+     it through `/v1/responses` (`ResponsesChat`).
+  2. **Token permissions** `deploy.redeploy` and `query.online`, added by Evan.
+  3. **A first `chalk apply`** (Chalk SQL needs a running query server; until then every query was
+     `UNIMPLEMENTED`). `chalk.yaml` installs only `requirements-deploy.txt` (`chalkpy`): Worker B's
+     `mcp` needs pydantic ≥ 2.12 and the engine pins < 2. `.chalkignore` keeps `aegis_worker_b/`
+     out of the apply, since importing `function.py` deploys Functions. Run it with
+     `--dir …/Aegis/chalk`: from a folder without `chalk.yaml` the CLI walks that whole folder.
+  4. **Fixes found live:** the sample's folder is created before upload (Chalk's upload won't make
+     parents), and Function names are DNS labels (`aegis-worker-b`, `aegis-refresh-known-hashes`,
+     `aegis-worker-b-rules`).
+  - Still to do: **rotate** the older service token (its secret was printed in a session on
+    2026-10-17).
+  - Next: deploy the Function (`cd chalk && uv run --env-file ../.env.local python
+     -m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
      MCP server and register it in the MCP Gateway (`mcp_server.py deploy`). The app runs Worker B
      whenever `CHALK_CLIENT_ID/SECRET/ENVIRONMENT` are set (`local` mode by default;
      `AEGIS_WORKER_B_VIA=function` after deploying).
