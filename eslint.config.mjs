@@ -15,6 +15,8 @@ export default defineConfig(
       'design-system/**',
       'figma/**',
       'screens/**',
+      // The product video is its own package (video/package.json), not app code.
+      'video/**',
       '_to_delete/**'
     ]
   },

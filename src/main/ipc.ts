@@ -3,7 +3,8 @@
 import { app, ipcMain, shell } from 'electron'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import type { EvalResults, IpcInvoke, InvokeChannel, MainRoute } from '@shared/ipc'
+import { parseEvalResults, type EvalResultsReply } from '@shared/evals'
+import type { IpcInvoke, InvokeChannel, MainRoute } from '@shared/ipc'
 import type { LiveRun, LiveSampleKey } from '@shared/live'
 import { status } from './status'
 import { getSettings, setSettings } from './settings'
@@ -21,13 +22,14 @@ function handle<C extends InvokeChannel>(channel: C, fn: Handler<C>): void {
   ipcMain.handle(channel, (_event, ...args) => fn(...(args as IpcInvoke[C]['args'])))
 }
 
-async function readEvalResults(): Promise<EvalResults | null> {
+async function readEvalResults(): Promise<EvalResultsReply> {
+  let raw: string
   try {
-    const raw = await readFile(join(app.getAppPath(), 'evals', 'results.json'), 'utf8')
-    return JSON.parse(raw) as EvalResults
+    raw = await readFile(join(app.getAppPath(), 'evals', 'results.json'), 'utf8')
   } catch {
     return null
   }
+  return parseEvalResults(raw)
 }
 
 export function registerIpc(

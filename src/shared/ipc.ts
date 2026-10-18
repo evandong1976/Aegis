@@ -1,5 +1,6 @@
 // Typed IPC between the main process and the renderer (via the preload API).
 
+import type { EvalResultsReply } from './evals'
 import type { LiveEvent, LiveRun, LiveSampleKey } from './live'
 import type { AppStatus, LogEntry, ScanReport, ScanSummary, ServiceHealth } from './types'
 
@@ -17,18 +18,6 @@ export interface Settings {
 export interface TrustedSite {
   domain: string
   addedAt: string
-}
-
-export interface EvalResults {
-  ranAt: string
-  datasets: Record<string, { size: number }>
-  configurations: Array<{
-    name: string
-    precision: number
-    recall: number
-    falseAlarmRate: number
-    msPerVerdict: number
-  }>
 }
 
 export type LinkTab = 'held' | 'blocked' | 'allowed' | 'all'
@@ -83,7 +72,8 @@ export interface IpcInvoke {
   'settings:set': { args: [patch: Partial<Settings>]; result: Settings }
   'trusted:list': { args: []; result: TrustedSite[] }
   'trusted:remove': { args: [domain: string]; result: TrustedSite[] }
-  'evals:get': { args: []; result: EvalResults | null }
+  /** evals/results.json (src/shared/evals.ts): null when there's none, `{ error }` when unreadable. */
+  'evals:get': { args: []; result: EvalResultsReply }
   'protection:pause': { args: []; result: AppStatus }
   'protection:resume': { args: []; result: AppStatus }
   /** Retries the fn key after Input Monitoring is granted; opens the System Settings pane if not. */
