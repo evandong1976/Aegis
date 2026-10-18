@@ -1,6 +1,7 @@
-// Worker B (MEGA_PROMPT §5.3, §5.6; PLAN.md decision 32): the same file, examined by Claude
+// Worker B (MEGA_PROMPT §5.3, §5.6; PLAN.md decision 32): the same file, examined by a GPT model
 // through Chalk's Model Gateway, using the playbook in docs/file_types_vulnerabilities.md, with the
-// tools running in a network-off Chalk sandbox. The Chalk side is Python (chalk/aegis_worker_b):
+// tools running in a network-off Chalk sandbox. Its SHA-256 is first looked up in the known-malware
+// feed kept in Chalk (a federated Chalk SQL query); a match is a hard rule. The Chalk side is Python (chalk/aegis_worker_b):
 // this module hands it the bytes on stdin and reads one JSON result back.
 //
 // Two ways to reach it (AEGIS_WORKER_B_VIA):
@@ -35,6 +36,17 @@ const LogSchema = z.object({
   detail: z.string().default('')
 })
 
+const KnownBadSchema = z.object({
+  matched: z.boolean().optional(),
+  matches: z
+    .array(
+      z.object({ sha256: z.string(), signature: z.string(), source: z.string() }).passthrough()
+    )
+    .default([]),
+  source: z.string().optional(),
+  error: z.string().optional()
+})
+
 export const WorkerBResultSchema = z.object({
   worker: z.literal('B'),
   provider: z.literal('chalk'),
@@ -42,6 +54,7 @@ export const WorkerBResultSchema = z.object({
   sandbox_id: z.string().optional(),
   error: z.string().optional(),
   analyst_error: z.string().optional(),
+  known_bad: KnownBadSchema.optional(),
   ms: z.number(),
   sandbox_log: z.array(LogSchema).default([]),
   analysis: z
@@ -172,7 +185,7 @@ export function workerBReport(
   ]
   if (a) {
     checks.push({
-      name: a.analyst === 'agent' ? 'Worker B analyst (Claude via Chalk)' : 'Worker B (rules only)',
+      name: a.analyst === 'agent' ? 'Worker B analyst (GPT via Chalk)' : 'Worker B (rules only)',
       state:
         a.verdict === 'malicious'
           ? 'fail'
@@ -182,7 +195,17 @@ export function workerBReport(
       result: `${a.verdict}, ${a.tool_log.length} tools${a.analyst === 'rules' && res.analyst_error ? ', model unavailable' : ''}`
     })
   }
-  const verified = (a?.vulnerabilities ?? []).filter((v) => v.verified)
+  // The federated lookup: a listed hash is a hard rule (MEGA_PROMPT §5.3, like a feed match on a link).
+  const kb = res.known_bad
+  const hit = kb?.matched ? kb.matches[0] : undefined
+  if (kb) {
+    checks.unshift({
+      name: 'Known-malware lookup (Chalk SQL)',
+      state: hit ? 'fail' : kb.error ? 'warn' : 'ok',
+      result: hit ? `listed: ${hit.signature}`.slice(0, 80) : kb.error ? 'unavailable' : 'no match'
+    })
+  }
+  const verified = (a?.vulnerabilities ?? []).filter((v) => v.verified && v.tool !== 'known_hashes')
   const reasons: Reason[] = verified.map((v) => ({
     code: `worker_b_${v.type
       .toLowerCase()
@@ -193,6 +216,17 @@ export function workerBReport(
     weight: 0,
     hard: false
   }))
+  if (hit) {
+    reasons.unshift({
+      code: 'known_bad_hash',
+      text: `Known malware: this exact file is listed by ${hit.source} as ${hit.signature}`.slice(
+        0,
+        200
+      ),
+      weight: 100,
+      hard: true
+    })
+  }
   const code: CodeExcerpt[] = verified
     .map((v) => ({ v, line: Number(/line (\d+)/i.exec(v.location)?.[1]) }))
     .filter(({ line }) => Number.isInteger(line) && line > 0)
@@ -223,7 +257,7 @@ export function workerBReport(
     : null
   const analysed = a?.analyst === 'agent' && a.verdict !== 'unknown'
   return {
-    verdict: a && a.verdict !== 'unknown' ? a.verdict : null,
+    verdict: hit ? 'malicious' : a && a.verdict !== 'unknown' ? a.verdict : null,
     summary: a?.summary ?? null,
     reasons,
     code,

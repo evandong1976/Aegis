@@ -337,7 +337,7 @@ describe('the download pipeline', () => {
       expect(report).toMatchObject({ verdict: 'malicious', action: 'quarantined' })
       expect(report.summary).toBe('Downloads a script from the internet and runs it.')
       expect(report.sandbox.map((x) => x.provider).sort()).toEqual(['chalk', 'daytona'])
-      expect(report.checks.map((c) => c.name)).toContain('Worker B analyst (Claude via Chalk)')
+      expect(report.checks.map((c) => c.name)).toContain('Worker B analyst (GPT via Chalk)')
       expect(report.code[0]).toMatchObject({ startLine: 2 })
     })
 
@@ -357,6 +357,30 @@ describe('the download pipeline', () => {
       const MACHO = Buffer.from([0xcf, 0xfa, 0xed, 0xfe, 0x0c, 0, 0, 1, 0, 0, 0, 0])
       const report = await finished(svc, svc.fromChrome(MACHO, meta('photo.jpg')))
       expect(report.verdict).toBe('malicious')
+    })
+
+    it('a known-malware hash quarantines the file through the hard rule', async () => {
+      const svc = service({
+        workerB: async () =>
+          bResult(
+            { verdict: 'clean', vulnerabilities: [] },
+            {
+              known_bad: {
+                matched: true,
+                matches: [
+                  {
+                    sha256: 'a'.repeat(64),
+                    signature: 'EICAR-Test-File (not a virus)',
+                    source: 'EICAR test file'
+                  }
+                ]
+              }
+            }
+          )
+      })
+      const report = await finished(svc, svc.fromChrome(SCRIPT, meta('update.sh')))
+      expect(report).toMatchObject({ verdict: 'malicious', action: 'quarantined', score: 100 })
+      expect(report.reasons[0]).toMatchObject({ code: 'known_bad_hash', hard: true })
     })
 
     it('a rules-only or failed Worker B leaves it Unknown and held', async () => {

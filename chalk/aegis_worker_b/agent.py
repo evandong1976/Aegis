@@ -1,4 +1,4 @@
-"""Worker B's analyst: Claude, reached through Chalk's Model Gateway, working through the playbook.
+"""Worker B's analyst: a GPT model, reached through Chalk's Model Gateway, working through the playbook.
 
 The agent never touches the sample. It sees the playbook (docs/file_types_vulnerabilities.md),
 the file's name, size and hash, and the output of the fixed tools in sandbox_tools.py, which run
@@ -23,7 +23,9 @@ from typing import Any, Callable, Protocol
 
 from . import playbook
 
-DEFAULT_MODEL = "claude-opus-5-5"
+#: Tried in order against the gateway's model list (ids carry the connection prefix, e.g. openai/).
+PREFERRED_MODELS = ["gpt-6.1-sol", "gpt-5", "gpt-5-mini", "gpt-4.1"]
+DEFAULT_MODEL = "openai/gpt-6.1-sol"
 MAX_TURNS = 14
 MAX_TOOL_CALLS = 24
 TOOL_OUTPUT_CAP = 12_000
@@ -39,8 +41,9 @@ You examine it only through the tools you are given; each one runs a fixed analy
 the file inside that sandbox and returns JSON.
 
 How to work:
-1. Start with `identify` to learn what the file really is. An extension does not establish a \
-vulnerability, and a name can lie (a ".jpg" that is a program).
+1. Start with `identify` to learn what the file really is, and `known_hashes` to check its SHA-256 \
+against the known-malware feed kept in Chalk. An extension does not establish a vulnerability, and \
+a name can lie (a ".jpg" that is a program). A known_hashes match is malicious by definition.
 2. Find the playbook row(s) below that match the real type, and run the tools that implement \
 that row's "methods to discover them". The user message suggests a starting plan; follow the \
 evidence beyond it when it points somewhere.
@@ -69,7 +72,7 @@ The playbook (docs/file_types_vulnerabilities.md):
 {playbook}"""
 
 
-# ── tool definitions for Claude ─────────────────────────────────────────────────────────────────
+# ── tool definitions for the model ──────────────────────────────────────────────────────────────
 
 TOOL_DESCRIPTIONS = {
     "identify": "Size, SHA-256, first bytes and `file`'s answer: what the file really is.",
@@ -93,59 +96,60 @@ TOOL_DESCRIPTIONS = {
     "binary_inspect": "Executable format, imported/exported symbols, dangerous APIs, signs of packing.",
 }
 
+#: Tools that run outside the sandbox, on data Aegis already has (never on the sample's bytes).
+HOST_TOOLS = {
+    "known_hashes": "Look up this file's SHA-256 in the known-malware feed kept in Chalk "
+    "(MalwareBazaar, via a federated Chalk SQL query). Takes no input: Aegis supplies the hash.",
+}
+
 LANGUAGES = ["c", "python", "javascript", "php", "sql", "shell"]
 
 
+def _function(name: str, description: str, parameters: dict) -> dict:
+    return {"type": "function", "function": {"name": name, "description": description, "parameters": parameters, "strict": True}}
+
+
+def _object(properties: dict, required: list[str]) -> dict:
+    return {"type": "object", "properties": properties, "required": required, "additionalProperties": False}
+
+
 def tool_definitions() -> list[dict]:
+    """OpenAI-style function tools, all strict (arguments always match the schema)."""
     defs = []
-    for name, desc in TOOL_DESCRIPTIONS.items():
-        schema: dict[str, Any] = {"type": "object", "properties": {}, "required": [], "additionalProperties": False}
+    for name, desc in {**TOOL_DESCRIPTIONS, **HOST_TOOLS}.items():
+        props: dict[str, Any] = {}
         if name == "read_lines":
-            schema["properties"] = {
+            props = {
                 "start": {"type": "integer", "description": "first line, from 1"},
                 "count": {"type": "integer", "description": "how many lines, at most 200"},
             }
-            schema["required"] = ["start", "count"]
         if name == "code_patterns":
-            schema["properties"] = {"language": {"type": "string", "enum": LANGUAGES}}
-            schema["required"] = ["language"]
-        defs.append({"name": name, "description": desc, "input_schema": schema, "strict": True})
-    defs.append(
+            props = {"language": {"type": "string", "enum": LANGUAGES}}
+        defs.append(_function(name, desc, _object(props, list(props))))
+    vuln = _object(
         {
-            "name": "submit_report",
-            "description": "File the final report. Call exactly once, when done.",
-            "strict": True,
-            "input_schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": ["verdict", "confidence", "summary", "file_type", "playbook_rows", "vulnerabilities", "unknowns"],
-                "properties": {
-                    "verdict": {"type": "string", "enum": ["clean", "suspicious", "malicious", "unknown"]},
-                    "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
-                    "summary": {"type": "string"},
-                    "file_type": {"type": "string", "description": "what the file really is"},
-                    "playbook_rows": {"type": "array", "items": {"type": "string"}, "description": "the rows you followed, e.g. '.sh, .bash, .ps1'"},
-                    "vulnerabilities": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "required": ["type", "severity", "tool", "location", "evidence", "explanation"],
-                            "properties": {
-                                "type": {"type": "string", "description": "the playbook's name for it, e.g. 'Zip Slip', 'XXE'"},
-                                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
-                                "tool": {"type": "string", "enum": list(TOOL_DESCRIPTIONS)},
-                                "location": {"type": "string", "description": "line N, member path, offset or symbol"},
-                                "evidence": {"type": "string", "description": "copied from the tool output"},
-                                "explanation": {"type": "string"},
-                            },
-                        },
-                    },
-                    "unknowns": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-        }
+            "type": {"type": "string", "description": "the playbook's name for it, e.g. 'Zip Slip', 'XXE'"},
+            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+            "tool": {"type": "string", "enum": list(TOOL_DESCRIPTIONS) + list(HOST_TOOLS)},
+            "location": {"type": "string", "description": "line N, member path, offset or symbol"},
+            "evidence": {"type": "string", "description": "copied from the tool output"},
+            "explanation": {"type": "string"},
+        },
+        ["type", "severity", "tool", "location", "evidence", "explanation"],
     )
+    report = _object(
+        {
+            "verdict": {"type": "string", "enum": ["clean", "suspicious", "malicious", "unknown"]},
+            "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+            "summary": {"type": "string"},
+            "file_type": {"type": "string", "description": "what the file really is"},
+            "playbook_rows": {"type": "array", "items": {"type": "string"}, "description": "the rows you followed, e.g. '.sh, .bash, .ps1'"},
+            "vulnerabilities": {"type": "array", "items": vuln},
+            "unknowns": {"type": "array", "items": {"type": "string"}},
+        },
+        ["verdict", "confidence", "summary", "file_type", "playbook_rows", "vulnerabilities", "unknowns"],
+    )
+    defs.append(_function("submit_report", "File the final report. Call exactly once, when done.", report))
     return defs
 
 
@@ -188,17 +192,19 @@ class ToolExecutor(Protocol):
     def __call__(self, tool: str, args: list[str]) -> dict: ...
 
 
-class MessagesAPI(Protocol):
+class ChatAPI(Protocol):
+    """`client.chat.completions` of an OpenAI-compatible client (the Model Gateway)."""
+
     def create(self, **kwargs: Any) -> Any: ...
 
 
 # ── the loop ────────────────────────────────────────────────────────────────────────────────────
 
 
-def system_blocks() -> list[dict]:
+def system_message() -> dict:
+    # Identical for every file and first in the request, so the provider's prompt cache reuses it.
     text = SYSTEM_PROMPT.format(fence_open=FENCE_OPEN, fence_close=FENCE_CLOSE, playbook=playbook.load_text())
-    # Stable across every file, so it's cached (tools render before it and are stable too).
-    return [{"type": "text", "text": text, "cache_control": {"type": "ephemeral"}}]
+    return {"role": "system", "content": text}
 
 
 def brief(filename: str, sha256: str, size: int, head: bytes) -> str:
@@ -244,6 +250,11 @@ def verify(report: dict, outputs: dict[str, list[str]]) -> list[dict]:
     return checked
 
 
+def _reasoning(model: str) -> bool:
+    name = model.split("/")[-1]
+    return name.startswith(("gpt-5", "o3", "o4"))
+
+
 def analyze(
     *,
     filename: str,
@@ -251,7 +262,7 @@ def analyze(
     size: int,
     head: bytes,
     run_tool: ToolExecutor,
-    messages_api: MessagesAPI,
+    chat: ChatAPI,
     model: str = DEFAULT_MODEL,
     effort: str = "medium",
     deadline_s: float = 100.0,
@@ -259,11 +270,11 @@ def analyze(
 ) -> AgentResult:
     started = time.monotonic()
     tools = tool_definitions()
-    system = system_blocks()
-    messages: list[dict] = [{"role": "user", "content": brief(filename, sha256, size, head)}]
+    messages: list[dict] = [system_message(), {"role": "user", "content": brief(filename, sha256, size, head)}]
     outputs: dict[str, list[str]] = {}
     tool_log: list[dict] = []
-    usage = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0}
+    usage = {"prompt_tokens": 0, "completion_tokens": 0, "cached_tokens": 0}
+    extra = {"reasoning_effort": effort} if _reasoning(model) else {}
     nudged = False
     stop = ""
 
@@ -271,24 +282,40 @@ def analyze(
         if time.monotonic() - started > deadline_s:
             stop = "deadline"
             break
-        resp = messages_api.create(
+        resp = chat.create(
             model=model,
-            max_tokens=16000,
-            system=system,
-            tools=tools,
             messages=messages,
-            output_config={"effort": effort},
+            tools=tools,
+            # Only tools: it works through them and answers with submit_report, never plain text.
+            tool_choice="required",
+            parallel_tool_calls=True,
+            max_completion_tokens=16000,
+            **extra,
         )
-        for k in usage:
-            usage[k] += int(getattr(resp.usage, k, 0) or 0)
-        stop = resp.stop_reason
-        if stop == "refusal":
+        u = getattr(resp, "usage", None)
+        if u is not None:
+            usage["prompt_tokens"] += int(getattr(u, "prompt_tokens", 0) or 0)
+            usage["completion_tokens"] += int(getattr(u, "completion_tokens", 0) or 0)
+            details = getattr(u, "prompt_tokens_details", None)
+            usage["cached_tokens"] += int(getattr(details, "cached_tokens", 0) or 0)
+        choice = resp.choices[0]
+        msg = choice.message
+        stop = choice.finish_reason or ""
+        if stop == "content_filter" or getattr(msg, "refusal", None):
+            stop = "refusal"
             break
-        messages.append({"role": "assistant", "content": resp.content})
-        uses = [b for b in resp.content if getattr(b, "type", "") == "tool_use"]
-        report = next((b for b in uses if b.name == "submit_report"), None)
+        calls = list(getattr(msg, "tool_calls", None) or [])
+        messages.append({
+            "role": "assistant",
+            "content": msg.content,
+            **({"tool_calls": [{"id": c.id, "type": "function", "function": {"name": c.function.name, "arguments": c.function.arguments}} for c in calls]} if calls else {}),
+        })
+        report = next((c for c in calls if c.function.name == "submit_report"), None)
         if report is not None:
-            r = dict(report.input)
+            try:
+                r = json.loads(report.function.arguments or "{}")
+            except json.JSONDecodeError:
+                r = {}
             return AgentResult(
                 verdict=r.get("verdict", "unknown"),
                 confidence=r.get("confidence", "low"),
@@ -298,34 +325,38 @@ def analyze(
                 vulnerabilities=verify(r, outputs),
                 unknowns=list(r.get("unknowns", [])),
                 tool_log=tool_log,
-                model=model,
+                model=getattr(resp, "model", None) or model,
                 turns=turn,
                 stop="submitted",
                 usage=usage,
             )
-        if not uses:
+        if not calls:
             if nudged:
                 break
             nudged = True
             messages.append({"role": "user", "content": "Call submit_report now with what you have found."})
             continue
-        results = []
-        for b in uses:
+        for c in calls:
+            name = c.function.name
             if len(tool_log) >= MAX_TOOL_CALLS:
-                results.append({"type": "tool_result", "tool_use_id": b.id, "is_error": True, "content": "Tool budget used up. Call submit_report."})
+                messages.append({"role": "tool", "tool_call_id": c.id, "content": "Tool budget used up. Call submit_report."})
                 continue
-            args = _args(b.name, dict(b.input))
+            try:
+                inp = json.loads(c.function.arguments or "{}")
+            except json.JSONDecodeError:
+                inp = {}
+            args = _args(name, inp)
             t0 = time.monotonic()
             try:
-                out = run_tool(b.name, args)
+                out = run_tool(name, args) if name in TOOL_DESCRIPTIONS or name in HOST_TOOLS else {"error": f"no tool {name!r}"}
                 ok = "error" not in out
             except Exception as e:  # noqa: BLE001 - a failed tool is a result for the agent
                 out, ok = {"error": f"{type(e).__name__}: {e}"[:300]}, False
             body = json.dumps(out, default=str)
-            outputs.setdefault(b.name, []).append(body)
+            outputs.setdefault(name, []).append(body)
             entry = ToolRun(
                 at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                tool=b.name,
+                tool=name,
                 args=args,
                 ok=ok,
                 ms=int((time.monotonic() - t0) * 1000),
@@ -334,9 +365,8 @@ def analyze(
                 detail=str(out.get("error", ""))[:200] if not ok else "",
             )
             tool_log.append(asdict(entry))
-            log(f"tool {b.name} {' '.join(args)} ok={ok} findings={entry.findings} {entry.ms}ms")
-            results.append({"type": "tool_result", "tool_use_id": b.id, "content": fence(out), "is_error": not ok})
-        messages.append({"role": "user", "content": results})
+            log(f"tool {name} {' '.join(args)} ok={ok} findings={entry.findings} {entry.ms}ms")
+            messages.append({"role": "tool", "tool_call_id": c.id, "content": fence(out)})
 
     return AgentResult(
         verdict="unknown",
@@ -387,32 +417,47 @@ def baseline(*, filename: str, head: bytes, run_tool: ToolExecutor) -> AgentResu
 
 
 def gateway_client() -> Any:
-    """An Anthropic client pointed at Chalk's Model Gateway, authenticated as this environment
-    (a service token on a developer's machine, the workload identity inside Chalk). No provider
-    key ever reaches this code."""
-    from anthropic import Anthropic
+    """An OpenAI-compatible client pointed at Chalk's Model Gateway. With CHALK_ROUTER_API_KEY (a
+    router key, `ck-...`, scoped to its own environment CHALK_ROUTER_ENV_ID) it uses that key;
+    otherwise it authenticates as this environment (a service token on a developer's machine, the
+    workload identity inside Chalk). The provider key lives in the gateway's connection; it never
+    reaches this code."""
+    from openai import OpenAI
+
+    router_key = os.environ.get("CHALK_ROUTER_API_KEY")
+    if router_key:
+        return OpenAI(
+            base_url=os.environ.get("CHALK_ROUTER_BASE_URL", "https://api.chalk.ai/v1/router"),
+            api_key=router_key,
+            default_headers={"X-Chalk-Env-Id": os.environ["CHALK_ROUTER_ENV_ID"]},
+            max_retries=3,
+            timeout=120.0,
+        )
+
     from chalkcompute._connect import ConnectClient
 
     conn = ConnectClient()
     conn._ensure_auth()
     api = (conn._api_server or "https://api.chalk.ai").rstrip("/")
-    return Anthropic(
+    return OpenAI(
         base_url=f"{api}/v1/router",
-        api_key=None,
-        auth_token=conn._access_token,
+        api_key=conn._access_token,
         default_headers={"X-Chalk-Env-Id": conn._env_id or os.environ.get("CHALK_ENVIRONMENT", "")},
         max_retries=3,
         timeout=120.0,
     )
 
 
-def gateway_model(client: Any, wanted: str = DEFAULT_MODEL) -> str:
-    """The gateway's name for `wanted` (it carries the connection's prefix, e.g. anthropic/…)."""
+def gateway_model(client: Any) -> str:
+    """AEGIS_CHALK_MODEL, else the first of PREFERRED_MODELS the gateway lists (with its prefix)."""
     override = os.environ.get("AEGIS_CHALK_MODEL")
     if override:
         return override
     ids = [m.id for m in client.models.list()]
-    for i in ids:
-        if i == wanted or i.endswith("/" + wanted):
-            return i
-    raise RuntimeError(f"the Model Gateway offers no {wanted}; it has: {', '.join(ids) or 'nothing'}")
+    for wanted in PREFERRED_MODELS:
+        for i in ids:
+            if i == wanted or i.endswith("/" + wanted):
+                return i
+    if not ids:
+        raise RuntimeError("the Model Gateway lists no models (check the provider connection's API key)")
+    raise RuntimeError(f"none of {PREFERRED_MODELS} in the Model Gateway; it has: {', '.join(ids[:20])}")

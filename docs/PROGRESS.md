@@ -42,7 +42,12 @@ disagree, PLAN.md › Decisions wins.
   1. The service token has only `agents.read` and `query.offline`; it needs `deploy.create` and
      `deploy.read` (image builds, sandboxes) and whatever running Functions/Evaluations needs.
      **Rotate it**: its secret was printed in a session on 2026-10-17.
-  2. The Model Gateway has no provider connection (0 models). Add Anthropic.
+  2. The Model Gateway's OpenAI connection ("GPT") holds a `ck-…` key, which OpenAI rejects; it
+     needs an OpenAI `sk-…` key. Worker B uses GPT (switched from Claude at Evan's request).
+  3. The new token (`token-f484…`, 2026-10-18) still lacks `deploy.redeploy` ("Redeploy an existing
+     deployment": running commands in a sandbox, deleting its volume) and `query.online` ("Query
+     online features": Chalk SQL). The feed upload already works: 799 hashes in
+     `aegis_known_bad_hashes` (04:52 UTC).
      Then: `pnpm try:chalk` → deploy the Function (`cd chalk && uv run --env-file ../.env.local python
 -m aegis_worker_b.function`) → evals (`python -m aegis_worker_b.evals`) → optionally deploy the
      MCP server and register it in the MCP Gateway (`mcp_server.py deploy`). The app runs Worker B

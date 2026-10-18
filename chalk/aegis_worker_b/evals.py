@@ -2,7 +2,7 @@
 
 Dataset: every labeled sample in samples.py (planted vulnerabilities + clean controls).
 Two evaluations in one suite, on the same dataset revision, so the dashboard compares them:
-  - "worker-b agent": the full Worker B (Claude through the Model Gateway, tools in the sandbox)
+  - "worker-b agent": the full Worker B (GPT through the Model Gateway, tools in the sandbox)
   - "worker-b rules": the playbook's rules alone, no model (the baseline the agent must beat)
 Scorers: scoring.py's three, plus the built-in json_valid.
 

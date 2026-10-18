@@ -1,8 +1,10 @@
 """pnpm try:chalk — checks every Chalk piece Worker B uses, then runs one harmless sample end to end.
 
 1. Auth: the service token in .env.local gets a Chalk access token.
-2. Model Gateway: lists models; finds claude-opus-5-5 (or AEGIS_CHALK_MODEL).
-3. MCP Gateway: answers initialize (lists registered tools).
+2. Model Gateway: lists models; picks GPT (or AEGIS_CHALK_MODEL); one tiny completion.
+3. MCP Gateway: answers initialize.
+3b. Federated query: loads MalwareBazaar's feed into the Chalk dataset, then finds EICAR's hash
+    with Chalk SQL.
 4. Sandbox: builds the image, creates the sandbox with the network off, proves it off from inside
    (probes must all fail), uploads and hash-checks a sample, runs one tool, terminates.
 5. Worker B: the demo shell script (`sh-dropper`, harmless) through the agent; prints the verdict.
@@ -53,11 +55,14 @@ def main() -> int:
         c._ensure_auth()
         return {"api_server": c._api_server, "environment": c._env_id, "token": bool(c._access_token)}
 
-    @step("2 Model Gateway: claude-opus-5-5")
+    @step("2 Model Gateway: GPT")
     def _():
         client = agent.gateway_client()
         ids = [m.id for m in client.models.list()]
-        return {"models": ids, "using": agent.gateway_model(client)}
+        model = agent.gateway_model(client)
+        r = client.chat.completions.create(model=model, messages=[{"role": "user", "content": "Reply with the word: ok"}],
+                                           max_completion_tokens=400)
+        return {"models": ids[:12], "using": model, "reply": r.choices[0].message.content}
 
     @step("3 MCP Gateway answers")
     def _():
@@ -78,6 +83,16 @@ def main() -> int:
         with urllib.request.urlopen(req, timeout=30) as r:
             body = r.read().decode()
         return {"server": "chalk-mcp-gateway" in body}
+
+    @step("3b federated query: feed into Chalk, Chalk SQL lookup")
+    def _():
+        from aegis_worker_b import threat_intel
+
+        loaded = threat_intel.refresh(log=lambda m: print("   ", m, flush=True))
+        hit = threat_intel.lookup(threat_intel.EICAR["sha256"])
+        miss = threat_intel.lookup("0" * 64)
+        assert hit.get("matched") and miss.get("matched") is False, (hit, miss)
+        return {"loaded": loaded, "eicar": hit["matches"][0]["signature"], "lookup_ms": hit["ms"]}
 
     @step("4 sandbox: network off (proven), upload, one tool, terminate")
     def _():

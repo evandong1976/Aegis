@@ -23,7 +23,7 @@ FUNCTION_NAME = "aegis_worker_b"
 _here = Path(__file__).resolve().parent
 image = (
     chalkcompute.Image.debian_slim("3.12")
-    .pip_install(["anthropic==1.11.0", "chalkcompute"])
+    .pip_install(["openai==3.24.0", "chalkcompute"])
     .add_local_python_source("aegis_worker_b")
     .add_local_file(playbook.load_path(), "/opt/aegis/playbook.md", strategy="copy")
 )
@@ -42,6 +42,14 @@ def aegis_worker_b(filename: str, data_b64: str) -> str:
     from aegis_worker_b.worker import run
 
     return json.dumps(run(filename, base64.b64decode(data_b64)))
+
+
+@chalkcompute.function(name="aegis_refresh_known_hashes", image=image, chalk_identity=True, schedule="1h")
+def aegis_refresh_known_hashes() -> None:
+    """Hourly: MalwareBazaar's recent samples → the aegis_known_bad_hashes dataset (threat_intel.py)."""
+    from aegis_worker_b.threat_intel import refresh
+
+    refresh()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 """The Chalk sandbox that holds the sample: network off, tools baked in, deleted in a `finally`.
 
-Network off means an empty host allow-list *and* every IPv4 and IPv6 route denied (Chalk
-sandboxes on the `host` compute class are open by default; denied routes win over everything).
+Network off means an empty host allow-list *and* every IPv4 route denied (Chalk sandboxes on the
+`host` compute class are open by default; denied routes win over everything; Chalk takes IPv4 CIDRs
+only, so IPv6 is covered by the probe).
 It is proven off from inside, with the same probes `try-daytona` uses, before the sample goes in;
 a sandbox that can reach anything is terminated and refused.
 """
@@ -24,7 +25,15 @@ TOOLS_PATH = "/opt/aegis/sandbox_tools.py"
 PLAYBOOK_PATH = "/opt/aegis/playbook.md"
 LIFETIME = "600s"  # a backstop: the sandbox is terminated in a finally long before this
 
-PROBE_URLS = ["https://example.com", "https://registry.npmjs.org/", "https://api.chalk.ai", "http://1.1.1.1"]
+# An ordinary site, a package registry, Chalk's own API, and raw IPv4 and IPv6 addresses (Chalk's
+# denied_routes take IPv4 CIDRs only, so IPv6 is proven blocked here rather than assumed).
+PROBE_URLS = [
+    "https://example.com",
+    "https://registry.npmjs.org/",
+    "https://api.chalk.ai",
+    "http://1.1.1.1",
+    "http://[2606:4700:4700::1111]",
+]
 
 
 def image() -> Any:
@@ -48,7 +57,9 @@ def image() -> Any:
 def network_off() -> Any:
     from chalkcompute import NetworkPolicy
 
-    return NetworkPolicy(allowed_hosts=[], denied_routes=["0.0.0.0/0", "::/0"])
+    # No hostnames allowed, and every IPv4 route denied (Chalk accepts IPv4 CIDRs only here; the
+    # IPv6 probe covers the rest).
+    return NetworkPolicy(allowed_hosts=[], denied_routes=["0.0.0.0/0"])
 
 
 def probe_command() -> str:

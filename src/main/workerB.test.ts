@@ -63,7 +63,7 @@ export function bResult(
       ],
       unknowns: [],
       tool_log: [{ tool: 'identify' }, { tool: 'code_patterns' }],
-      model: 'anthropic/claude-opus-5-5',
+      model: 'openai/gpt-5',
       turns: 3,
       stop: 'submitted',
       analyst: 'agent',
@@ -90,7 +90,7 @@ describe('Worker B result → report', () => {
     expect(rep.sandbox?.destroyedAt).toBe('2026-10-18T03:00:40Z')
     expect(rep.checks.map((c) => c.name)).toEqual([
       'Chalk sandbox (Worker B)',
-      'Worker B analyst (Claude via Chalk)'
+      'Worker B analyst (GPT via Chalk)'
     ])
   })
 
@@ -118,6 +118,36 @@ describe('Worker B result → report', () => {
     expect(rep.verdict).toBeNull()
     expect(rep.checks[0]).toMatchObject({ state: 'fail' })
     expect(rep.sandbox).toBeNull()
+  })
+})
+
+describe('the known-malware lookup (Chalk SQL)', () => {
+  const listed = {
+    matched: true,
+    matches: [{ sha256: 'a'.repeat(64), signature: 'RemusStealer', source: 'MalwareBazaar' }],
+    source: 'Chalk SQL over chalk.datasets.aegis_known_bad_hashes'
+  }
+
+  it('a listed hash is a hard rule, even when the analyst says clean', () => {
+    const rep = workerBReport(
+      bResult({ verdict: 'clean', vulnerabilities: [] }, { known_bad: listed }),
+      'x.exe'
+    )
+    expect(rep.verdict).toBe('malicious')
+    expect(rep.reasons[0]).toMatchObject({ code: 'known_bad_hash', hard: true })
+    expect(rep.reasons[0].text).toContain('MalwareBazaar as RemusStealer')
+    expect(rep.checks[0]).toMatchObject({ name: 'Known-malware lookup (Chalk SQL)', state: 'fail' })
+  })
+
+  it('no match and an unanswered lookup are reported differently', () => {
+    const miss = workerBReport(bResult({}, { known_bad: { matched: false, matches: [] } }), 'a.sh')
+    expect(miss.checks[0]).toMatchObject({ state: 'ok', result: 'no match' })
+    const err = workerBReport(
+      bResult({}, { known_bad: { matches: [], error: 'Chalk SQL: permission' } }),
+      'a.sh'
+    )
+    expect(err.checks[0]).toMatchObject({ state: 'warn', result: 'unavailable' })
+    expect(err.reasons.some((r) => r.hard)).toBe(false)
   })
 })
 
