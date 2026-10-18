@@ -1,0 +1,13 @@
+{
+  "name": "aegis-video",
+  "private": true,
+  "type": "module",
+  "description": "Aegis product video: animated scenes in HTML, rendered frame by frame with headless Chrome.",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "puppeteer-core": "^24.43.1"
+  }
+}

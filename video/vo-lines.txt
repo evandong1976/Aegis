@@ -1,0 +1,11 @@
+s01|Every day, you click links you didn't write, and open files you didn't make.
+s02|Most antivirus checks a file after it's already on your Mac. Then it tells you two words. Threat detected. Not what it would have done. Not why.
+s03|This is Aegis. It opens the dangerous stuff so you don't have to, and shows you exactly what it would have done.
+s04|Every link gets a verdict before you click, without ever being opened. Lookalike domains. Link text that lies. Three day old sites asking for your password. Checked in under a second.
+s05|Downloads are caught in memory, before they ever touch your disk. Risky files go to a throwaway Daytona sandbox, with the network cut off from the moment it's created.
+s06|Then you watch it run. Factory Droid reverse engineers the file from your Mac, through read only tools that only work inside the sandbox. Every call home fails.
+s07|When the run ends, you get the answer in plain English. It would have fetched a second stage, started itself at login, and gone looking for your passwords.
+s08|And the AI can't be talked out of it. It can only raise the verdict Aegis's rules produce. Never lower it. Aegis never calls anything safe. Without evidence, the answer is Unknown.
+s09|Every claim is backed by a saved run.
+s10|Next, a second analyst in Chalk, and verdicts over iMessage with Photon.
+s11|Aegis. See what's behind the click, before it lands.
