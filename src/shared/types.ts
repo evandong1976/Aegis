@@ -160,7 +160,7 @@ export const CodeExcerptSchema = z.object({
 export type CodeExcerpt = z.infer<typeof CodeExcerptSchema>
 
 export const SandboxRecordSchema = z.object({
-  provider: z.enum(['daytona', 'docker']),
+  provider: z.enum(['daytona', 'docker', 'chalk']),
   sandboxId: z.string(),
   image: z.string(),
   network: z.enum(['off', 'on']),

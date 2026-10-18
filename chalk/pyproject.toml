@@ -6,6 +6,7 @@ description = "Chalk project"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
 dependencies = [
+  "anthropic==1.11.0",
   "chalkcompute",
   "chalkpy[runtime]",
 ]

@@ -9,6 +9,7 @@ import type { CreateParams, SandboxClient, SandboxLike } from './daytona'
 import { createQuarantine } from './quarantine'
 import { safeName, ScanService, type ScanServiceDeps } from './scans'
 import { createDeliveredLedger } from './watcher'
+import { bResult } from './workerB.test'
 
 const SCRIPT = Buffer.from('#!/bin/sh\necho AEGIS_DEMO_EXECUTED\n')
 const PDF = Buffer.from('%PDF-1.7\n1 0 obj << /Type /Catalog >>\n')
@@ -317,5 +318,70 @@ describe('the download pipeline', () => {
     const ids = [1, 2, 3, 4, 5].map((n) => svc.fromChrome(SCRIPT, meta(`s${n}.sh`)))
     for (const id of ids) await finished(svc, id)
     expect(peak).toBe(2)
+  })
+
+  describe('with Worker B (Chalk)', () => {
+    it('runs both workers on the same bytes; B can raise the verdict', async () => {
+      const daytona = fakeDaytona()
+      let got: Buffer | null = null
+      const svc = service({
+        sandboxClient: async () => daytona.client,
+        workerB: async (bytes) => {
+          got = bytes
+          return bResult()
+        }
+      })
+      const report = await finished(svc, svc.fromChrome(SCRIPT, meta('update.sh')))
+      expect(got).toEqual(SCRIPT)
+      expect(daytona.made).toHaveLength(1)
+      expect(report).toMatchObject({ verdict: 'malicious', action: 'quarantined' })
+      expect(report.summary).toBe('Downloads a script from the internet and runs it.')
+      expect(report.sandbox.map((x) => x.provider).sort()).toEqual(['chalk', 'daytona'])
+      expect(report.checks.map((c) => c.name)).toContain('Worker B analyst (Claude via Chalk)')
+      expect(report.code[0]).toMatchObject({ startLine: 2 })
+    })
+
+    it("B's clean answer alone clears the file, marked partial (Worker A missing)", async () => {
+      const svc = service({
+        workerB: async () =>
+          bResult({ verdict: 'clean', vulnerabilities: [], summary: 'No threats found.' })
+      })
+      const report = await finished(svc, svc.fromChrome(SCRIPT, meta('update.sh')))
+      expect(report).toMatchObject({ verdict: 'clean', action: 'delivered', partial: true })
+    })
+
+    it("B can't lower a hard rule", async () => {
+      const svc = service({
+        workerB: async () => bResult({ verdict: 'clean', vulnerabilities: [] })
+      })
+      const MACHO = Buffer.from([0xcf, 0xfa, 0xed, 0xfe, 0x0c, 0, 0, 1, 0, 0, 0, 0])
+      const report = await finished(svc, svc.fromChrome(MACHO, meta('photo.jpg')))
+      expect(report.verdict).toBe('malicious')
+    })
+
+    it('a rules-only or failed Worker B leaves it Unknown and held', async () => {
+      for (const workerB of [
+        async () => bResult({ analyst: 'rules', verdict: 'clean', vulnerabilities: [] }),
+        async () => {
+          throw new Error('PermissionDenied: deploy.create')
+        }
+      ]) {
+        const svc = service({ sandboxClient: async () => null, workerB })
+        const report = await finished(svc, svc.fromChrome(SCRIPT, meta('update.sh')))
+        expect(report).toMatchObject({ verdict: 'unknown', action: 'held', partial: true })
+      }
+    })
+
+    it('never sends a cleared document to Worker B', async () => {
+      let calls = 0
+      const svc = service({
+        workerB: async () => {
+          calls++
+          return bResult()
+        }
+      })
+      await finished(svc, svc.fromChrome(PDF, meta('statement.pdf')))
+      expect(calls).toBe(0)
+    })
   })
 })

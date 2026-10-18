@@ -32,6 +32,7 @@ import { startSandboxScan, type SandboxScanInput } from './sandboxScan'
 import type { SandboxClient } from './daytona'
 import { FAKE_INSTALLER } from './testSamples'
 import { ScanService } from './scans'
+import { runWorkerB, workerBConfigured } from './workerB'
 import { createQuarantine } from './quarantine'
 import { createDeliveredLedger, startWatcher, type Watcher } from './watcher'
 
@@ -235,6 +236,14 @@ app.whenReady().then(async () => {
     mode: () => status.mode,
     takeSandboxJob: () => store?.takeSandboxJob(getSettings(store).sandboxDailyBudget) ?? false,
     concurrency: config.sandboxConcurrency,
+    // Worker B: Chalk sandbox + Claude through Chalk's Model Gateway (chalk/aegis_worker_b).
+    workerB: workerBConfigured()
+      ? (bytes, meta) =>
+          runWorkerB(bytes, meta, {
+            root: app.getAppPath(),
+            onLine: (line) => status.record(null, `worker B ${line}`)
+          })
+      : undefined,
     log: (level, text) => status.record(level, text),
     onActive: (count) => {
       status.activeScans = count
